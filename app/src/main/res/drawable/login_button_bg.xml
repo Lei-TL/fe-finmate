@@ -1,0 +1,19 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Khi nhấn -->
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#5A2BEA" /> <!-- Tím đậm hơn -->
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+
+    <!-- Trạng thái bình thường -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#6C3CF0" /> <!-- Màu tím chính -->
+            <corners android:radius="12dp" />
+        </shape>
+    </item>
+
+</selector>
