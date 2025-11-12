@@ -1,16 +1,19 @@
-package com.finmate;
+package com.finmate.layout;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import com.finmate.R;
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.ValueFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +75,12 @@ public class MainActivity extends AppCompatActivity {
         xAxis.setTextColor(Color.LTGRAY);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setGranularity(1f);
-        xAxis.setValueFormatter((value, axis) -> "Tháng " + (int) value);
+        xAxis.setValueFormatter(new ValueFormatter() {
+            @Override
+            public String getAxisLabel(float value, AxisBase axis) {
+                return "Tháng " + (int) value;
+            }
+        });
 
         // === Tùy chỉnh trục Y ===
         YAxis leftAxis = chart.getAxisLeft();
@@ -90,4 +98,3 @@ public class MainActivity extends AppCompatActivity {
         chart.invalidate();
     }
 }
-

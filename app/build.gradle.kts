@@ -1,3 +1,4 @@
+// Reverting to Java configuration
 plugins {
     alias(libs.plugins.android.application)
 }

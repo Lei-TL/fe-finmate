@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:background="#44464E"
     android:gravity="center"
-    tools:context=".MainActivity">
+    tools:context=".layout.MainActivity">
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/lineChart"
