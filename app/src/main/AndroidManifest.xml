@@ -10,6 +10,38 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.FinMate" />
+        android:theme="@style/Theme.FinMate">
+
+        <!-- Màn hình mở đầu tiên -->
+        <activity
+            android:name="com.finmate.LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Màn hình đăng ký -->
+        <activity
+            android:name="com.finmate.SignUpActivity"
+            android:exported="false" />
+
+        <!-- Màn hình chính -->
+        <activity
+            android:name="com.finmate.HomeActivity"
+            android:exported="false" />
+
+        <!-- Màn hình Cài đặt -->
+        <activity
+            android:name="com.finmate.SettingsActivity"
+            android:exported="false" />
+
+        <!-- Màn hình Bạn bè -->
+        <activity
+            android:name="com.finmate.FriendActivity"
+            android:exported="false" />
+
+    </application>
 
 </manifest>

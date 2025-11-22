@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace = "com.finmate"
-    compileSdk = 36
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.finmate"
-        minSdk = 31
-        targetSdk = 36
+        minSdk = 28
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -35,6 +35,7 @@ dependencies {
     implementation(libs.mpandroidchart)
     implementation(libs.appcompat)
     implementation(libs.material)
+    implementation(libs.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
