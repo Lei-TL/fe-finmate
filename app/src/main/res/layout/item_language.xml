@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="@drawable/bg_card"
+    android:paddingHorizontal="16dp"
+    android:layout_marginBottom="12dp">
+
+    <!-- FLAG -->
+    <ImageView
+        android:id="@+id/imgFlag"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/ic_flag_vn"
+        android:contentDescription="Language Flag" />
+
+    <!-- LANGUAGE NAME -->
+    <TextView
+        android:id="@+id/tvLanguageName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Vietnamese"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:layout_marginStart="16dp" />
+
+</LinearLayout>

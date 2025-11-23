@@ -1,0 +1,133 @@
+package com.finmate;
+
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Bundle;
+import android.view.MenuItem;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.ArrayList;
+
+public class HomeActivity extends AppCompatActivity {
+
+    LineChart lineChart;
+    BottomNavigationView bottomNavigation;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_home);
+
+        lineChart = findViewById(R.id.lineChart);
+        bottomNavigation = findViewById(R.id.bottomNavigation);
+
+        // Đặt mục nav_home được chọn khi vào màn hình
+        bottomNavigation.setSelectedItemId(R.id.nav_home);
+
+        setupChart();
+        setupBottomNavigation();
+    }
+
+    // =======================================
+    // 🚀 PHẦN 1: BIỂU ĐỒ THU – CHI
+    // =======================================
+    private void setupChart() {
+        ArrayList<Entry> income = new ArrayList<>();
+        ArrayList<Entry> expense = new ArrayList<>();
+
+        // ----- Dữ liệu mẫu (tháng 1 - 6) -----
+        income.add(new Entry(1, 60));
+        income.add(new Entry(2, 80));
+        income.add(new Entry(3, 90));
+        income.add(new Entry(4, 70));
+        income.add(new Entry(5, 85));
+        income.add(new Entry(6, 60));
+
+        expense.add(new Entry(1, 20));
+        expense.add(new Entry(2, 40));
+        expense.add(new Entry(3, 35));
+        expense.add(new Entry(4, 50));
+        expense.add(new Entry(5, 45));
+        expense.add(new Entry(6, 55));
+
+        LineDataSet incomeSet = new LineDataSet(income, "Thu nhập");
+        incomeSet.setColor(Color.GREEN);
+        incomeSet.setCircleColor(Color.GREEN);
+        incomeSet.setLineWidth(2f);
+        incomeSet.setValueTextColor(Color.WHITE);
+
+        LineDataSet expenseSet = new LineDataSet(expense, "Chi tiêu");
+        expenseSet.setColor(Color.MAGENTA);
+        expenseSet.setCircleColor(Color.MAGENTA);
+        expenseSet.setLineWidth(2f);
+        expenseSet.setValueTextColor(Color.WHITE);
+
+        LineData data = new LineData(incomeSet, expenseSet);
+        lineChart.setData(data);
+
+        // Tùy chỉnh trục X
+        XAxis xAxis = lineChart.getXAxis();
+        xAxis.setTextColor(Color.WHITE);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+
+        // Trục Y trái
+        YAxis leftAxis = lineChart.getAxisLeft();
+        leftAxis.setTextColor(Color.WHITE);
+
+        // Tắt trục Y phải
+        lineChart.getAxisRight().setEnabled(false);
+
+        // Chú thích
+        Legend legend = lineChart.getLegend();
+        legend.setTextColor(Color.WHITE);
+
+        // Tắt mô tả góc
+        lineChart.getDescription().setEnabled(false);
+
+        // Animation
+        lineChart.animateY(1000);
+    }
+
+    // =======================================
+    // 🚀 PHẦN 2: BOTTOM NAVIGATION
+    // =======================================
+    private void setupBottomNavigation() {
+        bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                Intent intent = null;
+                int itemId = item.getItemId();
+
+                if (itemId == R.id.nav_home) {
+                    // Đang ở màn hình Home, không làm gì
+                    return true;
+                } else if (itemId == R.id.nav_wallet) {
+                    intent = new Intent(HomeActivity.this, WalletActivity.class);
+                } else if (itemId == R.id.nav_add) {
+                    intent = new Intent(HomeActivity.this, AddTransactionActivity.class);
+                } else if (itemId == R.id.nav_statistic) {
+                    intent = new Intent(HomeActivity.this, StatisticActivity.class);
+                } else if (itemId == R.id.nav_settings) {
+                    intent = new Intent(HomeActivity.this, SettingsActivity.class);
+                }
+
+                if (intent != null) {
+                    startActivity(intent);
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                }
+                return true;
+            }
+        });
+    }
+}

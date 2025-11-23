@@ -1,0 +1,32 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+
+    <!-- Cốc -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3"
+        android:pathData="M12,10 L36,10 L34,38 L14,38 Z" />
+
+    <!-- Miệng ly -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3"
+        android:pathData="M12,10 L36,10" />
+
+    <!-- Ống hút -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="3"
+        android:pathData="M24,4 L24,10" />
+
+    <!-- Nước bên trong -->
+    <path
+        android:fillColor="#44FFFFFF"
+        android:pathData="M14,22 L34,22 L33,36 L15,36 Z" />
+</vector>

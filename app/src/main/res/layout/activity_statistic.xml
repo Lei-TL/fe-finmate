@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#0F1624"
+    android:orientation="vertical">
+
+    <!-- ====== BACK BUTTON ====== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:padding="4dp"
+            android:src="@drawable/ic_back"
+            app:tint="#FFFFFF" />
+    </LinearLayout>
+
+    <!-- ====== TAB CHI TIÊU / THU NHẬP ====== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:id="@+id/tvExpenseTab"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Chi tiêu"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/tvIncomeTab"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Thu nhập"
+            android:textSize="18sp"
+            android:textColor="#777777"
+            android:gravity="center" />
+    </LinearLayout>
+
+    <!-- ====== TỔNG CHI TIÊU ====== -->
+    <TextView
+        android:id="@+id/tvTotalExpense"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="-10,000,000 VND"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="12dp" />
+
+    <!-- ====== NỘI DUNG CHÍNH (CHART + PIE) ====== -->
+    <ScrollView
+        android:id="@+id/scrollContent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- DÒNG CHỌN LOẠI -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvAddTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Thống kê chi tiêu theo tháng"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+            </LinearLayout>
+
+            <!-- DROPDOWN 1 -->
+            <TextView
+                android:id="@+id/tvCategoryFilter"
+                android:layout_width="140dp"
+                android:layout_height="40dp"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="12dp"
+                android:text="Theo thể loại"
+                android:background="@drawable/edittext_bg"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp" />
+
+            <!-- BAR CHART -->
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/barChart"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:layout_marginTop="12dp" />
+
+            <!-- TIÊU ĐỀ PIE CHART -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="So sánh các loại chi tiêu"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="24dp" />
+
+            <!-- PIE CHART -->
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/pieChart"
+                android:layout_width="match_parent"
+                android:layout_height="260dp"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- ====== BOTTOM NAVIGATION ====== -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:background="@drawable/bg_bottom_nav"
+        app:itemIconTint="@color/selector_nav_color"
+        app:itemTextColor="@color/selector_nav_color"
+        app:menu="@menu/menu_bottom" />
+
+</LinearLayout>
