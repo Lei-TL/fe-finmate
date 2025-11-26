@@ -1,14 +1,14 @@
-package com.finmate;
+package com.finmate.UI.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.finmate.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class SettingsActivity extends AppCompatActivity {

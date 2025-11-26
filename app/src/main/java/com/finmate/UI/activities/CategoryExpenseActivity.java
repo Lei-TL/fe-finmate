@@ -1,4 +1,4 @@
-package com.finmate;
+package com.finmate.UI.activities;
 
 
 
@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.finmate.R;
 import com.finmate.adapters.CategoryGridAdapter;
 import com.finmate.adapters.CategoryListAdapter;
 import com.finmate.models.CategoryModel;

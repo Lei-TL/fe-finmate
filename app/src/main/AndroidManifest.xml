@@ -12,9 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FinMate">
 
-        <!-- Màn hình mở đầu tiên -->
+        <!-- Màn hình đăng nhập (Launcher) -->
         <activity
-            android:name="com.finmate.LoginActivity"
+            android:name=".UI.activities.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,25 +22,19 @@
             </intent-filter>
         </activity>
 
-        <!-- Màn hình đăng ký -->
-        <activity
-            android:name="com.finmate.SignUpActivity"
-            android:exported="false" />
-
-        <!-- Màn hình chính -->
-        <activity
-            android:name="com.finmate.HomeActivity"
-            android:exported="false" />
-
-        <!-- Màn hình Cài đặt -->
-        <activity
-            android:name="com.finmate.SettingsActivity"
-            android:exported="false" />
-
-        <!-- Màn hình Bạn bè -->
-        <activity
-            android:name="com.finmate.FriendActivity"
-            android:exported="false" />
+        <!-- Các màn hình khác -->
+        <activity android:name=".UI.activities.SignUpActivity" android:exported="false" />
+        <activity android:name=".UI.activities.HomeActivity" android:exported="false" />
+        <activity android:name=".UI.activities.SettingsActivity" android:exported="false" />
+        <activity android:name=".UI.activities.FriendActivity" android:exported="false" />
+        <activity android:name=".UI.activities.WalletActivity" android:exported="false" />
+        <activity android:name=".UI.activities.AccountActivity" android:exported="false" />
+        <activity android:name=".UI.activities.StatisticActivity" android:exported="false" />
+        <activity android:name=".UI.activities.AddTransactionActivity" android:exported="false" />
+        <activity android:name=".UI.activities.CategoryIncomeActivity" android:exported="false" />
+        <activity android:name=".UI.activities.CategoryExpenseActivity" android:exported="false" />
+        <activity android:name=".UI.activities.IncomeStatisticActivity" android:exported="false" />
+        <activity android:name=".UI.activities.LanguageSettingActivity" android:exported="false" />
 
     </application>
 
