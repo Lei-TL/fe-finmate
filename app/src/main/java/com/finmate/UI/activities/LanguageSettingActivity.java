@@ -1,7 +1,9 @@
-package com.finmate;
+package com.finmate.UI.activities;
 
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.finmate.R;
 
 public class LanguageSettingActivity extends AppCompatActivity {
     @Override

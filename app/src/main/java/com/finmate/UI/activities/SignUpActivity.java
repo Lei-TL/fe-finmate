@@ -1,4 +1,4 @@
-package com.finmate;
+package com.finmate.UI.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +8,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.finmate.R;
 
 public class SignUpActivity extends AppCompatActivity {
 
