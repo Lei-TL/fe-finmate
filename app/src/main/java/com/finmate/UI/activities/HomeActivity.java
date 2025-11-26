@@ -1,4 +1,4 @@
-package com.finmate;
+package com.finmate.UI.activities;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -7,7 +7,12 @@ import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.finmate.R;
+import com.finmate.adapters.TransactionAdapter;
+import com.finmate.models.Transaction;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -18,11 +23,15 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class HomeActivity extends AppCompatActivity {
 
     LineChart lineChart;
     BottomNavigationView bottomNavigation;
+    RecyclerView rvTransactions;
+    TransactionAdapter transactionAdapter;
+    List<Transaction> transactionList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,12 +40,14 @@ public class HomeActivity extends AppCompatActivity {
 
         lineChart = findViewById(R.id.lineChart);
         bottomNavigation = findViewById(R.id.bottomNavigation);
+        rvTransactions = findViewById(R.id.rvTransactions);
 
         // Đặt mục nav_home được chọn khi vào màn hình
         bottomNavigation.setSelectedItemId(R.id.nav_home);
 
         setupChart();
         setupBottomNavigation();
+        setupRecyclerView();
     }
 
     // =======================================
@@ -129,5 +140,26 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    // =======================================
+    // 🚀 PHẦN 3: RECYCLERVIEW GIAO DỊCH
+    // =======================================
+    private void setupRecyclerView() {
+        transactionList = new ArrayList<>();
+        
+        // Thêm dữ liệu giả
+        transactionList.add(new Transaction("Ăn uống", "Riêng tôi", "-100,000 đ", "Ví của tôi", "22/04/2022"));
+        transactionList.add(new Transaction("Lương", "Công ty", "+15,000,000 đ", "Ví ngân hàng", "21/04/2022"));
+        transactionList.add(new Transaction("Xăng xe", "Riêng tôi", "-50,000 đ", "Ví của tôi", "20/04/2022"));
+        transactionList.add(new Transaction("Mua sắm", "Gia đình", "-2,000,000 đ", "Ví chung", "19/04/2022"));
+        transactionList.add(new Transaction("Thưởng", "Công ty", "+500,000 đ", "Ví ngân hàng", "18/04/2022"));
+        transactionList.add(new Transaction("Ăn sáng", "Riêng tôi", "-35,000 đ", "Ví của tôi", "18/04/2022"));
+        transactionList.add(new Transaction("Cafe", "Bạn bè", "-45,000 đ", "Ví của tôi", "17/04/2022"));
+        transactionList.add(new Transaction("Điện nước", "Gia đình", "-1,200,000 đ", "Ví chung", "15/04/2022"));
+
+        transactionAdapter = new TransactionAdapter(transactionList);
+        rvTransactions.setLayoutManager(new LinearLayoutManager(this));
+        rvTransactions.setAdapter(transactionAdapter);
     }
 }

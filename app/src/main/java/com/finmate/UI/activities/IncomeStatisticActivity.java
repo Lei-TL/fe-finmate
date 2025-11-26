@@ -1,13 +1,13 @@
-package com.finmate;
+package com.finmate.UI.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.finmate.R;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -89,7 +89,7 @@ public class IncomeStatisticActivity extends AppCompatActivity {
         bottomNavigation.setOnNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
 
-            if (id == R.id.nav_transaction) {
+            if (id == R.id.nav_home) { // Fixed: nav_transaction -> nav_home
                 startActivity(new Intent(this, HomeActivity.class));
                 return true;
             }
@@ -104,8 +104,8 @@ public class IncomeStatisticActivity extends AppCompatActivity {
             if (id == R.id.nav_statistic) {
                 return true; // Màn hình hiện tại
             }
-            if (id == R.id.nav_setting) {
-                // TODO: Điều hướng đến SettingActivity
+            if (id == R.id.nav_settings) { // Fixed: nav_setting -> nav_settings
+                startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             }
             return false;

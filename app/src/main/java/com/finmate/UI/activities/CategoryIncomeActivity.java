@@ -1,4 +1,4 @@
-package com.finmate;
+package com.finmate.UI.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,9 +12,10 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.finmate.R;
 import com.finmate.adapters.CategoryGridAdapter;
 import com.finmate.adapters.CategoryListAdapter;
-import com.finmate.dialogs.AddCategoryDialog;
+import com.finmate.UI.dialogs.AddCategoryDialog;
 import com.finmate.models.CategoryModel;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 

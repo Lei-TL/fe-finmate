@@ -1,4 +1,4 @@
-package com.finmate.dialogs;
+package com.finmate.UI.dialogs;
 
 import android.app.Dialog;
 import android.content.Context;
