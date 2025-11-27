@@ -3,7 +3,7 @@ package com.finmate.util;
 import android.content.Context;
 
 import com.finmate.database.AppDatabase;
-import com.finmate.database.TokenEntity;
+import com.finmate.entities.TokenEntity;
 
 public class TokenManager {
     private AppDatabase db;
