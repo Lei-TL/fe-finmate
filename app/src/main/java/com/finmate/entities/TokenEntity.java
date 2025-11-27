@@ -1,4 +1,4 @@
-package com.finmate.database;
+package com.finmate.entities;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
