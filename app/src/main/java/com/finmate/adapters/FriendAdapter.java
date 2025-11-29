@@ -12,20 +12,16 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
-import com.finmate.models.Friend;
+import com.finmate.UI.models.FriendUIModel; // Import UI Model mới
 
 import java.util.List;
 
-// ===================================
-//      ADAPTER FOR RECYCLERVIEW
-// ===================================
-// Thêm "public" để lớp này có thể được truy cập từ các package khác
 public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> {
 
     private Context context;
-    private List<Friend> friendList;
+    private List<FriendUIModel> friendList; // Sửa thành FriendUIModel
 
-    public FriendAdapter(Context context, List<Friend> friendList) {
+    public FriendAdapter(Context context, List<FriendUIModel> friendList) { // Sửa thành FriendUIModel
         this.context = context;
         this.friendList = friendList;
     }
@@ -39,13 +35,13 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
     @Override
     public void onBindViewHolder(@NonNull FriendAdapter.FriendViewHolder holder, int position) {
-        Friend friend = friendList.get(position);
-        holder.ivAvatar.setImageResource(friend.avatarResId);
-        holder.tvStatus.setText(friend.status);
+        FriendUIModel friend = friendList.get(position); // Sửa thành FriendUIModel
+        holder.ivAvatar.setImageResource(friend.getAvatarResId());
+        holder.tvStatus.setText(friend.getStatus());
 
         // Handle click on more options icon
         holder.ivMoreOptions.setOnClickListener(v -> {
-            Toast.makeText(context, "Tùy chọn cho: " + friend.status, Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Tùy chọn cho: " + friend.getStatus(), Toast.LENGTH_SHORT).show();
         });
     }
 

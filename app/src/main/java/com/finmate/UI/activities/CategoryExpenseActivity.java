@@ -1,7 +1,5 @@
 package com.finmate.UI.activities;
 
-
-
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -9,9 +7,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
+import com.finmate.UI.models.CategoryUIModel; // Import đúng UI Model
 import com.finmate.adapters.CategoryGridAdapter;
 import com.finmate.adapters.CategoryListAdapter;
-import com.finmate.models.CategoryModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +17,7 @@ import java.util.List;
 public class CategoryExpenseActivity extends AppCompatActivity {
 
     RecyclerView rvCategories;
-    List<CategoryModel> list;
+    List<CategoryUIModel> list; // Sửa thành CategoryUIModel
     CategoryGridAdapter adapterGrid;
     CategoryListAdapter adapterList;
     boolean isGrid = true;
@@ -37,9 +35,10 @@ public class CategoryExpenseActivity extends AppCompatActivity {
 
     private void loadExpenseCategories() {
         list = new ArrayList<>();
-        list.add(new CategoryModel(R.drawable.ic_food, "Thực phẩm"));
-        list.add(new CategoryModel(R.drawable.ic_drink, "Chế độ ăn"));
-        list.add(new CategoryModel(R.drawable.ic_travel, "Di chuyển"));
+        // Sửa thành CategoryUIModel
+        list.add(new CategoryUIModel(R.drawable.ic_food, "Thực phẩm"));
+        list.add(new CategoryUIModel(R.drawable.ic_drink, "Chế độ ăn"));
+        list.add(new CategoryUIModel(R.drawable.ic_travel, "Di chuyển"));
     }
 
     private void showGrid() {

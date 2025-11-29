@@ -11,19 +11,25 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
-import com.finmate.models.CategoryModel;
+import com.finmate.UI.models.CategoryUIModel;
 
 import java.util.List;
 
 public class  CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapter.ViewHolder> {
 
     private final Context context;
-    private final List<CategoryModel> list;
+    private List<CategoryUIModel> list; // Giữ lại private để đảm bảo tính đóng gói
 
-    // === CONSTRUCTOR ĐÚNG CHUẨN ===
-    public CategoryListAdapter(Context context, List<CategoryModel> list) {
+    public CategoryListAdapter(Context context, List<CategoryUIModel> list) {
         this.context = context;
         this.list = list;
+    }
+
+    // ⭐ THÊM PHƯƠNG THỨC UPDATE CÒN THIẾU
+    public void updateList(List<CategoryUIModel> newList) {
+        list.clear();
+        list.addAll(newList);
+        notifyDataSetChanged(); // Báo cho RecyclerView vẽ lại
     }
 
     @NonNull
@@ -36,7 +42,7 @@ public class  CategoryListAdapter extends RecyclerView.Adapter<CategoryListAdapt
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        CategoryModel model = list.get(position);
+        CategoryUIModel model = list.get(position);
         holder.imgIcon.setImageResource(model.getIcon());
         holder.txtName.setText(model.getName());
     }

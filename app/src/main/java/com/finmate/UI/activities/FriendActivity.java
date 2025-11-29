@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
+import com.finmate.UI.models.FriendUIModel; // Import UI Model mới
 import com.finmate.adapters.FriendAdapter;
-import com.finmate.models.Friend;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -29,13 +29,13 @@ public class FriendActivity extends AppCompatActivity {
         RecyclerView rvFriends = findViewById(R.id.rvFriends);
         rvFriends.setLayoutManager(new LinearLayoutManager(this));
 
-        // Create sample data
-        List<Friend> friendList = new ArrayList<>();
-        friendList.add(new Friend(R.drawable.ic_friend, "Bạn còn thiếu một chút tiền từ Nguyễn An"));
-        friendList.add(new Friend(R.drawable.ic_friend, "Nguyễn Văn B đã trả lại bạn 50,000 VND"));
-        friendList.add(new Friend(R.drawable.ic_friend, "Bạn đã nhắc nhở Trần Thị C trả tiền"));
-        friendList.add(new Friend(R.drawable.ic_friend, "Lê Văn D vừa gửi bạn một yêu cầu chia tiền"));
-        friendList.add(new Friend(R.drawable.ic_friend, "Bạn và Phạm Thị E đã hòa tiền"));
+        // Create sample data with the new UI Model
+        List<FriendUIModel> friendList = new ArrayList<>();
+        friendList.add(new FriendUIModel(R.drawable.ic_friend, "Bạn còn thiếu một chút tiền từ Nguyễn An"));
+        friendList.add(new FriendUIModel(R.drawable.ic_friend, "Nguyễn Văn B đã trả lại bạn 50,000 VND"));
+        friendList.add(new FriendUIModel(R.drawable.ic_friend, "Bạn đã nhắc nhở Trần Thị C trả tiền"));
+        friendList.add(new FriendUIModel(R.drawable.ic_friend, "Lê Văn D vừa gửi bạn một yêu cầu chia tiền"));
+        friendList.add(new FriendUIModel(R.drawable.ic_friend, "Bạn và Phạm Thị E đã hòa tiền"));
 
         // Set adapter
         FriendAdapter adapter = new FriendAdapter(this, friendList);
@@ -73,4 +73,3 @@ public class FriendActivity extends AppCompatActivity {
         });
     }
 }
-

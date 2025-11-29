@@ -1,7 +1,5 @@
 package com.finmate.adapters;
 
-
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,18 +11,24 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
-import com.finmate.models.CategoryModel;
+import com.finmate.UI.models.CategoryUIModel;
 
 import java.util.List;
 
 public class CategoryGridAdapter extends RecyclerView.Adapter<CategoryGridAdapter.ViewHolder> {
 
     private Context context;
-    private List<CategoryModel> list;
+    private List<CategoryUIModel> list;
 
-    public CategoryGridAdapter(Context context, List<CategoryModel> list) {
+    public CategoryGridAdapter(Context context, List<CategoryUIModel> list) {
         this.context = context;
         this.list = list;
+    }
+
+    // ⭐ HÀM QUAN TRỌNG: UPDATE LIST MỚI
+    public void updateList(List<CategoryUIModel> newList) {
+        this.list = newList;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -36,8 +40,8 @@ public class CategoryGridAdapter extends RecyclerView.Adapter<CategoryGridAdapte
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        CategoryModel model = list.get(position);
-        holder.imgIcon.setImageResource(model.getIcon());
+        CategoryUIModel model = list.get(position);
+        holder.imgIcon.setImageResource(model.getIcon());   // getIcon() bạn đã có trong UI Model
         holder.txtName.setText(model.getName());
     }
 
@@ -46,7 +50,7 @@ public class CategoryGridAdapter extends RecyclerView.Adapter<CategoryGridAdapte
         return list.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imgIcon;
         TextView txtName;
 
