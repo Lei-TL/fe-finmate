@@ -10,10 +10,10 @@
     <LinearLayout
         android:id="@+id/layoutHeader"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:paddingHorizontal="16dp">
 
         <ImageView
             android:id="@+id/btnBack"
@@ -51,31 +51,32 @@
     <LinearLayout
         android:id="@+id/tabContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_below="@id/layoutHeader"
         android:orientation="horizontal"
         android:gravity="center"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="8dp">
+        android:paddingHorizontal="16dp">
 
+        <!-- Tab Chi tiêu -->
         <TextView
             android:id="@+id/tabExpense"
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Chi tiêu"
             android:gravity="center"
-            android:textColor="#777777"
+            android:text="Chi tiêu"
+            android:textColor="#888888"
             android:textSize="16sp"
             android:background="@drawable/tab_inactive_bg" />
 
+        <!-- Tab Thu nhập (Active) -->
         <TextView
             android:id="@+id/tabIncome"
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="Thu nhập"
             android:gravity="center"
+            android:text="Thu nhập"
             android:textColor="#FFFFFF"
             android:textStyle="bold"
             android:textSize="16sp"
@@ -84,16 +85,16 @@
 
     <!-- ========== RECYCLER VIEW ========== -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvIncomeCategories"
+        android:id="@+id/rvCategories"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_below="@id/tabContainer"
         android:layout_above="@id/layoutAddNew"
-        android:layout_marginTop="12dp"
         android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
         android:clipToPadding="false"
-        tools:itemCount="4"
-        tools:listitem="@layout/item_category_grid" />
+        tools:listitem="@layout/item_category_grid"
+        tools:itemCount="8" />
 
     <!-- ========== ADD NEW BUTTON ========== -->
     <LinearLayout
@@ -101,10 +102,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:background="#0F1624">
 
         <Button
-            android:id="@+id/btnAddIncomeCategory"
+            android:id="@+id/btnAddNewCategory"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:background="@drawable/btn_primary"

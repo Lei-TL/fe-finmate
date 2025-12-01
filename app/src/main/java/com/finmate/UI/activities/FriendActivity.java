@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
-import com.finmate.UI.models.FriendUIModel; // Import UI Model mới
+import com.finmate.UI.models.FriendUIModel;
 import com.finmate.adapters.FriendAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -22,14 +22,14 @@ public class FriendActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend);
 
-        // BACK
+        // Back button
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
-        // SETUP RECYCLER VIEW
+        // RecyclerView setup
         RecyclerView rvFriends = findViewById(R.id.rvFriends);
         rvFriends.setLayoutManager(new LinearLayoutManager(this));
 
-        // Create sample data with the new UI Model
+        // Sample data
         List<FriendUIModel> friendList = new ArrayList<>();
         friendList.add(new FriendUIModel(R.drawable.ic_friend, "Bạn còn thiếu một chút tiền từ Nguyễn An"));
         friendList.add(new FriendUIModel(R.drawable.ic_friend, "Nguyễn Văn B đã trả lại bạn 50,000 VND"));
@@ -41,35 +41,25 @@ public class FriendActivity extends AppCompatActivity {
         FriendAdapter adapter = new FriendAdapter(this, friendList);
         rvFriends.setAdapter(adapter);
 
-        // BOTTOM NAVIGATION
+        // Bottom Navigation
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
-        bottomNav.setSelectedItemId(R.id.nav_settings); // Đặt mục Cài đặt được chọn
+        bottomNav.setSelectedItemId(R.id.nav_settings);
 
         bottomNav.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) {
+            int id = item.getItemId();
+            if (id == R.id.nav_home) {
                 startActivity(new Intent(this, HomeActivity.class));
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                return true;
-            } else if (itemId == R.id.nav_wallet) {
+            } else if (id == R.id.nav_wallet) {
                 startActivity(new Intent(this, WalletActivity.class));
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                return true;
-            } else if (itemId == R.id.nav_add) {
+            } else if (id == R.id.nav_add) {
                 startActivity(new Intent(this, AddTransactionActivity.class));
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                return true;
-            } else if (itemId == R.id.nav_statistic) {
+            } else if (id == R.id.nav_statistic) {
                 startActivity(new Intent(this, StatisticActivity.class));
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                return true;
-            } else if (itemId == R.id.nav_settings) {
-                // Nhấn vào Cài đặt khi đang ở màn hình con của nó -> quay về Cài đặt
+            } else if (id == R.id.nav_settings) {
                 startActivity(new Intent(this, SettingsActivity.class));
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                return true;
             }
-            return false;
+            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            return true;
         });
     }
 }

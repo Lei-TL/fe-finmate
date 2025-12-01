@@ -47,28 +47,31 @@ public class CategoryIncomeActivity extends AppCompatActivity {
         repo = new CategoryRepository(this);
 
         initViews();
-        setupGrid();   // Default dùng dạng Grid
+        setupGrid();      // mặc định dạng GRID
         handleEvents();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        loadCategoriesFromDB();  // Tải lại dữ liệu khi quay lại màn hình
+        loadCategoriesFromDB();
     }
 
     private void initViews() {
-        rvCategories = findViewById(R.id.rvIncomeCategories);
+        rvCategories = findViewById(R.id.rvCategories);
+
         btnBack = findViewById(R.id.btnBack);
         btnMore = findViewById(R.id.btnMore);
+
         tabExpense = findViewById(R.id.tabExpense);
         tabIncome = findViewById(R.id.tabIncome);
-        btnAddNew = findViewById(R.id.btnAddIncomeCategory);
+
+        btnAddNew = findViewById(R.id.btnAddNewCategory);
     }
 
-    // ================= LOAD CATEGORY FROM ROOM ====================
     private void loadCategoriesFromDB() {
         repo.getByType("income", entities -> {
+
             List<CategoryUIModel> uiModels = new ArrayList<>();
 
             for (CategoryEntity entity : entities) {
@@ -76,7 +79,7 @@ public class CategoryIncomeActivity extends AppCompatActivity {
             }
 
             runOnUiThread(() -> {
-                this.incomeList = uiModels;
+                incomeList = uiModels;
 
                 if (isGrid && gridAdapter != null) {
                     gridAdapter.updateList(uiModels);
@@ -87,30 +90,36 @@ public class CategoryIncomeActivity extends AppCompatActivity {
         });
     }
 
-    // ================= GRID VIEW ====================
     private void setupGrid() {
         isGrid = true;
+
         rvCategories.setLayoutManager(new GridLayoutManager(this, 3));
         gridAdapter = new CategoryGridAdapter(this, incomeList);
         rvCategories.setAdapter(gridAdapter);
 
-        tabIncome.setBackgroundResource(R.drawable.tab_active_bg);
-        tabExpense.setBackgroundResource(R.drawable.tab_inactive_bg);
+        highlightTabs();
     }
 
-    // ================= LIST VIEW ====================
     private void setupList() {
         isGrid = false;
+
         rvCategories.setLayoutManager(new LinearLayoutManager(this));
         listAdapter = new CategoryListAdapter(this, incomeList);
         rvCategories.setAdapter(listAdapter);
 
-        tabIncome.setBackgroundResource(R.drawable.tab_active_bg);
-        tabExpense.setBackgroundResource(R.drawable.tab_inactive_bg);
+        highlightTabs();
     }
 
-    // ================= EVENTS ====================
+    private void highlightTabs() {
+        tabIncome.setBackgroundResource(R.drawable.tab_active_bg);
+        tabExpense.setBackgroundResource(R.drawable.tab_inactive_bg);
+
+        tabIncome.setTextColor(getColor(R.color.white));
+        tabExpense.setTextColor(getColor(R.color.black));
+    }
+
     private void handleEvents() {
+
         btnBack.setOnClickListener(v -> finish());
 
         tabExpense.setOnClickListener(v -> {
@@ -118,49 +127,77 @@ public class CategoryIncomeActivity extends AppCompatActivity {
             finish();
         });
 
-        tabIncome.setOnClickListener(v -> {});
+        tabIncome.setOnClickListener(v -> { /* đang ở đây */ });
 
         btnMore.setOnClickListener(v -> openBottomSheet());
+
         btnAddNew.setOnClickListener(v -> openAddNewCategoryDialog());
     }
 
-    // ================= BOTTOM SHEET ====================
     private void openBottomSheet() {
+
         BottomSheetDialog dialog = new BottomSheetDialog(this);
-        dialog.setContentView(R.layout.bottom_sheet_category_options);
+        View view = getLayoutInflater().inflate(R.layout.bottom_sheet_category_options, null);
 
-        View btnList = dialog.findViewById(R.id.btnList);
-        if (btnList != null) btnList.setOnClickListener(v -> {
-            setupList();
+        TextView tvDelete = view.findViewById(R.id.tvDelete);
+        TextView tvToggleView = view.findViewById(R.id.tvToggleView);
+        TextView tvDuplicate = view.findViewById(R.id.tvDuplicate);
+        TextView tvShare = view.findViewById(R.id.tvShare);
+        TextView tvHelp = view.findViewById(R.id.tvHelp);
+
+        // ⭐ Update text toggle đúng với chế độ hiện tại
+        if (isGrid) {
+            ((TextView) tvToggleView.findViewById(android.R.id.text1))
+                    .setText("Hiển thị dạng danh sách");
+        } else {
+            ((TextView) tvToggleView.findViewById(android.R.id.text1))
+                    .setText("Hiển thị dạng lưới");
+        }
+
+        // ⭐ Đổi chế độ GRID / LIST
+        tvToggleView.setOnClickListener(v -> {
+            if (isGrid) setupList();
+            else setupGrid();
             dialog.dismiss();
         });
 
-        View btnGrid = dialog.findViewById(R.id.btnGrid);
-        if (btnGrid != null) btnGrid.setOnClickListener(v -> {
-            setupGrid();
+        tvDelete.setOnClickListener(v -> {
+            Toast.makeText(this, "Chức năng xóa đang phát triển", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
         });
 
-        View btnDelete = dialog.findViewById(R.id.btnDelete);
-        if (btnDelete != null)
-            btnDelete.setOnClickListener(v ->
-                    Toast.makeText(this, "Chức năng đang phát triển", Toast.LENGTH_SHORT).show());
+        tvDuplicate.setOnClickListener(v -> {
+            Toast.makeText(this, "Chức năng tạo bản sao đang phát triển", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        });
 
+        tvShare.setOnClickListener(v -> {
+            Toast.makeText(this, "Chia sẻ đang phát triển", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        });
+
+        tvHelp.setOnClickListener(v -> {
+            Toast.makeText(this, "Trợ giúp đang phát triển", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        });
+
+        dialog.setContentView(view);
         dialog.show();
     }
 
-    // ================= ADD NEW CATEGORY ====================
     private void openAddNewCategoryDialog() {
+
         AddCategoryDialog dialog = new AddCategoryDialog(
                 this,
-                "income", // loại danh mục
+                "income",
                 (name, type) -> saveCategory(name, type)
         );
+
         dialog.show();
     }
 
-    // ================= SAVE CATEGORY TO DB ====================
     private void saveCategory(String name, String type) {
+
         CategoryEntity entity = new CategoryEntity(
                 name,
                 type,
@@ -169,7 +206,7 @@ public class CategoryIncomeActivity extends AppCompatActivity {
 
         repo.insert(entity);
 
-        Toast.makeText(this, "Đã thêm danh mục", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Đã thêm danh mục!", Toast.LENGTH_SHORT).show();
         loadCategoriesFromDB();
     }
 }

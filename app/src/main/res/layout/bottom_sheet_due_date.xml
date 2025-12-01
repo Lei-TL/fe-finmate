@@ -1,6 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="#1A1E2E">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chọn ngày đến hạn"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="15dp"/>
+
+    <TextView
+        android:id="@+id/tvDueToday"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Trong ngày"
+        android:textSize="16sp"
+        android:textColor="#FFFFFF"
+        android:padding="15dp"
+        android:background="@android:drawable/list_selector_background"/>
+
+    <TextView
+        android:id="@+id/tvDueSingle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Chọn 1 ngày"
+        android:textSize="16sp"
+        android:textColor="#FFFFFF"
+        android:padding="15dp"
+        android:background="@android:drawable/list_selector_background"/>
+
+    <TextView
+        android:id="@+id/tvDueRange"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Chọn khoảng ngày (từ → đến)"
+        android:textSize="16sp"
+        android:textColor="#FFFFFF"
+        android:padding="15dp"
+        android:background="@android:drawable/list_selector_background"/>
+
+    <TextView
+        android:id="@+id/tvDueClear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Xóa ngày"
+        android:textSize="16sp"
+        android:textColor="#FF5252"
+        android:padding="15dp"/>
+</LinearLayout>

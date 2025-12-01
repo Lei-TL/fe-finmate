@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="#0F1624">
 
-    <!-- ===== MAIN SCROLL CONTENT ===== -->
+    <!-- ===== MAIN CONTENT ===== -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -17,14 +17,14 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- ===== HEADER (BACK + TITLE) ===== -->
+            <!-- ===== HEADER ===== -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-                <!-- BACK -->
+                <!-- BACK BUTTON -->
                 <ImageView
                     android:id="@+id/btnBack"
                     android:layout_width="28dp"
@@ -36,29 +36,67 @@
 
                 <!-- TITLE -->
                 <TextView
+                    android:id="@+id/tvTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ngôn ngữ"
+                    android:text="@string/title_language"
                     android:textColor="#FFFFFF"
-                    android:textSize="20sp"
                     android:textStyle="bold"
+                    android:textSize="20sp"
                     android:layout_marginStart="16dp" />
-
             </LinearLayout>
 
-            <!-- ===== LIST LANGUAGE ===== -->
+            <!-- ====== LANGUAGE: TIẾNG VIỆT ====== -->
+            <LinearLayout
+                android:id="@+id/btnVietnamese"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_card"
+                android:paddingHorizontal="16dp"
+                android:layout_marginTop="24dp">
 
-            <include layout="@layout/item_language" />
-            <include layout="@layout/item_language" />
-            <include layout="@layout/item_language" />
-            <include layout="@layout/item_language" />
-            <include layout="@layout/item_language" />
-            <include layout="@layout/item_language" />
-            <include layout="@layout/item_language" />
-            <include layout="@layout/item_language" />
-            <include layout="@layout/item_language" />
-            <include layout="@layout/item_language" />
-            <include layout="@layout/item_language" />
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_flag_vn"
+                    android:contentDescription="@string/language_vietnamese" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/language_vietnamese"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:layout_marginStart="12dp" />
+            </LinearLayout>
+
+            <!-- ====== LANGUAGE: ENGLISH ====== -->
+            <LinearLayout
+                android:id="@+id/btnEnglish"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_card"
+                android:paddingHorizontal="16dp"
+                android:layout_marginTop="12dp">
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_flag_us"
+                    android:contentDescription="@string/language_english" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/language_english"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:layout_marginStart="12dp" />
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>
@@ -68,8 +106,8 @@
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="65dp"
-        android:background="@drawable/bg_bottom_nav"
         android:layout_alignParentBottom="true"
+        android:background="@drawable/bg_bottom_nav"
         app:itemIconTint="@color/selector_nav_color"
         app:itemTextColor="@color/selector_nav_color"
         app:menu="@menu/menu_bottom" />
