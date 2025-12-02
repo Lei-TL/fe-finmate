@@ -1,129 +1,160 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@android:color/white"
-    android:padding="16dp">
+    android:paddingVertical="12dp">
 
+    <!-- Xóa -->
     <LinearLayout
-        android:id="@+id/btnDelete"
+        android:id="@+id/tvDelete"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="48dp"
+        android:paddingHorizontal="16dp"
         android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
         android:orientation="horizontal">
 
         <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_delete" />
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_delete"
+            app:tint="#333333" />
 
         <TextView
+            android:id="@+id/tvDeleteText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="14dp"
             android:text="Xóa"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textColor="#222222" />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/btnList"
+    <View
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="1dp"
+        android:background="#DDDDDD" />
+
+    <!-- Toggle Grid/List -->
+    <LinearLayout
+        android:id="@+id/tvToggleView"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:paddingHorizontal="16dp"
         android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
         android:orientation="horizontal">
 
         <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_list" />
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_list"
+            app:tint="#333333" />
 
         <TextView
+            android:id="@+id/tvToggleText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="14dp"
             android:text="Hiển thị dạng danh sách"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textColor="#222222" />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/btnGrid"
+    <View
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="1dp"
+        android:background="#DDDDDD" />
+
+    <!-- Duplicate -->
+    <LinearLayout
+        android:id="@+id/tvDuplicate"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:paddingHorizontal="16dp"
         android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
         android:orientation="horizontal">
 
         <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_grid" />
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_duplicate"
+            app:tint="#333333" />
 
         <TextView
+            android:id="@+id/tvDuplicateText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:text="Hiển thị dạng lưới"
-            android:textSize="16sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/btnDuplicate"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_duplicate" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="14dp"
             android:text="Tạo bản sao"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textColor="#222222" />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/btnShare"
+    <View
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="1dp"
+        android:background="#DDDDDD" />
+
+    <!-- Share -->
+    <LinearLayout
+        android:id="@+id/tvShare"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:paddingHorizontal="16dp"
         android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
         android:orientation="horizontal">
 
         <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_share" />
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_share"
+            app:tint="#333333" />
 
         <TextView
+            android:id="@+id/tvShareText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="14dp"
             android:text="Chia sẻ"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textColor="#222222" />
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/btnHelp"
+    <View
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="1dp"
+        android:background="#DDDDDD" />
+
+    <!-- Help -->
+    <LinearLayout
+        android:id="@+id/tvHelp"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:paddingHorizontal="16dp"
         android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
         android:orientation="horizontal">
 
         <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_help" />
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_help"
+            app:tint="#333333" />
 
         <TextView
+            android:id="@+id/tvHelpText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:text="Trợ giúp - phản hồi"
-            android:textSize="16sp" />
+            android:layout_marginStart="14dp"
+            android:text="Trợ giúp và phản hồi"
+            android:textSize="16sp"
+            android:textColor="#222222" />
     </LinearLayout>
 
 </LinearLayout>

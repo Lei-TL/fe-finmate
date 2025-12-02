@@ -2,43 +2,40 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/bg_card"
-    android:padding="10dp"
+    android:layout_height="70dp"
     android:orientation="horizontal"
+    android:background="@drawable/bg_card"
     android:gravity="center_vertical"
-    android:layout_marginBottom="12dp">
+    android:padding="12dp">
 
-    <!-- Friend Avatar -->
+    <!-- Avatar -->
     <ImageView
         android:id="@+id/ivFriendAvatar"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
         android:src="@drawable/ic_friend"
-        android:background="@drawable/bg_circle"
+        android:background="@drawable/bg_circle_dark"
         android:padding="6dp" />
 
-    <!-- Friend Status -->
+    <!-- Text -->
     <TextView
         android:id="@+id/tvFriendStatus"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:layout_marginStart="12dp"
-        android:layout_marginEnd="8dp"
-        android:text="Bạn còn thiếu một chút tiền từ Nguyễn An"
+        android:layout_weight="1"
+        android:text="Hiển thị trạng thái"
         android:textColor="#FFFFFF"
-        android:textSize="14sp" />
+        android:textSize="14sp"
+        android:maxLines="2" />
 
-    <!-- More Options Icon -->
+    <!-- MORE OPTIONS -->
     <ImageView
         android:id="@+id/ivMoreOptions"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/ic_more"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:src="@drawable/ic_more_vertical"
         app:tint="#FFFFFF"
-        android:padding="2dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Tùy chọn khác" />
+        android:padding="4dp" />
 
 </LinearLayout>

@@ -4,18 +4,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.LinearLayout;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.finmate.R;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.finmate.UI.dialogs.ThemeDialog;
+import com.finmate.UI.activities.NotificationSettingsActivity;
+
 
 public class SettingsActivity extends AppCompatActivity {
 
     ImageView btnBack;
     LinearLayout btnLanguage, btnCategory, btnTheme, btnFriend, btnAccount, btnNotification;
-    BottomNavigationView bottomNavigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,49 +30,41 @@ public class SettingsActivity extends AppCompatActivity {
         btnFriend = findViewById(R.id.btnFriend);
         btnAccount = findViewById(R.id.btnAccount);
         btnNotification = findViewById(R.id.btnNotification);
-        bottomNavigation = findViewById(R.id.bottomNavigation);
-
-        // Chọn tab Cài đặt
-        bottomNavigation.setSelectedItemId(R.id.nav_settings);
 
         // Nút quay lại
         btnBack.setOnClickListener(v -> finish());
 
-        // Xử lý các mục cài đặt
-        btnLanguage.setOnClickListener(v -> show("Ngôn ngữ"));
-        btnCategory.setOnClickListener(v -> show("Quản lý thể loại"));
-        btnTheme.setOnClickListener(v -> show("Giao diện hệ thống"));
-        btnFriend.setOnClickListener(v -> startActivity(new Intent(this, FriendActivity.class)));
-        btnAccount.setOnClickListener(v -> show("Tài khoản"));
-        btnNotification.setOnClickListener(v -> show("Thông báo"));
+        // ===================== XỬ LÝ CÁC NÚT ========================
 
-        // ====== BOTTOM NAVIGATION ======
-        bottomNavigation.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) {
-                startActivity(new Intent(this, HomeActivity.class));
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                return true;
-            } else if (itemId == R.id.nav_wallet) {
-                startActivity(new Intent(this, WalletActivity.class));
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                return true;
-            } else if (itemId == R.id.nav_add) {
-                startActivity(new Intent(this, AddTransactionActivity.class));
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                return true;
-            } else if (itemId == R.id.nav_statistic) {
-                startActivity(new Intent(this, StatisticActivity.class));
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                return true;
-            } else if (itemId == R.id.nav_settings) {
-                return true; // đang ở đây
-            }
-            return false;
+        // 1. Ngôn ngữ
+        btnLanguage.setOnClickListener(v ->
+                startActivity(new Intent(this, LanguageSettingActivity.class))
+        );
+
+        // 2. Quản lý thể loại
+        btnCategory.setOnClickListener(v ->
+                startActivity(new Intent(this, CategoryIncomeActivity.class))
+        );
+
+        // 3. Giao diện hệ thống (mở BottomSheet / Dialog)
+        btnTheme.setOnClickListener(v -> {
+            ThemeDialog dialog = new ThemeDialog();
+            dialog.show(getSupportFragmentManager(), "theme_dialog");
         });
-    }
 
-    private void show(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        // 4. Bạn bè
+        btnFriend.setOnClickListener(v ->
+                startActivity(new Intent(this, FriendActivity.class))
+        );
+
+        // 5. Tài khoản
+        btnAccount.setOnClickListener(v ->
+                startActivity(new Intent(this, AccountActivity.class))
+        );
+
+        // 6. Thông báo
+        btnNotification.setOnClickListener(v ->
+                startActivity(new Intent(this, NotificationSettingsActivity.class))
+        );
     }
 }

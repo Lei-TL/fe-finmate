@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#0F1624"
+    android:padding="16dp">
+
+    <!-- ===== HEADER ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:padding="6dp"
+            android:src="@drawable/ic_back"
+            app:tint="#FFFFFF"
+            android:contentDescription="Quay lại" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Thêm ví tiền"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+
+        <View
+            android:layout_width="32dp"
+            android:layout_height="32dp" />
+    </LinearLayout>
+
+    <!-- ===== CARD NỘI DUNG ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:background="@drawable/bg_card"
+        android:elevation="4dp">
+
+        <!-- ICON VÍ -->
+        <ImageView
+            android:id="@+id/imgWalletIcon"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/ic_wallet"
+            app:tint="#FFFFFF"
+            android:layout_gravity="center"
+            android:contentDescription="Icon ví"
+            android:padding="10dp" />
+
+        <!-- TÊN VÍ -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tên ví"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="18dp" />
+
+        <EditText
+            android:id="@+id/edtWalletName"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_input"
+            android:hint="Nhập tên ví"
+            android:paddingHorizontal="12dp"
+            android:autofillHints="name"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#BBBBBB"
+            android:contentDescription="Nhập tên ví" />
+
+        <!-- SỐ DƯ BAN ĐẦU -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Số dư ban đầu"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="14dp" />
+
+        <EditText
+            android:id="@+id/edtWalletBalance"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_input"
+            android:hint="Nhập số dư ban đầu"
+            android:inputType="number"
+            android:paddingHorizontal="12dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#BBBBBB"
+            android:contentDescription="Nhập số dư ban đầu" />
+
+        <!-- NÚT LỰA CHỌN ICON -->
+        <Button
+            android:id="@+id/btnChooseIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="Chọn icon"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#3A3A3A"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp" />
+    </LinearLayout>
+
+    <!-- ===== BUTTONS ===== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="24dp">
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Hủy"
+            android:backgroundTint="#444444"
+            android:textColor="#FFFFFF" />
+
+        <View
+            android:layout_width="12dp"
+            android:layout_height="1dp" />
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:text="Lưu"
+            android:backgroundTint="#4CAF50"
+            android:textColor="#FFFFFF" />
+    </LinearLayout>
+
+</LinearLayout>

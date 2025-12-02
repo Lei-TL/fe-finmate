@@ -9,7 +9,7 @@ public class TokenManager {
     private AppDatabase db;
 
     public TokenManager(Context context) {
-        db = AppDatabase.getDatabase(context);
+        db = AppDatabase.getInstance(context);
     }
 
     public void saveToken(String accessToken, String refreshToken) {

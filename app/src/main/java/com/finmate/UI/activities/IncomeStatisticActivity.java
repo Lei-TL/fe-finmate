@@ -10,7 +10,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.finmate.R;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import android.graphics.Color;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class IncomeStatisticActivity extends AppCompatActivity {
 
@@ -32,9 +45,6 @@ public class IncomeStatisticActivity extends AppCompatActivity {
         tvIncomeTab = findViewById(R.id.tvIncomeTab);
         tvTotalIncome = findViewById(R.id.tvTotalIncome);
 
-        tvAddTitle = findViewById(R.id.tvAddTitle);
-        tvCategoryFilter = findViewById(R.id.tvCategoryFilter);
-
         barChartIncome = findViewById(R.id.barChartIncome);
         pieChartIncome = findViewById(R.id.pieChartIncome);
 
@@ -54,42 +64,91 @@ public class IncomeStatisticActivity extends AppCompatActivity {
         tvIncomeTab.setOnClickListener(v -> {});
 
         // ================== CHART SETUP ==================
-        setupBarChart();
-        setupPieChart();
+        loadBarChartData();
+        loadPieChartData();
 
         // ================== BOTTOM NAVIGATION ==================
         setupBottomNav();
     }
 
-    // ================== HÀM VẼ BIỂU ĐỒ CỘT ==================
-    private void setupBarChart() {
+    // ================== DỮ LIỆU MẪU THU NHẬP THEO THÁNG ==================
+    private void loadBarChartData() {
+        List<BarEntry> entries = new ArrayList<>();
+        entries.add(new BarEntry(1, 5000000));
+        entries.add(new BarEntry(2, 8000000));
+        entries.add(new BarEntry(3, 6000000));
+        entries.add(new BarEntry(4, 9000000));
+        entries.add(new BarEntry(5, 10000000));
+
+        BarDataSet dataSet = new BarDataSet(entries, "Thu nhập");
+        dataSet.setColor(Color.parseColor("#4CAF50"));
+        dataSet.setValueTextColor(Color.WHITE);
+        dataSet.setValueTextSize(10f);
+
+        BarData barData = new BarData(dataSet);
+        barData.setBarWidth(0.35f);
+
+        barChartIncome.setData(barData);
+        barChartIncome.setFitBars(true);
+
+        // Tắt mô tả
         barChartIncome.getDescription().setEnabled(false);
         barChartIncome.getLegend().setEnabled(false);
-        barChartIncome.setDrawGridBackground(false);
-        barChartIncome.setNoDataText("Không có dữ liệu");
 
-        // TODO: Sau này bạn bind dữ liệu BE vào đây
+        // Cài đặt trục X
+        XAxis xAxis = barChartIncome.getXAxis();
+        xAxis.setTextColor(Color.WHITE);
+        xAxis.setDrawGridLines(false);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+
+        barChartIncome.invalidate();
     }
 
-    // ================== HÀM VẼ BIỂU ĐỒ TRÒN ==================
-    private void setupPieChart() {
-        pieChartIncome.getDescription().setEnabled(false);
-        pieChartIncome.setDrawHoleEnabled(true);
-        pieChartIncome.setHoleRadius(45f);
-        pieChartIncome.setTransparentCircleRadius(50f);
+    // ================== BIỂU ĐỒ TRÒN ==================
+    private void loadPieChartData() {
+        List<PieEntry> entries = new ArrayList<>();
+        entries.add(new PieEntry(40f, "Lương"));
+        entries.add(new PieEntry(25f, "Thưởng"));
+        entries.add(new PieEntry(15f, "Kinh doanh"));
+        entries.add(new PieEntry(20f, "Khác"));
+
+        PieDataSet dataSet = new PieDataSet(entries, "");
+        dataSet.setColors(
+                Color.parseColor("#4CAF50"),
+                Color.parseColor("#8BC34A"),
+                Color.parseColor("#CDDC39"),
+                Color.parseColor("#FFC107")
+        );
+
+        dataSet.setValueTextColor(Color.WHITE);
+        dataSet.setValueTextSize(12f);
+
+        PieData pieData = new PieData(dataSet);
+
+        pieChartIncome.setData(pieData);
         pieChartIncome.setUsePercentValues(true);
 
-        // TODO: Bind dữ liệu vào biểu đồ ở đây
+        pieChartIncome.setDrawHoleEnabled(true);
+        pieChartIncome.setHoleRadius(40f);
+        pieChartIncome.setTransparentCircleRadius(45f);
+
+        pieChartIncome.getDescription().setEnabled(false);
+
+        Legend legend = pieChartIncome.getLegend();
+        legend.setTextColor(Color.WHITE);
+        legend.setTextSize(12f);
+
+        pieChartIncome.invalidate();
     }
 
-    // ================== HÀM BOTTOM NAV ==================
+    // ================== BOTTOM NAV ==================
     private void setupBottomNav() {
         bottomNavigation.setSelectedItemId(R.id.nav_statistic);
 
         bottomNavigation.setOnNavigationItemSelectedListener(item -> {
             int id = item.getItemId();
 
-            if (id == R.id.nav_home) { // Fixed: nav_transaction -> nav_home
+            if (id == R.id.nav_home) {
                 startActivity(new Intent(this, HomeActivity.class));
                 return true;
             }
@@ -102,9 +161,9 @@ public class IncomeStatisticActivity extends AppCompatActivity {
                 return true;
             }
             if (id == R.id.nav_statistic) {
-                return true; // Màn hình hiện tại
+                return true;
             }
-            if (id == R.id.nav_settings) { // Fixed: nav_setting -> nav_settings
+            if (id == R.id.nav_settings) {
                 startActivity(new Intent(this, SettingsActivity.class));
                 return true;
             }
