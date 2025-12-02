@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">FinMate</string>
+
+    <!-- TITLES -->
+    <string name="title_language">Ngôn ngữ</string>
+    <string name="title_settings">Cài đặt</string>
+
+    <!-- LANGUAGES -->
+    <string name="language_vietnamese">Tiếng Việt</string>
+    <string name="language_english">Tiếng Anh</string>
 </resources>

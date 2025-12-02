@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="#1A1F2E"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/tvIncomeGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Thu nhập"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:padding="16dp" />
+
+    <TextView
+        android:id="@+id/tvExpenseGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Chi tiêu"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:padding="16dp" />
+
+</LinearLayout>
