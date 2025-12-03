@@ -2,92 +2,11 @@
 <resources>
     <string name="app_name">FinMate</string>
 
-    <!-- General -->
-    <string name="username_hint">Username</string>
-    <string name="password_hint">Password</string>
-    <string name="email_hint">Email</string>
-    <string name="login">Login</string>
-    <string name="signup">Sign Up</string>
-    <string name="save_changes">Save Changes</string>
-    <string name="name">Name</string>
-    <string name="email">Email</string>
-    <string name="birthday">Birthday</string>
-    <string name="description">Description</string>
-    <string name="friends">Friends</string>
-    <string name="feature_in_development">Feature in development</string>
+    <!-- TITLES -->
+    <string name="title_language">Ngôn ngữ</string>
+    <string name="title_settings">Cài đặt</string>
 
-    <!-- Login Screen -->
-    <string name="welcome_back">Welcome Back!</string>
-    <string name="forgot_password">Forgot Password</string>
-    <string name="no_account">Don\'t have an account? Sign up</string>
-
-    <!-- Signup Screen -->
-    <string name="create_account">Create Account</string>
-    <string name="signup_button">Sign Up</string>
-    <string name="already_have_account">Already have an account? Login</string>
-
-    <!-- Home Screen -->
-    <string name="greeting">Hi,</string>
-    <string name="chart_title">Income - Expense Statistics</string>
-
-    <!-- Account Screen -->
-    <string name="income">Income</string>
-    <string name="expense">Expense</string>
-    <string name="balance">Balance</string>
-    <string name="enter_name_hint">Enter name</string>
-    <string name="enter_email_hint">Enter email</string>
-    <string name="enter_description_hint">Enter description...</string>
-    <string name="toast_change_avatar">Change avatar</string>
-    <string name="toast_edit_mode">Edit mode</string>
-    <string name="toast_changes_saved">Changes saved</string>
-
-    <!-- Wallet Screen -->
-    <string name="my_account">My Account</string>
-    <string name="my_wallet">My Wallet</string>
-    <string name="personal">Personal</string>
-
-    <!-- Statistic Screen -->
-    <string name="statistic_monthly_expense">Monthly Expense Statistics</string>
-    <string name="filter_by_category">By Category</string>
-    <string name="compare_expense_types">Compare Expense Types</string>
-    <string name="statistic_monthly_income">Monthly Income Statistics</string>
-    <string name="compare_income_types">Compare Income Types</string>
-
-    <!-- Category Screens -->
-    <string name="select_income_group">Select Income Group</string>
-    <string name="select_expense_group">Select Expense Group</string>
-    <string name="add_new_category_group">Add New Category Group</string>
-
-    <!-- Settings Screen -->
-    <string name="manage_categories">Manage Categories</string>
-    <string name="system_theme_setting">System Theme</string>
-    <string name="notifications">Notifications</string>
-
-    <!-- Bottom Navigation -->
-    <string name="nav_home">Transactions</string>
-    <string name="nav_wallet">Wallet</string>
-    <string name="nav_add">Add</string>
-    <string name="nav_statistic">Statistics</string>
-    <string name="nav_settings">Settings</string>
-
-    <!-- Settings Options -->
-    <string name="language">Language</string>
-    <string name="theme">Theme</string>
-    <string name="choose_language">Choose Language</string>
-    <string name="choose_theme">Choose Theme</string>
-    <string name="light_theme">Light</string>
-    <string name="dark_theme">Dark</string>
-    <string name="system_theme">System</string>
-    <string name="cancel">Cancel</string>
-
-    <string-array name="language_options">
-        <item>English</item>
-        <item>Tiếng Việt</item>
-    </string-array>
-    <string-array name="theme_options">
-        <item>@string/light_theme</item>
-        <item>@string/dark_theme</item>
-        <item>@string/system_theme</item>
-    </string-array>
-
+    <!-- LANGUAGES -->
+    <string name="language_vietnamese">Tiếng Việt</string>
+    <string name="language_english">Tiếng Anh</string>
 </resources>

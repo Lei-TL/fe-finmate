@@ -9,7 +9,6 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottomNavigation"
         android:padding="16dp">
 
         <LinearLayout
@@ -38,7 +37,6 @@
                 android:layout_marginBottom="12dp" />
 
             <!-- ========================== ITEM: NGÔN NGỮ ============================ -->
-
             <LinearLayout
                 android:id="@+id/btnLanguage"
                 android:layout_width="match_parent"
@@ -65,7 +63,6 @@
             </LinearLayout>
 
             <!-- ======================= ITEM: QUẢN LÝ THỂ LOẠI ======================= -->
-
             <LinearLayout
                 android:id="@+id/btnCategory"
                 android:layout_width="match_parent"
@@ -92,7 +89,6 @@
             </LinearLayout>
 
             <!-- ======================= ITEM: GIAO DIỆN HỆ THỐNG ======================= -->
-
             <LinearLayout
                 android:id="@+id/btnTheme"
                 android:layout_width="match_parent"
@@ -119,7 +115,6 @@
             </LinearLayout>
 
             <!-- ============================ ITEM: BẠN BÈ ============================ -->
-
             <LinearLayout
                 android:id="@+id/btnFriend"
                 android:layout_width="match_parent"
@@ -146,7 +141,6 @@
             </LinearLayout>
 
             <!-- ========================== ITEM: TÀI KHOẢN ========================== -->
-
             <LinearLayout
                 android:id="@+id/btnAccount"
                 android:layout_width="match_parent"
@@ -173,7 +167,6 @@
             </LinearLayout>
 
             <!-- ========================== ITEM: THÔNG BÁO ========================== -->
-
             <LinearLayout
                 android:id="@+id/btnNotification"
                 android:layout_width="match_parent"
@@ -207,18 +200,8 @@
                     android:layout_height="12dp"
                     android:background="@drawable/red_dot" />
             </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
-
-    <!-- ========================= BOTTOM NAVIGATION ========================== -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
-        android:layout_width="match_parent"
-        android:layout_height="65dp"
-        android:layout_alignParentBottom="true"
-        android:background="?attr/bottomNavBackgroundColor"
-        app:menu="@menu/menu_bottom"
-        app:itemIconTint="@color/selector_nav_color"
-        app:itemTextColor="@color/selector_nav_color" />
 
 </RelativeLayout>

@@ -15,7 +15,7 @@
         android:textStyle="bold"
         android:textSize="20sp"
         android:layout_marginTop="24dp"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true" />
 
 
     <!-- ===================== SCROLL CONTENT ===================== -->
@@ -31,7 +31,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-
             <!-- Chọn nhóm giao dịch -->
             <EditText
                 android:id="@+id/etCategory"
@@ -40,11 +39,10 @@
                 android:hint="Chọn nhóm giao dịch *"
                 android:background="?attr/editTextBackground"
                 android:padding="14dp"
-                android:textColor="?attr/editTextColor"
-                android:textColorHint="?attr/editTextColorHint"
+                android:textColor="@color/edittext_text_color"
+                android:textColorHint="@color/edittext_hint_color"
                 android:drawableEnd="@drawable/ic_arrow_drop_down"
-                android:drawableTint="?attr/iconTint"
-                android:layout_marginTop="16dp"/>
+                android:layout_marginTop="16dp" />
 
             <!-- Tên giao dịch -->
             <EditText
@@ -101,14 +99,13 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Đến hạn"
-                    android:textColor="?attr/textColorSecondary"
-                    android:textSize="16sp"/>
+                    android:textColor="#7A7F8C"
+                    android:textSize="16sp" />
 
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:src="@drawable/ic_calendar"
-                    app:tint="?attr/iconTint"/>
+                    android:src="@drawable/ic_calendar" />
             </LinearLayout>
 
             <!-- Ghi chú -->
@@ -120,9 +117,9 @@
                 android:padding="14dp"
                 android:background="?attr/editTextBackground"
                 android:gravity="top"
-                android:textColor="?attr/editTextColor"
-                android:textColorHint="?attr/editTextColorHint"
-                android:layout_marginTop="16dp"/>
+                android:textColor="@color/edittext_text_color"
+                android:textColorHint="@color/edittext_hint_color"
+                android:layout_marginTop="16dp" />
 
             <!-- ==== BUTTONS ==== -->
             <LinearLayout
@@ -140,11 +137,11 @@
                     android:text="HỦY"
                     android:textColor="@android:color/white"
                     android:backgroundTint="#E53935"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
 
                 <View
                     android:layout_width="24dp"
-                    android:layout_height="1dp"/>
+                    android:layout_height="1dp" />
 
                 <Button
                     android:id="@+id/btnSave"
@@ -153,7 +150,7 @@
                     android:text="LƯU"
                     android:textColor="@android:color/white"
                     android:backgroundTint="#3D5AFE"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold" />
             </LinearLayout>
 
         </LinearLayout>

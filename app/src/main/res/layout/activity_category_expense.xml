@@ -6,23 +6,21 @@
     android:layout_height="match_parent"
     android:background="?attr/backgroundColor">
 
-    <!-- ================= HEADER ================= -->
+    <!-- HEADER -->
     <LinearLayout
         android:id="@+id/layoutHeader"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp">
 
         <ImageView
             android:id="@+id/btnBack"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:src="@drawable/ic_back"
-            android:padding="4dp"
-            android:contentDescription="Back"
-            app:tint="?attr/iconTint"
+            app:tint="#FFFFFF"
             android:background="?attr/selectableItemBackgroundBorderless" />
 
         <TextView
@@ -30,8 +28,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/select_expense_group"
-            android:textColor="?attr/textColorPrimary"
+            android:text="Chọn nhóm giao dịch"
+            android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold"
             android:gravity="center" />
@@ -41,67 +39,63 @@
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:src="@drawable/ic_more"
-            android:padding="4dp"
-            android:contentDescription="More"
-            app:tint="?attr/iconTint"
+            app:tint="#FFFFFF"
             android:background="?attr/selectableItemBackgroundBorderless" />
     </LinearLayout>
 
-    <!-- ================= TAB: CHI TIÊU / THU NHẬP ================= -->
+    <!-- TABS -->
     <LinearLayout
         android:id="@+id/tabContainer"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/layoutHeader"
+        android:layout_height="48dp"
         android:orientation="horizontal"
-        android:gravity="center"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="8dp">
+        android:layout_below="@id/layoutHeader"
+        android:paddingHorizontal="20dp">
 
         <TextView
             android:id="@+id/tabExpense"
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@string/expense"
             android:gravity="center"
-            android:textColor="?attr/textColorPrimary"
+            android:text="Chi tiêu"
             android:textStyle="bold"
-            android:textSize="16sp"
+            android:textColor="#FFFFFF"
             android:background="@drawable/tab_active_bg" />
 
         <TextView
             android:id="@+id/tabIncome"
             android:layout_width="0dp"
-            android:layout_height="40dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@string/income"
             android:gravity="center"
-            android:textColor="?attr/textColorSecondary"
-            android:textSize="16sp"
+            android:text="Thu nhập"
+            android:textColor="#888888"
             android:background="@drawable/tab_inactive_bg" />
     </LinearLayout>
 
-    <!-- ================= RECYCLER VIEW ================= -->
+    <!-- LIST -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvCategories"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_below="@id/tabContainer"
-        android:layout_above="@+id/layoutAddNew"
-        android:layout_marginTop="12dp"
+        android:layout_above="@id/layoutAddNew"
         android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="80dp"
         android:clipToPadding="false"
         tools:listitem="@layout/item_category_grid"
         tools:itemCount="12" />
 
-    <!-- ================= ADD NEW CATEGORY BUTTON ================= -->
+    <!-- ADD BUTTON -->
     <LinearLayout
         android:id="@+id/layoutAddNew"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:background="#0F1624">
 
         <Button
             android:id="@+id/btnAddNewCategory"
