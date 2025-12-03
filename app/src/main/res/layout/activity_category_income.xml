@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0F1624">
+    android:background="?attr/backgroundColor">
 
     <!-- ========== HEADER ========== -->
     <LinearLayout
@@ -23,7 +23,7 @@
             android:src="@drawable/ic_back"
             android:contentDescription="Back"
             android:background="?attr/selectableItemBackgroundBorderless"
-            app:tint="#FFFFFF" />
+            app:tint="?attr/iconTint" />
 
         <TextView
             android:id="@+id/tvTitle"
@@ -31,8 +31,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Chọn nhóm giao dịch thu nhập"
-            android:textColor="#FFFFFF"
+            android:text="@string/select_income_group"
+            android:textColor="?attr/textColorPrimary"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -44,7 +44,7 @@
             android:src="@drawable/ic_more"
             android:contentDescription="More options"
             android:background="?attr/selectableItemBackgroundBorderless"
-            app:tint="#FFFFFF" />
+            app:tint="?attr/iconTint" />
     </LinearLayout>
 
     <!-- ========== TAB ========== -->
@@ -109,11 +109,11 @@
             android:id="@+id/btnAddNewCategory"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:background="@drawable/btn_primary"
-            android:text="Thêm mới nhóm phân loại"
+            android:background="?attr/buttonBackground"
+            android:text="@string/add_new_category_group"
             android:textAllCaps="false"
             android:textStyle="bold"
-            android:textColor="#FFFFFF" />
+            android:textColor="?attr/buttonTextColor" />
     </LinearLayout>
 
 </RelativeLayout>

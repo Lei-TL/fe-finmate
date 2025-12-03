@@ -1,18 +1,18 @@
 package com.finmate.UI.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.LinearLayout;
 import android.widget.ImageView;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 
 import com.finmate.R;
 import com.finmate.UI.dialogs.ThemeDialog;
 import com.finmate.UI.activities.NotificationSettingsActivity;
 
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends BaseActivity {
 
     ImageView btnBack;
     LinearLayout btnLanguage, btnCategory, btnTheme, btnFriend, btnAccount, btnNotification;
@@ -23,6 +23,16 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
         // ÁNH XẠ
+        initViews();
+
+        // XỬ LÝ SỰ KIỆN
+        setupListeners();
+
+        // Chọn tab Cài đặt trên Bottom Nav
+        bottomNavigation.setSelectedItemId(R.id.nav_settings);
+    }
+
+    private void initViews() {
         btnBack = findViewById(R.id.btnBack);
         btnLanguage = findViewById(R.id.btnLanguage);
         btnCategory = findViewById(R.id.btnCategory);

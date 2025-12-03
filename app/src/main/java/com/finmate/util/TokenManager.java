@@ -1,39 +1,35 @@
 package com.finmate.util;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import dagger.hilt.android.qualifiers.ApplicationContext;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
-import com.finmate.database.AppDatabase;
-import com.finmate.entities.TokenEntity;
-
+@Singleton
 public class TokenManager {
-    private AppDatabase db;
+    private SharedPreferences prefs;
+    private SharedPreferences.Editor editor;
 
     public TokenManager(Context context) {
         db = AppDatabase.getInstance(context);
     }
 
     public void saveToken(String accessToken, String refreshToken) {
-        TokenEntity token = new TokenEntity(accessToken, refreshToken);
-        // Clear old tokens before inserting new one to ensure only one valid session exists
-        db.tokenDao().clearTokens();
-        db.tokenDao().insertToken(token);
+        editor.putString("ACCESS_TOKEN", accessToken);
+        editor.putString("REFRESH_TOKEN", refreshToken);
+        editor.apply();
     }
 
-    public String getAccessToken() {
-        TokenEntity token = db.tokenDao().getToken();
-        return token != null ? token.accessToken : null;
-    }
-    
-    public String getRefreshToken() {
-        TokenEntity token = db.tokenDao().getToken();
-        return token != null ? token.refreshToken : null;
-    }
-
-    public void clearToken() {
-        db.tokenDao().clearTokens();
-    }
-    
     public boolean isLoggedIn() {
-        return getAccessToken() != null;
+        return prefs.contains("ACCESS_TOKEN");
+    }
+
+    public String getToken() {
+        return prefs.getString("ACCESS_TOKEN", null);
+    }
+
+    public void logout() {
+        editor.clear().apply();
     }
 }

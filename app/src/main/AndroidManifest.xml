@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.finmate">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".MainApplication"
         android:allowBackup="true"
@@ -17,7 +19,7 @@
 
         <!-- Màn hình đăng nhập (Launcher) -->
         <activity
-            android:name=".UI.activities.LoginActivity"
+            android:name=".UI.activities.HomeActivity"
             android:exported="true">
 
             <intent-filter>
@@ -30,7 +32,7 @@
         <!-- ======= CÁC MÀN HÌNH KHÁC ======= -->
 
         <activity android:name=".UI.activities.SignUpActivity" android:exported="false" />
-        <activity android:name=".UI.activities.HomeActivity" android:exported="false" />
+        <activity android:name=".UI.activities.LoginActivity" android:exported="false" />
         <activity android:name=".UI.activities.SettingsActivity" android:exported="false" />
         <activity android:name=".UI.activities.FriendActivity" android:exported="false" />
         <activity android:name=".UI.activities.WalletActivity" android:exported="false" />

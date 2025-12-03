@@ -7,15 +7,27 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.finmate.R;
+import com.finmate.models.AuthResponse;
+import com.finmate.models.RegisterRequest;
+import com.finmate.network.ApiService;
 
-public class SignUpActivity extends AppCompatActivity {
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+@AndroidEntryPoint
+public class SignUpActivity extends BaseActivity {
 
     EditText etName, etEmail, etPassword;
     Button btnSignup;
     TextView tvAlreadyAccount;
+
+    @Inject
+    ApiService apiService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,14 +64,7 @@ public class SignUpActivity extends AppCompatActivity {
                 return;
             }
 
-            // Sau này bạn gửi API đăng ký → lưu DB server
-            Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
-
-            // Chuyển về Login
-            Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
-            startActivity(intent);
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-            finish();
+            register(name, email, pass);
         });
 
         // Quay lại Login
@@ -68,6 +73,36 @@ public class SignUpActivity extends AppCompatActivity {
             startActivity(intent);
             overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
             finish();
+        });
+    }
+
+    private void register(String username, String email, String password) {
+        RegisterRequest request = new RegisterRequest(username, email, password);
+        
+        btnSignup.setEnabled(false);
+
+        apiService.register(request).enqueue(new Callback<AuthResponse>() {
+            @Override
+            public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
+                btnSignup.setEnabled(true);
+                if (response.isSuccessful()) {
+                    Toast.makeText(SignUpActivity.this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+
+                    // Chuyển về Login
+                    Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                    finish();
+                } else {
+                    Toast.makeText(SignUpActivity.this, "Đăng ký thất bại! Có thể username đã tồn tại.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<AuthResponse> call, Throwable t) {
+                btnSignup.setEnabled(true);
+                Toast.makeText(SignUpActivity.this, "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }

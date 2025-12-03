@@ -20,7 +20,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.Calendar;
 
-public class AddTransactionActivity extends AppCompatActivity {
+public class AddTransactionActivity extends BaseActivity {
 
     EditText etCategory, etTitle, etAmount, tvFriend, etNote;
     TextView tvDate;

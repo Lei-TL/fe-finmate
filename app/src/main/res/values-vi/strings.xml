@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FinMate</string>
+
+    <!-- General -->
+    <string name="username_hint">Tên người dùng</string>
+    <string name="password_hint">Mật khẩu</string>
+    <string name="email_hint">Email</string>
+    <string name="login">Đăng nhập</string>
+    <string name="signup">Đăng ký</string>
+    <string name="save_changes">Lưu thay đổi</string>
+    <string name="name">Tên</string>
+    <string name="email">Email</string>
+    <string name="birthday">Ngày sinh</string>
+    <string name="description">Mô tả bản thân</string>
+    <string name="friends">Bạn bè</string>
+    <string name="feature_in_development">Tính năng đang phát triển</string>
+
+    <!-- Login Screen -->
+    <string name="welcome_back">Chào mừng quay trở lại !</string>
+    <string name="forgot_password">Quên mật khẩu</string>
+    <string name="no_account">Bạn không có tài khoản? Đăng ký</string>
+
+    <!-- Signup Screen -->
+    <string name="create_account">Tạo tài khoản</string>
+    <string name="signup_button">Đăng ký</string>
+    <string name="already_have_account">Đã có tài khoản? Đăng nhập</string>
+
+    <!-- Home Screen -->
+    <string name="greeting">Chào,</string>
+    <string name="chart_title">Thống kê thu nhập - chi tiêu</string>
+
+    <!-- Account Screen -->
+    <string name="income">Thu nhập</string>
+    <string name="expense">Chi tiêu</string>
+    <string name="balance">Số dư</string>
+    <string name="enter_name_hint">Nhập tên</string>
+    <string name="enter_email_hint">Nhập email</string>
+    <string name="enter_description_hint">Nhập mô tả...</string>
+    <string name="toast_change_avatar">Đổi avatar</string>
+    <string name="toast_edit_mode">Chế độ chỉnh sửa</string>
+    <string name="toast_changes_saved">Đã lưu thay đổi</string>
+
+    <!-- Wallet Screen -->
+    <string name="my_account">Tài khoản của tôi</string>
+    <string name="my_wallet">Ví của tôi</string>
+    <string name="personal">Riêng tôi</string>
+
+    <!-- Statistic Screen -->
+    <string name="statistic_monthly_expense">Thống kê chi tiêu theo tháng</string>
+    <string name="filter_by_category">Theo thể loại</string>
+    <string name="compare_expense_types">So sánh các loại chi tiêu</string>
+    <string name="statistic_monthly_income">Thống kê thu nhập theo tháng</string>
+    <string name="compare_income_types">So sánh các loại thu nhập</string>
+
+    <!-- Category Screens -->
+    <string name="select_income_group">Chọn nhóm giao dịch thu nhập</string>
+    <string name="select_expense_group">Chọn nhóm giao dịch chi tiêu</string>
+    <string name="add_new_category_group">Thêm mới nhóm phân loại</string>
+
+    <!-- Settings Screen -->
+    <string name="manage_categories">Quản lý thể loại</string>
+    <string name="system_theme_setting">Giao diện hệ thống</string>
+    <string name="notifications">Thông báo</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Giao dịch</string>
+    <string name="nav_wallet">Ví tiền</string>
+    <string name="nav_add">Thêm</string>
+    <string name="nav_statistic">Thống kê</string>
+    <string name="nav_settings">Cài đặt</string>
+
+    <!-- Settings Options -->
+    <string name="language">Ngôn ngữ</string>
+    <string name="theme">Giao diện</string>
+    <string name="choose_language">Chọn ngôn ngữ</string>
+    <string name="choose_theme">Chọn giao diện</string>
+    <string name="light_theme">Sáng</string>
+    <string name="dark_theme">Tối</string>
+    <string name="system_theme">Theo hệ thống</string>
+    <string name="cancel">Hủy</string>
+
+    <string-array name="language_options">
+        <item>English</item>
+        <item>Tiếng Việt</item>
+    </string-array>
+    <string-array name="theme_options">
+        <item>@string/light_theme</item>
+        <item>@string/dark_theme</item>
+        <item>@string/system_theme</item>
+    </string-array>
+
+</resources>

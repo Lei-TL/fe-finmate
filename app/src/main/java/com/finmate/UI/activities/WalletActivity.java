@@ -7,12 +7,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.finmate.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class WalletActivity extends AppCompatActivity {
+public class WalletActivity extends BaseActivity {
 
     TextView tvBalance, tvIncomeValue, tvExpenseValue;
     ProgressBar progIncome, progExpense;

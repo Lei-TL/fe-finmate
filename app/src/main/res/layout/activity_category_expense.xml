@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0F1624">
+    android:background="?attr/backgroundColor">
 
     <!-- HEADER -->
     <LinearLayout
@@ -101,11 +101,11 @@
             android:id="@+id/btnAddNewCategory"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:text="Thêm mới nhóm phân loại"
+            android:text="@string/add_new_category_group"
             android:textAllCaps="false"
             android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/btn_primary" />
+            android:textColor="?attr/buttonTextColor"
+            android:background="?attr/buttonBackground" />
     </LinearLayout>
 
 </RelativeLayout>
