@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="backgroundColor" format="color" />
+    <attr name="surfaceColor" format="color" />
+    <attr name="cardBackgroundColor" format="color" />
+    <attr name="bottomNavBackgroundColor" format="color" />
+    <attr name="textColorPrimary" format="color" />
+    <attr name="textColorSecondary" format="color" />
+    <attr name="textColorPositive" format="color" />
+    <attr name="textColorNegative" format="color" />
+    <attr name="editTextBackground" format="reference" />
+    <attr name="editTextColor" format="color" />
+    <attr name="editTextColorHint" format="color" />
+    <attr name="buttonBackground" format="reference" />
+    <attr name="buttonTextColor" format="color" />
+    <attr name="iconTint" format="color" />
+    <attr name="progressBarBackgroundColor" format="color" />
+</resources>

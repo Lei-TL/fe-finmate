@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0F1624">
+    android:background="?attr/backgroundColor">
 
     <!-- ================= HEADER ================= -->
     <LinearLayout
@@ -22,7 +22,7 @@
             android:src="@drawable/ic_back"
             android:padding="4dp"
             android:contentDescription="Back"
-            app:tint="#FFFFFF"
+            app:tint="?attr/iconTint"
             android:background="?attr/selectableItemBackgroundBorderless" />
 
         <TextView
@@ -30,8 +30,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Chọn nhóm giao dịch chi tiêu"
-            android:textColor="#FFFFFF"
+            android:text="@string/select_expense_group"
+            android:textColor="?attr/textColorPrimary"
             android:textSize="18sp"
             android:textStyle="bold"
             android:gravity="center" />
@@ -43,7 +43,7 @@
             android:src="@drawable/ic_more"
             android:padding="4dp"
             android:contentDescription="More"
-            app:tint="#FFFFFF"
+            app:tint="?attr/iconTint"
             android:background="?attr/selectableItemBackgroundBorderless" />
     </LinearLayout>
 
@@ -63,9 +63,9 @@
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="1"
-            android:text="Chi tiêu"
+            android:text="@string/expense"
             android:gravity="center"
-            android:textColor="#FFFFFF"
+            android:textColor="?attr/textColorPrimary"
             android:textStyle="bold"
             android:textSize="16sp"
             android:background="@drawable/tab_active_bg" />
@@ -75,9 +75,9 @@
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_weight="1"
-            android:text="Thu nhập"
+            android:text="@string/income"
             android:gravity="center"
-            android:textColor="#777777"
+            android:textColor="?attr/textColorSecondary"
             android:textSize="16sp"
             android:background="@drawable/tab_inactive_bg" />
     </LinearLayout>
@@ -88,7 +88,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_below="@id/tabContainer"
-        android:layout_above="@id/layoutAddNew"
+        android:layout_above="@+id/layoutAddNew"
         android:layout_marginTop="12dp"
         android:paddingHorizontal="16dp"
         android:clipToPadding="false"
@@ -107,11 +107,11 @@
             android:id="@+id/btnAddNewCategory"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:text="Thêm mới nhóm phân loại"
+            android:text="@string/add_new_category_group"
             android:textAllCaps="false"
             android:textStyle="bold"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/btn_primary" />
+            android:textColor="?attr/buttonTextColor"
+            android:background="?attr/buttonBackground" />
     </LinearLayout>
 
 </RelativeLayout>

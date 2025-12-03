@@ -3,7 +3,6 @@ package com.finmate.UI.activities;
 
 
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -16,7 +15,7 @@ import com.finmate.models.CategoryModel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoryExpenseActivity extends AppCompatActivity {
+public class CategoryExpenseActivity extends BaseActivity {
 
     RecyclerView rvCategories;
     List<CategoryModel> list;

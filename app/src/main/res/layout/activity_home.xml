@@ -4,21 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0F1624"
+    android:background="?attr/backgroundColor"
     android:orientation="vertical"
-    tools:context=".HomeActivity">
+    tools:context=".UI.activities.HomeActivity">
 
-    <!-- ====== THANH STATUS BAR (Giờ + Icon) ====== -->
-
-
-    <!-- ====== HEADER NGƯỜI DÙNG ====== -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="16dp"
-        android:paddingBottom="12dp">
+        android:paddingBottom="12dp"
+        android:background="?attr/colorPrimary">
 
         <ImageView
             android:id="@+id/imgAvatar"
@@ -27,19 +24,21 @@
             android:layout_marginEnd="12dp"
             android:background="@drawable/bg_circle"
             android:padding="5dp"
-            android:src="@drawable/ic_avatar" />
+            android:src="@drawable/ic_avatar"
+            app:tint="?attr/colorOnPrimary"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            tools:ignore="ExtraText">
 
             <TextView
                 android:id="@+id/tvHello"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Hi,"
-                android:textColor="#FFFFFF"
+                android:text="@string/greeting"
+                android:textColor="?attr/colorOnPrimary"
                 android:textSize="16sp" />
 
             <TextView
@@ -47,19 +46,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Minh Hoa"
-                android:textColor="#FFFFFF"
+                android:textColor="?attr/colorOnPrimary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
 
-    <!-- ====== BIỂU ĐỒ THU NHẬP - CHI TIÊU ====== -->
     <LinearLayout
         android:id="@+id/chartContainer"
         android:layout_width="match_parent"
         android:layout_height="210dp"
         android:layout_margin="16dp"
         android:background="@drawable/bg_card"
+        android:backgroundTint="?attr/cardBackgroundColor"
         android:elevation="4dp"
         android:orientation="vertical"
         android:padding="12dp">
@@ -68,8 +67,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="Thống kê thu nhập - chi tiêu"
-            android:textColor="#B0B0B0"
+            android:text="@string/chart_title"
+            android:textColor="?attr/textColorSecondary"
             android:textSize="14sp" />
 
         <com.github.mikephil.charting.charts.LineChart
@@ -79,7 +78,6 @@
             android:layout_marginTop="8dp" />
     </LinearLayout>
 
-    <!-- ====== DANH SÁCH GIAO DỊCH (RecyclerView) ====== -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTransactions"
         android:layout_width="match_parent"
@@ -88,10 +86,11 @@
         android:clipToPadding="false"
         android:paddingBottom="16dp" />
 
-    <!-- ====== BOTTOM NAVIGATION ====== -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
-        android:layout_height="65dp" />
+        android:layout_height="65dp"
+        app:menu="@menu/menu_bottom"
+        android:background="?attr/bottomNavBackgroundColor"/>
 
 </LinearLayout>

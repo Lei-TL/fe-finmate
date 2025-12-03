@@ -1,17 +1,19 @@
 package com.finmate.UI.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.LinearLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 
 import com.finmate.R;
+import com.finmate.adapters.ThemeHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends BaseActivity {
 
     ImageView btnBack;
     LinearLayout btnLanguage, btnCategory, btnTheme, btnFriend, btnAccount, btnNotification;
@@ -23,6 +25,16 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
         // ÁNH XẠ
+        initViews();
+
+        // XỬ LÝ SỰ KIỆN
+        setupListeners();
+
+        // Chọn tab Cài đặt trên Bottom Nav
+        bottomNavigation.setSelectedItemId(R.id.nav_settings);
+    }
+
+    private void initViews() {
         btnBack = findViewById(R.id.btnBack);
         btnLanguage = findViewById(R.id.btnLanguage);
         btnCategory = findViewById(R.id.btnCategory);
@@ -31,22 +43,20 @@ public class SettingsActivity extends AppCompatActivity {
         btnAccount = findViewById(R.id.btnAccount);
         btnNotification = findViewById(R.id.btnNotification);
         bottomNavigation = findViewById(R.id.bottomNavigation);
+    }
 
-        // Chọn tab Cài đặt
-        bottomNavigation.setSelectedItemId(R.id.nav_settings);
-
-        // Nút quay lại
+    private void setupListeners() {
         btnBack.setOnClickListener(v -> finish());
 
-        // Xử lý các mục cài đặt
-        btnLanguage.setOnClickListener(v -> show("Ngôn ngữ"));
-        btnCategory.setOnClickListener(v -> show("Quản lý thể loại"));
-        btnTheme.setOnClickListener(v -> show("Giao diện hệ thống"));
+        btnAccount.setOnClickListener(v -> startActivity(new Intent(this, AccountActivity.class)));
+        btnCategory.setOnClickListener(v -> startActivity(new Intent(this, CategoryIncomeActivity.class)));
         btnFriend.setOnClickListener(v -> startActivity(new Intent(this, FriendActivity.class)));
-        btnAccount.setOnClickListener(v -> show("Tài khoản"));
-        btnNotification.setOnClickListener(v -> show("Thông báo"));
+        btnLanguage.setOnClickListener(v -> startActivity(new Intent(this, LanguageSettingActivity.class)));
+        btnTheme.setOnClickListener(v -> showThemeDialog());
 
-        // ====== BOTTOM NAVIGATION ======
+        btnNotification.setOnClickListener(v -> showFeatureInDevelopmentToast());
+
+        // Xử lý Bottom Navigation
         bottomNavigation.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == R.id.nav_home) {
@@ -66,13 +76,36 @@ public class SettingsActivity extends AppCompatActivity {
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 return true;
             } else if (itemId == R.id.nav_settings) {
-                return true; // đang ở đây
+                return true;
             }
             return false;
         });
     }
 
-    private void show(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    private void showThemeDialog() {
+        final String[] themeCodes = {ThemeHelper.LIGHT_MODE, ThemeHelper.DARK_MODE, ThemeHelper.SYSTEM_DEFAULT};
+        SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        String currentTheme = prefs.getString("theme", ThemeHelper.SYSTEM_DEFAULT);
+        int checkedItem = 0;
+        if (currentTheme.equals(ThemeHelper.DARK_MODE)) {
+            checkedItem = 1;
+        } else if (currentTheme.equals(ThemeHelper.SYSTEM_DEFAULT)) {
+            checkedItem = 2;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.choose_theme)
+                .setSingleChoiceItems(R.array.theme_options, checkedItem, (dialog, which) -> {
+                    String selectedTheme = themeCodes[which];
+                    prefs.edit().putString("theme", selectedTheme).apply();
+                    ThemeHelper.applyTheme(selectedTheme);
+                    dialog.dismiss();
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    private void showFeatureInDevelopmentToast() {
+        Toast.makeText(this, R.string.feature_in_development, Toast.LENGTH_SHORT).show();
     }
 }

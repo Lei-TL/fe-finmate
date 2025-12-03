@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0F1624"
+    android:background="?attr/backgroundColor"
     android:orientation="vertical">
 
     <!-- ====== BACK BUTTON ====== -->
@@ -19,7 +19,7 @@
             android:layout_height="28dp"
             android:padding="4dp"
             android:src="@drawable/ic_back"
-            app:tint="#FFFFFF" />
+            app:tint="?attr/iconTint" />
     </LinearLayout>
 
     <!-- ====== TAB CHI TIÊU / THU NHẬP ====== -->
@@ -35,10 +35,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Chi tiêu"
+            android:text="@string/expense"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="#FFFFFF"
+            android:textColor="?attr/textColorPrimary"
             android:gravity="center" />
 
         <TextView
@@ -46,9 +46,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Thu nhập"
+            android:text="@string/income"
             android:textSize="18sp"
-            android:textColor="#777777"
+            android:textColor="?attr/textColorSecondary"
             android:gravity="center" />
     </LinearLayout>
 
@@ -58,7 +58,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="-10,000,000 VND"
-        android:textColor="#FFFFFF"
+        android:textColor="?attr/textColorNegative"
         android:textSize="16sp"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="12dp" />
@@ -86,8 +86,8 @@
                     android:id="@+id/tvAddTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Thống kê chi tiêu theo tháng"
-                    android:textColor="#FFFFFF"
+                    android:text="@string/statistic_monthly_expense"
+                    android:textColor="?attr/textColorPrimary"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp" />
@@ -100,9 +100,9 @@
                 android:layout_height="40dp"
                 android:gravity="center_vertical"
                 android:paddingHorizontal="12dp"
-                android:text="Theo thể loại"
-                android:background="@drawable/edittext_bg"
-                android:textColor="#FFFFFF"
+                android:text="@string/filter_by_category"
+                android:background="?attr/editTextBackground"
+                android:textColor="?attr/editTextColor"
                 android:textSize="14sp" />
 
             <!-- BAR CHART -->
@@ -116,9 +116,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="So sánh các loại chi tiêu"
+                android:text="@string/compare_expense_types"
                 android:textStyle="bold"
-                android:textColor="#FFFFFF"
+                android:textColor="?attr/textColorPrimary"
                 android:layout_marginTop="24dp" />
 
             <!-- PIE CHART -->
@@ -136,7 +136,7 @@
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="65dp"
-        android:background="@drawable/bg_bottom_nav"
+        android:background="?attr/bottomNavBackgroundColor"
         app:itemIconTint="@color/selector_nav_color"
         app:itemTextColor="@color/selector_nav_color"
         app:menu="@menu/menu_bottom" />

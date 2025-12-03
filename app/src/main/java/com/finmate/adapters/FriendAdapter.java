@@ -16,10 +16,6 @@ import com.finmate.models.Friend;
 
 import java.util.List;
 
-// ===================================
-//      ADAPTER FOR RECYCLERVIEW
-// ===================================
-// Thêm "public" để lớp này có thể được truy cập từ các package khác
 public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> {
 
     private Context context;

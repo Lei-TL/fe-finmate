@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0F1624">
+    android:background="?attr/backgroundColor">
 
     <!-- SCROLL CONTENT -->
     <ScrollView
@@ -24,15 +24,15 @@
                 android:layout_height="32dp"
                 android:padding="6dp"
                 android:src="@drawable/ic_back"
-                app:tint="#FFFFFF" />
+                app:tint="?attr/iconTint" />
 
             <!-- TITLE -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cài đặt"
+                android:text="@string/nav_settings"
                 android:textSize="22sp"
-                android:textColor="#FFFFFF"
+                android:textColor="?attr/textColorPrimary"
                 android:textStyle="bold"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="12dp" />
@@ -45,7 +45,7 @@
                 android:layout_height="60dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:background="@drawable/bg_card"
+                android:background="?attr/cardBackgroundColor"
                 android:paddingHorizontal="16dp"
                 android:layout_marginBottom="12dp">
 
@@ -53,13 +53,13 @@
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:src="@drawable/ic_language"
-                    app:tint="#FFFFFF" />
+                    app:tint="?attr/iconTint" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ngôn ngữ"
-                    android:textColor="#FFFFFF"
+                    android:text="@string/language"
+                    android:textColor="?attr/textColorPrimary"
                     android:textSize="16sp"
                     android:layout_marginStart="12dp" />
             </LinearLayout>
@@ -72,7 +72,7 @@
                 android:layout_height="60dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:background="@drawable/bg_card"
+                android:background="?attr/cardBackgroundColor"
                 android:paddingHorizontal="16dp"
                 android:layout_marginBottom="12dp">
 
@@ -80,13 +80,13 @@
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:src="@drawable/ic_category"
-                    app:tint="#FFFFFF" />
+                    app:tint="?attr/iconTint" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Quản lý thể loại"
-                    android:textColor="#FFFFFF"
+                    android:text="@string/manage_categories"
+                    android:textColor="?attr/textColorPrimary"
                     android:textSize="16sp"
                     android:layout_marginStart="12dp" />
             </LinearLayout>
@@ -99,7 +99,7 @@
                 android:layout_height="60dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:background="@drawable/bg_card"
+                android:background="?attr/cardBackgroundColor"
                 android:paddingHorizontal="16dp"
                 android:layout_marginBottom="12dp">
 
@@ -107,13 +107,13 @@
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:src="@drawable/ic_theme"
-                    app:tint="#FFFFFF" />
+                    app:tint="?attr/iconTint" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Giao diện hệ thống"
-                    android:textColor="#FFFFFF"
+                    android:text="@string/system_theme_setting"
+                    android:textColor="?attr/textColorPrimary"
                     android:textSize="16sp"
                     android:layout_marginStart="12dp" />
             </LinearLayout>
@@ -126,7 +126,7 @@
                 android:layout_height="60dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:background="@drawable/bg_card"
+                android:background="?attr/cardBackgroundColor"
                 android:paddingHorizontal="16dp"
                 android:layout_marginBottom="12dp">
 
@@ -134,13 +134,13 @@
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:src="@drawable/ic_friend"
-                    app:tint="#FFFFFF" />
+                    app:tint="?attr/iconTint" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Bạn bè"
-                    android:textColor="#FFFFFF"
+                    android:text="@string/friends"
+                    android:textColor="?attr/textColorPrimary"
                     android:textSize="16sp"
                     android:layout_marginStart="12dp" />
             </LinearLayout>
@@ -153,7 +153,7 @@
                 android:layout_height="60dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:background="@drawable/bg_card"
+                android:background="?attr/cardBackgroundColor"
                 android:paddingHorizontal="16dp"
                 android:layout_marginBottom="12dp">
 
@@ -161,13 +161,13 @@
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:src="@drawable/ic_account"
-                    app:tint="#FFFFFF" />
+                    app:tint="?attr/iconTint" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tài khoản"
-                    android:textColor="#FFFFFF"
+                    android:text="@string/my_account"
+                    android:textColor="?attr/textColorPrimary"
                     android:textSize="16sp"
                     android:layout_marginStart="12dp" />
             </LinearLayout>
@@ -180,20 +180,20 @@
                 android:layout_height="60dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:background="@drawable/bg_card"
+                android:background="?attr/cardBackgroundColor"
                 android:paddingHorizontal="16dp">
 
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:src="@drawable/ic_notification"
-                    app:tint="#FFFFFF" />
+                    app:tint="?attr/iconTint" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Thông báo"
-                    android:textColor="#FFFFFF"
+                    android:text="@string/notifications"
+                    android:textColor="?attr/textColorPrimary"
                     android:textSize="16sp"
                     android:layout_marginStart="12dp" />
 
@@ -216,7 +216,7 @@
         android:layout_width="match_parent"
         android:layout_height="65dp"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/bg_bottom_nav"
+        android:background="?attr/bottomNavBackgroundColor"
         app:menu="@menu/menu_bottom"
         app:itemIconTint="@color/selector_nav_color"
         app:itemTextColor="@color/selector_nav_color" />

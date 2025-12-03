@@ -6,11 +6,6 @@ import android.os.Bundle;
 import android.view.MenuItem;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.finmate.R;
 import com.finmate.adapters.TransactionAdapter;
 import com.finmate.models.Transaction;
 import com.github.mikephil.charting.charts.LineChart;
@@ -25,7 +20,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity {
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.finmate.R;
+
+public class HomeActivity extends BaseActivity {
 
     LineChart lineChart;
     BottomNavigationView bottomNavigation;

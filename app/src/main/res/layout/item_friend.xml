@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_card"
+    android:background="?attr/surfaceColor"
     android:padding="10dp"
     android:orientation="horizontal"
     android:gravity="center_vertical"
@@ -27,7 +27,7 @@
         android:layout_marginStart="12dp"
         android:layout_marginEnd="8dp"
         android:text="Bạn còn thiếu một chút tiền từ Nguyễn An"
-        android:textColor="#FFFFFF"
+        android:textColor="?attr/textColorPrimary"
         android:textSize="14sp" />
 
     <!-- More Options Icon -->
@@ -36,7 +36,7 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:src="@drawable/ic_more"
-        app:tint="#FFFFFF"
+        app:tint="?attr/iconTint"
         android:padding="2dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="Tùy chọn khác" />
