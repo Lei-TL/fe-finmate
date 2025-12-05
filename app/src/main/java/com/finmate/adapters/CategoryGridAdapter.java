@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
-import com.finmate.UI.models.CategoryUIModel;
+import com.finmate.ui.models.CategoryUIModel;
 
 import java.util.List;
 
