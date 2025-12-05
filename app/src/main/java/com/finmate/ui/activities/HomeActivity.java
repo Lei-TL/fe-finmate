@@ -29,7 +29,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeActivity extends AppCompatActivity {
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.finmate.R;
+
+public class HomeActivity extends BaseActivity {
 
     private LineChart lineChart;
     private BottomNavigationView bottomNavigation;

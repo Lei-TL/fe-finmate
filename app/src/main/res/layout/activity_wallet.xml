@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0F1624"
+    android:background="?attr/backgroundColor"
     android:orientation="vertical">
 
     <!-- ====== CARD VÍ TIỀN ====== -->
@@ -13,6 +13,7 @@
         android:layout_margin="16dp"
         android:padding="16dp"
         android:background="@drawable/bg_card"
+        android:backgroundTint="?attr/cardBackgroundColor"
         android:orientation="vertical">
 
         <!-- TIÊU ĐỀ + SỐ DƯ -->
@@ -25,8 +26,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Tài khoản của tôi"
-                android:textColor="#FFFFFF"
+                android:text="@string/my_account"
+                android:textColor="?attr/textColorPrimary"
                 android:textSize="16sp"
                 android:textStyle="bold"/>
 
@@ -36,7 +37,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0 VND"
-                android:textColor="#FFFFFF"
+                android:textColor="?attr/textColorPrimary"
                 android:textStyle="bold"
                 android:textSize="16sp"/>
         </LinearLayout>
@@ -46,8 +47,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Thu nhập"
-            android:textColor="#FF2EBF"
+            android:text="@string/income"
+            android:textColor="?attr/textColorPositive"
             android:textStyle="bold"/>
 
         <ProgressBar
@@ -57,14 +58,14 @@
             android:layout_height="8dp"
             android:max="100"
             android:progressTint="#FF2EBF"
-            android:backgroundTint="#3A3A3A"/>
+            android:backgroundTint="?attr/progressBarBackgroundColor"/>
 
         <TextView
             android:id="@+id/tv_income_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="+0 VND"
-            android:textColor="#FF2EBF"
+            android:textColor="?attr/textColorPositive"
             android:textSize="13sp"
             android:layout_marginBottom="12dp"/>
 
@@ -72,8 +73,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Chi tiêu"
-            android:textColor="#A0A0A0"
+            android:text="@string/expense"
+            android:textColor="?attr/textColorSecondary"
             android:textStyle="bold"/>
 
         <ProgressBar
@@ -83,14 +84,14 @@
             android:layout_height="8dp"
             android:max="100"
             android:progressTint="#7CE27D"
-            android:backgroundTint="#3A3A3A"/>
+            android:backgroundTint="?attr/progressBarBackgroundColor"/>
 
         <TextView
             android:id="@+id/tv_expense_value"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="-0 VND"
-            android:textColor="#7CE27D"
+            android:textColor="?attr/textColorNegative"
             android:textSize="13sp"/>
 
     </LinearLayout>
@@ -118,9 +119,8 @@
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="65dp"
-        android:background="@drawable/bg_bottom_nav"
+        android:background="?attr/bottomNavBackgroundColor"
         app:menu="@menu/menu_bottom"
-        app:itemIconTint="@color/selector_nav_color"
         app:itemTextColor="@color/selector_nav_color"/>
 
 </LinearLayout>

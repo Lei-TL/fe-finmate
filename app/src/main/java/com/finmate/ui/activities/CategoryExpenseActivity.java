@@ -21,7 +21,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CategoryExpenseActivity extends AppCompatActivity {
+public class CategoryExpenseActivity extends BaseActivity {
 
     RecyclerView rvCategories;
     List<CategoryUIModel> list = new ArrayList<>();
