@@ -13,9 +13,9 @@
         android:id="@+id/imgIcon"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:src="@drawable/ic_food"
+        android:src="@drawable/chedoan"
         android:layout_gravity="center"
-        app:tint="?attr/iconTint" />
+        app:tint="@null" />
 
     <TextView
         android:id="@+id/txtName"

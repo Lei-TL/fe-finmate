@@ -155,9 +155,6 @@
                     android:backgroundTint="#3D5AFE"
                     android:textStyle="bold"/>
             </LinearLayout>
-
         </LinearLayout>
-
     </ScrollView>
-
 </RelativeLayout>

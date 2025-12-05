@@ -11,8 +11,8 @@
         android:id="@+id/imgCategory"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:src="@drawable/ic_food"
-        app:tint="?attr/iconTint"
+        android:src="@drawable/traidau"
+        app:tint="@null"
         android:layout_marginEnd="12dp" />
 
     <LinearLayout

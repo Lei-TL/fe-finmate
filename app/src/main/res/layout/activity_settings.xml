@@ -52,8 +52,8 @@
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/ic_language"
-                    app:tint="?attr/iconTint" />
+                    android:src="@drawable/ngonngu"
+                    app:tint="@null" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -79,8 +79,8 @@
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/ic_category"
-                    app:tint="?attr/iconTint" />
+                    android:src="@drawable/theloai"
+                    app:tint="@null" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -106,8 +106,8 @@
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/ic_theme"
-                    app:tint="?attr/iconTint" />
+                    android:src="@drawable/giaodien"
+                    app:tint="@null" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -133,8 +133,8 @@
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/ic_friend"
-                    app:tint="?attr/iconTint" />
+                    android:src="@drawable/friend"
+                    app:tint="@null" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -160,8 +160,8 @@
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/ic_account"
-                    app:tint="?attr/iconTint" />
+                    android:src="@drawable/taikhoan"
+                    app:tint="@null" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -186,8 +186,8 @@
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/ic_notification"
-                    app:tint="?attr/iconTint" />
+                    android:src="@drawable/thongbao"
+                    app:tint="@null" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -218,7 +218,6 @@
         android:layout_alignParentBottom="true"
         android:background="?attr/bottomNavBackgroundColor"
         app:menu="@menu/menu_bottom"
-        app:itemIconTint="@color/selector_nav_color"
         app:itemTextColor="@color/selector_nav_color" />
 
 </RelativeLayout>

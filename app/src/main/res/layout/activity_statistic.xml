@@ -137,7 +137,6 @@
         android:layout_width="match_parent"
         android:layout_height="65dp"
         android:background="?attr/bottomNavBackgroundColor"
-        app:itemIconTint="@color/selector_nav_color"
         app:itemTextColor="@color/selector_nav_color"
         app:menu="@menu/menu_bottom" />
 

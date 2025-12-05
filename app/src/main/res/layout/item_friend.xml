@@ -14,7 +14,7 @@
         android:id="@+id/ivFriendAvatar"
         android:layout_width="36dp"
         android:layout_height="36dp"
-        android:src="@drawable/ic_friend"
+        android:src="@drawable/friend"
         android:background="@drawable/bg_circle"
         android:padding="6dp" />
 
