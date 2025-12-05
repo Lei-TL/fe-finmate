@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="#0F1624">
+    android:background="?attr/backgroundColor">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,7 +22,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/ic_back"
-                android:tint="#FFFFFF"
+                app:tint="?attr/iconTint"
                 android:padding="4dp"
                 android:layout_alignParentStart="true" />
 
@@ -30,7 +31,7 @@
                 android:layout_width="28dp"
                 android:layout_height="28dp"
                 android:src="@drawable/ic_more"
-                android:tint="#FFFFFF"
+                app:tint="?attr/iconTint"
                 android:padding="4dp"
                 android:layout_alignParentEnd="true" />
         </RelativeLayout>
@@ -71,22 +72,22 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Thu nhập   +60,000,000 VND"
-                android:textColor="#00FF00"
+                android:text="@string/income"
+                android:textColor="?attr/textColorPositive"
                 android:textSize="14sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Chi tiêu     -10,000,000 VND"
-                android:textColor="#FF4444"
+                android:text="@string/expense"
+                android:textColor="?attr/textColorNegative"
                 android:textSize="14sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Số dư         +50,000,000 VND"
-                android:textColor="#00FF00"
+                android:text="@string/balance"
+                android:textColor="?attr/textColorPositive"
                 android:textSize="14sp" />
         </LinearLayout>
 
@@ -94,48 +95,50 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tên"
-            android:textColor="#FFFFFF"
+            android:text="@string/name"
+            android:textColor="?attr/textColorPrimary"
             android:layout_marginTop="20dp" />
 
         <EditText
             android:id="@+id/edtName"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:background="@drawable/bg_input"
+            android:background="?attr/editTextBackground"
             android:padding="12dp"
-            android:textColor="#FFFFFF"
-            android:hint="Nhập tên" />
+            android:textColor="?attr/editTextColor"
+            android:textColorHint="?attr/editTextColorHint"
+            android:hint="@string/enter_name_hint" />
 
         <!-- EMAIL -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Email"
-            android:textColor="#FFFFFF"
+            android:text="@string/email"
+            android:textColor="?attr/textColorPrimary"
             android:layout_marginTop="12dp" />
 
         <EditText
             android:id="@+id/edtEmail"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:background="@drawable/bg_input"
+            android:background="?attr/editTextBackground"
             android:padding="12dp"
-            android:textColor="#FFFFFF"
-            android:hint="Nhập email" />
+            android:textColor="?attr/editTextColor"
+            android:textColorHint="?attr/editTextColorHint"
+            android:hint="@string/enter_email_hint" />
 
         <!-- NGÀY SINH -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ngày sinh"
-            android:textColor="#FFFFFF"
+            android:text="@string/birthday"
+            android:textColor="?attr/textColorPrimary"
             android:layout_marginTop="12dp" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:background="@drawable/bg_input"
+            android:background="?attr/editTextBackground"
             android:paddingHorizontal="12dp"
             android:gravity="center_vertical">
 
@@ -143,7 +146,9 @@
                 android:id="@+id/edtBirthday"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#FFFFFF"
+                android:textColor="?attr/editTextColor"
+                android:textColorHint="?attr/editTextColorHint"
+                android:background="@null"
                 android:hint="30/08/2001"
                 android:padding="0dp" />
 
@@ -152,15 +157,15 @@
                 android:layout_height="28dp"
                 android:layout_alignParentRight="true"
                 android:src="@drawable/ic_calendar"
-                android:tint="#FFFFFF" />
+                app:tint="?attr/iconTint" />
         </RelativeLayout>
 
         <!-- MÔ TẢ -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mô tả bản thân"
-            android:textColor="#FFFFFF"
+            android:text="@string/description"
+            android:textColor="?attr/textColorPrimary"
             android:layout_marginTop="12dp" />
 
         <EditText
@@ -168,17 +173,48 @@
             android:layout_width="match_parent"
             android:layout_height="120dp"
             android:gravity="top"
-            android:background="@drawable/bg_input"
+            android:background="?attr/editTextBackground"
             android:padding="12dp"
-            android:textColor="#FFFFFF"
-            android:hint="Nhập mô tả..." />
+            android:textColor="?attr/editTextColor"
+            android:textColorHint="?attr/editTextColorHint"
+            android:hint="@string/enter_description_hint" />
+
+        <!-- NGÔN NGỮ -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/language"
+            android:textColor="?attr/textColorPrimary"
+            android:layout_marginTop="12dp" />
+
+        <Spinner
+            android:id="@+id/spnLanguage"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="?attr/editTextBackground"
+            android:padding="12dp" />
+
+        <!-- GIAO DIỆN -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/theme"
+            android:textColor="?attr/textColorPrimary"
+            android:layout_marginTop="12dp" />
+
+        <Spinner
+            android:id="@+id/spnTheme"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="?attr/editTextBackground"
+            android:padding="12dp" />
 
         <!-- BẠN BÈ -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bạn bè"
-            android:textColor="#FFFFFF"
+            android:text="@string/friends"
+            android:textColor="?attr/textColorPrimary"
             android:layout_marginTop="12dp" />
 
         <LinearLayout
@@ -218,6 +254,14 @@
                 android:background="@drawable/bg_circle_white"
                 android:padding="10dp" />
         </LinearLayout>
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/save_changes"
+            android:layout_marginTop="16dp"/>
+
     </LinearLayout>
 
 </ScrollView>

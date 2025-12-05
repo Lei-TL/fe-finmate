@@ -2,14 +2,14 @@ package com.finmate.util;
 
 import android.content.Context;
 
-import com.finmate.database.AppDatabase;
+import com.finmate.data.local.database.AppDatabase;
 import com.finmate.entities.TokenEntity;
 
 public class TokenManager {
     private AppDatabase db;
 
     public TokenManager(Context context) {
-        db = AppDatabase.getInstance(context);
+        db = AppDatabase.getDatabase(context);
     }
 
     public void saveToken(String accessToken, String refreshToken) {

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="70dp"
     android:orientation="horizontal"
@@ -10,7 +11,8 @@
         android:id="@+id/imgCategory"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:src="@drawable/ic_food"
+        android:src="@drawable/traidau"
+        app:tint="@null"
         android:layout_marginEnd="12dp" />
 
     <LinearLayout
@@ -21,18 +23,18 @@
 
         <TextView
             android:id="@+id/tvName"
-            android:text="Ăn uống"
+            android:text="@string/expense"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
+            android:textColor="?attr/textColorPrimary"
             android:textSize="15sp" />
 
         <TextView
             android:id="@+id/tvGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Riêng tôi"
-            android:textColor="#C0C0C0"
+            android:text="@string/personal"
+            android:textColor="?attr/textColorSecondary"
             android:textSize="13sp" />
     </LinearLayout>
 
@@ -47,15 +49,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="-100,000 đ"
-            android:textColor="#FF7777"
+            android:textColor="?attr/textColorNegative"
             android:textSize="15sp" />
 
         <TextView
             android:id="@+id/tvWallet"
-            android:text="Ví của tôi"
+            android:text="@string/my_wallet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#C0C0C0"
+            android:textColor="?attr/textColorSecondary"
             android:textSize="13sp" />
     </LinearLayout>
 </LinearLayout>

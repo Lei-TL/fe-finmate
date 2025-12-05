@@ -1,11 +1,11 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.hilt) // Sử dụng plugin Hilt cho Java, thay vì kotlin-kapt
+    alias(libs.plugins.hilt)
 }
 
 android {
     namespace = "com.finmate"
-    compileSdk = 34 // Sửa lại phiên bản SDK cho đúng
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.finmate"
@@ -37,13 +37,37 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.room.runtime)
-    annotationProcessor(libs.room.compiler) // Dùng annotationProcessor cho Java
+    annotationProcessor(libs.room.compiler)
 
     // Hilt
     implementation(libs.hilt.android)
-    annotationProcessor(libs.hilt.compiler) // Dùng annotationProcessor cho Java
+    annotationProcessor(libs.hilt.compiler)
+
+    // Retrofit & OkHttp
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    implementation(libs.okhttp.logging)
+
+    // DataStore
+    implementation(libs.datastore.prefs)
+    implementation(libs.datastore.rxjava3) // For Java support
+
+    // RxJava
+    implementation(libs.rxjava)
+
+    // Lifecycle
+    implementation(libs.lifecycle.viewmodel)
+    implementation(libs.lifecycle.livedata)
+
+    // Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.gson)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 }
