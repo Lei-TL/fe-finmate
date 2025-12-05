@@ -9,16 +9,23 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
-import com.finmate.UI.models.TransactionUIModel; // Import đúng UI Model
+import com.finmate.ui.models.TransactionUIModel; 
 
 import java.util.List;
 
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder> {
 
-    private List<TransactionUIModel> transactionList; // Sửa thành TransactionUIModel
+    private List<TransactionUIModel> transactionList;
 
-    public TransactionAdapter(List<TransactionUIModel> transactionList) { // Sửa thành TransactionUIModel
+    public TransactionAdapter(List<TransactionUIModel> transactionList) {
         this.transactionList = transactionList;
+    }
+
+    // === PHƯƠNG THỨC ĐỂ CẬP NHẬT DỮ LIỆU ===
+    public void updateList(List<TransactionUIModel> newList) {
+        this.transactionList.clear();
+        this.transactionList.addAll(newList);
+        notifyDataSetChanged(); // Báo cho RecyclerView cập nhật lại
     }
 
     @NonNull
@@ -30,7 +37,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
-        TransactionUIModel transaction = transactionList.get(position); // Sửa thành TransactionUIModel
+        TransactionUIModel transaction = transactionList.get(position);
         holder.tvName.setText(transaction.getName());
         holder.tvGroup.setText(transaction.getCategory());
         holder.tvMoney.setText(transaction.getAmount());
