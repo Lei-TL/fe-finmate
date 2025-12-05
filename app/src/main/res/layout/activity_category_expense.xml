@@ -74,21 +74,22 @@
             android:background="@drawable/tab_inactive_bg" />
     </LinearLayout>
 
-    <!-- LIST -->
+    <!-- ================= RECYCLER VIEW ================= -->
+
+    <!-- ================= ADD NEW CATEGORY BUTTON ================= -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvCategories"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_above="@+id/layoutAddNew"
         android:layout_below="@id/tabContainer"
-        android:layout_above="@id/layoutAddNew"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="80dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="-2dp"
         android:clipToPadding="false"
-        tools:listitem="@layout/item_category_grid"
-        tools:itemCount="12" />
+        android:paddingHorizontal="16dp"
+        tools:itemCount="12"
+        tools:listitem="@layout/item_category_grid" />
 
-    <!-- ADD BUTTON -->
     <LinearLayout
         android:id="@+id/layoutAddNew"
         android:layout_width="match_parent"

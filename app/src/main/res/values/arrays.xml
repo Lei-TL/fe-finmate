@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="predefined_icons">
+        <item>@drawable/chedoan</item>
+        <item>@drawable/dulich</item>
+        <item>@drawable/education</item>
+        <item>@drawable/giaitri</item>
+        <item>@drawable/hoadondien</item>
+        <item>@drawable/hoadonnuoc</item>
+        <item>@drawable/quatang</item>
+        <item>@drawable/thoitrang</item>
+        <item>@drawable/thucung</item>
+        <item>@drawable/tiendautu</item>
+        <item>@drawable/tienkhac</item>
+        <item>@drawable/tienluong</item>
+        <item>@drawable/tienthuong</item>
+        <item>@drawable/traidau</item>
+        <item>@drawable/ngonngu</item>
+        <item>@drawable/theloai</item>
+        <item>@drawable/giaodien</item>
+    </array>
+
+    <array name="predefined_colors">
+        <item>#FF6B6B</item>
+        <item>#4ECDC4</item>
+        <item>#45B7D1</item>
+        <item>#96CEB4</item>
+        <item>#F7C56E</item>
+        <item>#D4A5A5</item>
+        <item>#9B59B6</item>
+        <item>#3498DB</item>
+        <item>#E74C3C</item>
+        <item>#2ECC71</item>
+        <item>#F1C40F</item>
+        <item>#E67E22</item>
+        <item>#1ABC9C</item>
+        <item>#2980B9</item>
+        <item>#8E44AD</item>
+    </array>
+</resources>
