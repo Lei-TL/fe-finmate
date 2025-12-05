@@ -1,4 +1,4 @@
-package com.finmate.dto;
+package com.finmate.database.dao;
 
 import androidx.room.Dao;
 import androidx.room.Insert;

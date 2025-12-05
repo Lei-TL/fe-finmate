@@ -11,10 +11,8 @@ public class TokenManager {
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
 
-    @Inject
-    public TokenManager(@ApplicationContext Context context) {
-        prefs = context.getSharedPreferences("FinMatePrefs", Context.MODE_PRIVATE);
-        editor = prefs.edit();
+    public TokenManager(Context context) {
+        db = AppDatabase.getInstance(context);
     }
 
     public void saveToken(String accessToken, String refreshToken) {

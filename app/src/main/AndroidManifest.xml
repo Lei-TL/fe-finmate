@@ -21,11 +21,15 @@
         <activity
             android:name=".UI.activities.HomeActivity"
             android:exported="true">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
+
+        <!-- ======= CÁC MÀN HÌNH KHÁC ======= -->
 
         <activity android:name=".UI.activities.SignUpActivity" android:exported="false" />
         <activity android:name=".UI.activities.LoginActivity" android:exported="false" />
@@ -39,6 +43,9 @@
         <activity android:name=".UI.activities.CategoryExpenseActivity" android:exported="false" />
         <activity android:name=".UI.activities.IncomeStatisticActivity" android:exported="false" />
         <activity android:name=".UI.activities.LanguageSettingActivity" android:exported="false" />
+
+        <!-- ======= THÊM MÀN HÌNH THÊM VÍ ======= -->
+        <activity android:name=".UI.activities.AddWalletActivity" android:exported="false" />
 
     </application>
 

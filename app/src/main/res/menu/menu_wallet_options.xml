@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_choose_wallet"
+        android:title="Chọn ví"
+        android:icon="@drawable/ic_wallet" />
+
+    <item
+        android:id="@+id/action_add_wallet"
+        android:title="Thêm ví"
+        android:icon="@drawable/ic_add" />
+
+</menu>

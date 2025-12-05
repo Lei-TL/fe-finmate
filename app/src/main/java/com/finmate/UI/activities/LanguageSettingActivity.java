@@ -4,83 +4,96 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.finmate.R;
-import com.finmate.adapters.LanguageAdapter;
-import com.finmate.models.Language;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Locale;
 
-public class LanguageSettingActivity extends BaseActivity implements LanguageAdapter.OnItemClickListener {
+public class LanguageSettingActivity extends AppCompatActivity {
 
-    private RecyclerView rvLanguages;
-    private LanguageAdapter adapter;
-    private List<Language> languageList;
-    private SharedPreferences prefs;
+    ImageView btnBack;
+    LinearLayout btnVietnamese, btnEnglish;
+    BottomNavigationView bottomNavigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // ⭐ Load ngôn ngữ trước khi setContentView
+        loadLanguage();
+
         setContentView(R.layout.activity_language_settings);
 
-        prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        // ÁNH XẠ
+        btnBack = findViewById(R.id.btnBack);
+        btnVietnamese = findViewById(R.id.btnVietnamese);
+        btnEnglish = findViewById(R.id.btnEnglish);
+        bottomNavigation = findViewById(R.id.bottomNavigation);
 
-        // Back button
-        ImageView btnBack = findViewById(R.id.btnBack);
+        // QUAY LẠI
         btnBack.setOnClickListener(v -> finish());
 
-        // Setup RecyclerView
-        rvLanguages = findViewById(R.id.rvLanguages);
-        rvLanguages.setLayoutManager(new LinearLayoutManager(this));
+        // ================= CHỌN TIẾNG VIỆT =================
+        btnVietnamese.setOnClickListener(v -> {
+            saveLanguage("vi");
+            restartApp();
+        });
 
-        // Prepare data and adapter
-        prepareLanguageList();
-        adapter = new LanguageAdapter(this, languageList, this);
-        rvLanguages.setAdapter(adapter);
+        // ================= CHỌN ENGLISH =================
+        btnEnglish.setOnClickListener(v -> {
+            saveLanguage("en");
+            restartApp();
+        });
+
+
     }
 
-    private void prepareLanguageList() {
-        languageList = new ArrayList<>();
-        languageList.add(new Language("English", "en", R.drawable.ic_flag_uk)); // Assume you have these drawables
-        languageList.add(new Language("Tiếng Việt", "vi", R.drawable.ic_flag_vn));
+    // ==================================================
+    // ⭐ LƯU NGÔN NGỮ VÀO SharedPreferences
+    // ==================================================
+    private void saveLanguage(String lang) {
+        SharedPreferences.Editor editor =
+                getSharedPreferences("settings", MODE_PRIVATE).edit();
 
-        String currentLangCode = prefs.getString("language", "en");
-
-        for (Language lang : languageList) {
-            if (lang.getCode().equals(currentLangCode)) {
-                lang.setSelected(true);
-                break;
-            }
-        }
+        editor.putString("language", lang);
+        editor.apply();
     }
 
-    @Override
-    public void onItemClick(int position) {
-        // Get selected language
-        Language selectedLanguage = languageList.get(position);
+    // ==================================================
+    // ⭐ ÁP DỤNG NGÔN NGỮ KHI MỞ ACTIVITY
+    // ==================================================
+    private void loadLanguage() {
+        SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
+        String lang = prefs.getString("language", "vi");
 
-        // Save the new language preference
-        prefs.edit().putString("language", selectedLanguage.getCode()).apply();
+        Locale newLocale = new Locale(lang);
+        Locale.setDefault(newLocale);
 
-        // Update the selection state in the list
-        for (int i = 0; i < languageList.size(); i++) {
-            languageList.get(i).setSelected(i == position);
-        }
+        android.content.res.Configuration config =
+                new android.content.res.Configuration();
 
-        // Notify the adapter that the data has changed to update the checkmark
-        adapter.notifyDataSetChanged();
+        config.setLocale(newLocale);
 
-        // Restart the current activity to apply the new language
-        recreate();
+        getResources().updateConfiguration(
+                config,
+                getResources().getDisplayMetrics()
+        );
+    }
 
-        // Optionally, restart the main activity to ensure the whole app is updated
-        Intent intent = new Intent(this, HomeActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+    // ==================================================
+    // ⭐ RESTART APP SAU KHI ĐỔI NGÔN NGỮ
+    // ==================================================
+    private void restartApp() {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                Intent.FLAG_ACTIVITY_NEW_TASK |
+                Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
         startActivity(intent);
-        finish();
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 }
