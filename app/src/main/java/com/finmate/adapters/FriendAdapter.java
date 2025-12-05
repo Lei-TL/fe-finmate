@@ -12,7 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
-import com.finmate.UI.models.FriendUIModel;
+import com.finmate.ui.models.FriendUIModel;
 
 import java.util.List;
 

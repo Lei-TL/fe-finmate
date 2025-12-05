@@ -17,35 +17,35 @@
         android:theme="@style/Theme.FinMate"
         tools:targetApi="31">
 
-        <!-- Màn hình đăng nhập (Launcher) -->
+        <!-- Màn hình Splash (Launcher) -->
         <activity
-            android:name=".UI.activities.HomeActivity"
+            android:name=".ui.splash.SplashActivity"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
 
-        <!-- ======= CÁC MÀN HÌNH KHÁC ======= -->
+        <!-- Màn hình Auth -->
+        <activity android:name=".ui.auth.LoginActivity" android:exported="false" />
+        <activity android:name=".ui.auth.SignUpActivity" android:exported="false" />
 
-        <activity android:name=".UI.activities.SignUpActivity" android:exported="false" />
-        <activity android:name=".UI.activities.LoginActivity" android:exported="false" />
-        <activity android:name=".UI.activities.SettingsActivity" android:exported="false" />
-        <activity android:name=".UI.activities.FriendActivity" android:exported="false" />
-        <activity android:name=".UI.activities.WalletActivity" android:exported="false" />
-        <activity android:name=".UI.activities.AccountActivity" android:exported="false" />
-        <activity android:name=".UI.activities.StatisticActivity" android:exported="false" />
-        <activity android:name=".UI.activities.AddTransactionActivity" android:exported="false" />
-        <activity android:name=".UI.activities.CategoryIncomeActivity" android:exported="false" />
-        <activity android:name=".UI.activities.CategoryExpenseActivity" android:exported="false" />
-        <activity android:name=".UI.activities.IncomeStatisticActivity" android:exported="false" />
-        <activity android:name=".UI.activities.LanguageSettingActivity" android:exported="false" />
+        <!-- Home -->
+        <activity android:name=".ui.home.HomeActivity" android:exported="false" />
 
-        <!-- ======= THÊM MÀN HÌNH THÊM VÍ ======= -->
-        <activity android:name=".UI.activities.AddWalletActivity" android:exported="false" />
+        <!-- ======= CÁC MÀN HÌNH KHÁC (Vẫn ở package cũ chưa move) ======= -->
+        <activity android:name=".ui.activities.SettingsActivity" android:exported="false" />
+        <activity android:name=".ui.activities.FriendActivity" android:exported="false" />
+        <activity android:name=".ui.activities.WalletActivity" android:exported="false" />
+        <activity android:name=".ui.activities.AccountActivity" android:exported="false" />
+        <activity android:name=".ui.activities.StatisticActivity" android:exported="false" />
+        <activity android:name=".ui.activities.AddTransactionActivity" android:exported="false" />
+        <activity android:name=".ui.activities.CategoryIncomeActivity" android:exported="false" />
+        <activity android:name=".ui.activities.CategoryExpenseActivity" android:exported="false" />
+        <activity android:name=".ui.activities.IncomeStatisticActivity" android:exported="false" />
+        <activity android:name=".ui.activities.LanguageSettingActivity" android:exported="false" />
+        <activity android:name=".ui.activities.AddWalletActivity" android:exported="false" />
 
     </application>
 
