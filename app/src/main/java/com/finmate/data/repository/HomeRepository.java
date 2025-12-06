@@ -4,10 +4,9 @@ import com.finmate.core.network.ApiCallback;
 import com.finmate.data.dto.TransactionPageResponse;
 import com.finmate.data.dto.TransactionResponse;
 import com.finmate.data.dto.WalletResponse;
-import com.finmate.entities.TransactionEntity;
-import com.finmate.entities.WalletEntity;
+import com.finmate.data.local.database.entity.TransactionEntity;
+import com.finmate.data.local.database.entity.WalletEntity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;

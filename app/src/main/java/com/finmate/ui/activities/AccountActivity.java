@@ -10,10 +10,12 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.finmate.R;
-import com.finmate.adapters.ThemeHelper;
+import androidx.appcompat.app.AppCompatActivity;
 
-public class AccountActivity extends BaseActivity {
+import com.finmate.R;
+import com.finmate.core.ui.ThemeHelper;
+
+public class AccountActivity extends AppCompatActivity {
 
     private ImageView btnBack, btnCamera, btnEdit;
     private EditText edtName, edtEmail, edtBirthday, edtNote;

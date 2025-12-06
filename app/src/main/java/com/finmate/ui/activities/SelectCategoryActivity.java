@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
-import com.finmate.ui.models.CategoryUIModel;
-import com.finmate.adapters.CategoryGridAdapter;
+import com.finmate.ui.transaction.CategoryUIModel;
+import com.finmate.ui.transaction.CategoryGridAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

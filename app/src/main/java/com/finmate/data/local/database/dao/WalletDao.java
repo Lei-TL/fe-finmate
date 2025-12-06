@@ -5,7 +5,7 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
-import com.finmate.entities.WalletEntity;
+import com.finmate.data.local.database.entity.WalletEntity;
 import java.util.List;
 
 @Dao
