@@ -10,7 +10,7 @@ android {
     defaultConfig {
         applicationId = "com.finmate"
         minSdk = 26
-        targetSdk = 34
+        targetSdkVersion(rootProject.extra["defaultTargetSdkVersion"] as Int)
         versionCode = 1
         versionName = "1.0"
 
@@ -59,15 +59,7 @@ dependencies {
     implementation(libs.lifecycle.viewmodel)
     implementation(libs.lifecycle.livedata)
 
-    // Retrofit
-    implementation(libs.retrofit)
-    implementation(libs.converter.gson)
-    implementation(libs.gson)
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 }

@@ -5,8 +5,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.finmate.data.repository.HomeRepository;
-import com.finmate.entities.TransactionEntity;
-import com.finmate.entities.WalletEntity;
+import com.finmate.data.local.database.entity.TransactionEntity;
+import com.finmate.data.local.database.entity.WalletEntity;
 
 import java.util.List;
 

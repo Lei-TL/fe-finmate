@@ -14,10 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
 import com.finmate.ui.dialogs.AddCategoryDialog;
-import com.finmate.ui.models.CategoryUIModel;
-import com.finmate.adapters.CategoryGridAdapter;
-import com.finmate.adapters.CategoryListAdapter;
-import com.finmate.entities.CategoryEntity;
+import com.finmate.ui.transaction.CategoryUIModel;
+import com.finmate.ui.transaction.CategoryGridAdapter;
+import com.finmate.ui.transaction.CategoryListAdapter;
+import com.finmate.data.local.database.entity.CategoryEntity;
 import com.finmate.data.repository.CategoryRepository;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 

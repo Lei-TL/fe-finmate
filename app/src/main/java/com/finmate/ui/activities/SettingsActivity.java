@@ -1,14 +1,12 @@
 package com.finmate.ui.activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ImageView;
 
-import androidx.appcompat.app.AlertDialog;
-
 import com.finmate.R;
 import com.finmate.ui.dialogs.ThemeDialog;
+import com.finmate.ui.friend.FriendActivity;
 
 
 public class SettingsActivity extends BaseActivity {

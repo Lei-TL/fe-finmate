@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.finmate.ui.auth.LoginActivity;
-import com.finmate.ui.activities.HomeActivity;
 
 import dagger.hilt.android.AndroidEntryPoint;
 

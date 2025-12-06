@@ -6,7 +6,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.finmate.entities.TransactionEntity;
+import com.finmate.data.local.database.entity.TransactionEntity;
 
 import java.util.List;
 
