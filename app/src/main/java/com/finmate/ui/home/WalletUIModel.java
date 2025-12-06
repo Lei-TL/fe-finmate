@@ -1,4 +1,4 @@
-package com.finmate.ui.models;
+package com.finmate.ui.home;
 
 public class WalletUIModel {
 

@@ -1,4 +1,4 @@
-package com.finmate.adapters;
+package com.finmate.ui.settings;
 
 import android.content.Context;
 import android.view.LayoutInflater;

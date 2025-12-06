@@ -1,4 +1,4 @@
-package com.finmate.adapters;
+package com.finmate.ui.transaction;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
-import com.finmate.ui.models.TransactionUIModel; 
 
 import java.util.List;
 

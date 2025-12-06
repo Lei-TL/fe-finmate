@@ -1,4 +1,4 @@
-package com.finmate.adapters;
+package com.finmate.core.ui;
 
 import android.content.Context;
 import android.content.SharedPreferences;

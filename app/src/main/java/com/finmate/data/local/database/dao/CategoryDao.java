@@ -7,7 +7,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.finmate.entities.CategoryEntity;
+import com.finmate.data.local.database.entity.CategoryEntity;
 
 import java.util.List;
 

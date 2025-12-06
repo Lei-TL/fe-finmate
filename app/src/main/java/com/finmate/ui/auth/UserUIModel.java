@@ -1,4 +1,4 @@
-package com.finmate.ui.models;
+package com.finmate.ui.auth;
 
 public class UserUIModel {
 

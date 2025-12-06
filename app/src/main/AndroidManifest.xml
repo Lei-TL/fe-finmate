@@ -36,8 +36,8 @@
 
         <!-- ======= CÁC MÀN HÌNH KHÁC (Vẫn ở package cũ chưa move) ======= -->
         <activity android:name=".ui.activities.SettingsActivity" android:exported="false" />
-        <activity android:name=".ui.activities.FriendActivity" android:exported="false" />
-        <activity android:name=".ui.activities.WalletActivity" android:exported="false" />
+        <activity android:name=".ui.friend.FriendActivity" android:exported="false" />
+        <activity android:name=".ui.home.WalletActivity" android:exported="false" />
         <activity android:name=".ui.activities.AccountActivity" android:exported="false" />
         <activity android:name=".ui.activities.StatisticActivity" android:exported="false" />
         <activity android:name=".ui.activities.AddTransactionActivity" android:exported="false" />

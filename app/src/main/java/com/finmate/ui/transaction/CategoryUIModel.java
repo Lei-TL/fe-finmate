@@ -1,4 +1,4 @@
-package com.finmate.ui.models;
+package com.finmate.ui.transaction;
 
 // Model này dành riêng cho tầng UI, tuân thủ Clean Architecture
 public class CategoryUIModel {

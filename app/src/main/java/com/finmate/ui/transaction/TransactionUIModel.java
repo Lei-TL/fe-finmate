@@ -1,4 +1,4 @@
-package com.finmate.ui.models;
+package com.finmate.ui.transaction;
 
 // Model này chỉ chứa dữ liệu đã được định dạng cho tầng UI
 public class TransactionUIModel {

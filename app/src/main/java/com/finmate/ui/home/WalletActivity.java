@@ -1,4 +1,4 @@
-package com.finmate.ui.activities;
+package com.finmate.ui.home;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +9,9 @@ import com.finmate.ui.base.BaseActivity;
 import androidx.annotation.NonNull;
 
 import com.finmate.R;
+import com.finmate.ui.activities.AddTransactionActivity;
+import com.finmate.ui.activities.SettingsActivity;
+import com.finmate.ui.activities.StatisticActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class WalletActivity extends BaseActivity {
