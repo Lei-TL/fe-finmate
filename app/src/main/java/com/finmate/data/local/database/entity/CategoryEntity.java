@@ -7,15 +7,49 @@ import androidx.room.PrimaryKey;
 public class CategoryEntity {
 
     @PrimaryKey(autoGenerate = true)
-    public int id;
+    private int id;
 
-    public String name;      // tên category: ăn uống, mua sắm...
-    public String type;      // income / expense
-    public int iconRes;      // icon R.drawable.xxx
+    private String name;     // Tên category
+    private String type;     // income / expense
+    private String icon;     // Icon dạng string từ server, ví dụ "ic_food"
 
-    public CategoryEntity(String name, String type, int iconRes) {
+    public CategoryEntity(String name, String type, String icon) {
         this.name = name;
         this.type = type;
-        this.iconRes = iconRes;
+        this.icon = icon;
+    }
+
+    // Getters
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getIcon() {
+        return icon;
+    }
+
+    // Setters
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
 }
