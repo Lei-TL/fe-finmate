@@ -9,13 +9,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
-
+import com.finmate.ui.base.BaseActivity;
 import com.finmate.R;
-import com.finmate.core.ui.ThemeHelper;
+import com.finmate.adapters.ThemeHelper;
 
-public class AccountActivity extends AppCompatActivity {
+public class AccountActivity extends BaseActivity {
 
     private ImageView btnBack, btnCamera, btnEdit;
     private EditText edtName, edtEmail, edtBirthday, edtNote;
@@ -102,13 +100,16 @@ public class AccountActivity extends AppCompatActivity {
     }
 
     private void loadLanguageSelection() {
-        String currentLanguage = getLanguagePreference(this);
+        SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        String currentLanguage = prefs.getString("language", "en");
+
         if (currentLanguage.equals("vi")) {
             spnLanguage.setSelection(1);
         } else {
             spnLanguage.setSelection(0);
         }
     }
+
 
     private void setupThemeSpinner() {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,

@@ -16,6 +16,7 @@ import com.finmate.ui.transaction.CategoryUIModel;
 import com.finmate.ui.transaction.CategoryGridAdapter;
 import com.finmate.ui.transaction.CategoryListAdapter;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.finmate.ui.base.BaseActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +96,6 @@ public class CategoryExpenseActivity extends BaseActivity {
     private void highlightTabs() {
         tabExpense.setBackgroundResource(R.drawable.tab_active_bg);
         tabIncome.setBackgroundResource(R.drawable.tab_inactive_bg);
-
         tabExpense.setTextColor(getColor(R.color.white));
         tabIncome.setTextColor(getColor(R.color.gray));
     }
@@ -109,7 +109,6 @@ public class CategoryExpenseActivity extends BaseActivity {
         });
 
         btnMore.setOnClickListener(v -> showMoreMenu());
-
         layoutAddNew.setOnClickListener(v -> showAddNewCategoryDialog());
     }
 
@@ -124,9 +123,7 @@ public class CategoryExpenseActivity extends BaseActivity {
         LinearLayout tvHelp = view.findViewById(R.id.tvHelp);
 
         TextView txtToggle = view.findViewById(R.id.tvToggleText);
-        // nếu có text trong layout
 
-        // set text toggle đúng
         if (txtToggle != null)
             txtToggle.setText(isGrid ? "Dạng danh sách" : "Dạng lưới");
 
