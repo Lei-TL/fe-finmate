@@ -2,11 +2,95 @@
 <resources>
     <string name="app_name">FinMate</string>
 
-    <!-- TITLES -->
-    <string name="title_language">Ngôn ngữ</string>
-    <string name="title_settings">Cài đặt</string>
+    <!-- Navigation -->
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_wallet">Ví của tôi</string>
+    <string name="nav_add">Thêm mới</string>
+    <string name="nav_statistic">Thống kê</string>
+    <string name="nav_settings">Cài đặt</string>
 
-    <!-- LANGUAGES -->
+    <!-- Common -->
+    <string name="income">Thu nhập</string>
+    <string name="expense">Chi tiêu</string>
+    <string name="balance">Số dư</string>
+    <string name="name">Họ và tên</string>
+    <string name="email">Email</string>
+    <string name="birthday">Ngày sinh</string>
+    <string name="description">Mô tả</string>
+    <string name="save_changes">Lưu thay đổi</string>
+    <string name="cancel">Hủy</string>
+    <string name="feature_in_development">Chức năng đang phát triển</string>
+
+    <!-- Login / Signup -->
+    <string name="login">Đăng nhập</string>
+    <string name="signup">Đăng ký</string>
+    <string name="welcome_back">Chào mừng trở lại!</string>
+    <string name="username_hint">Tên người dùng</string>
+    <string name="password_hint">Mật khẩu</string>
+    <string name="email_hint">Nhập email của bạn</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="no_account">Chưa có tài khoản?</string>
+    <string name="create_account">Tạo tài khoản</string>
+    <string name="already_have_account">Đã có tài khoản?</string>
+    <string name="signup_button">Đăng ký</string>
+
+    <!-- Home -->
+    <string name="greeting">Xin chào,</string>
+    <string name="chart_title">Thống kê thu chi</string>
+
+    <!-- Settings -->
+    <string name="title_settings">Cài đặt</string>
+    <string name="my_account">Tài khoản của tôi</string>
+    <string name="my_wallet">Ví của tôi</string>
+    <string name="manage_categories">Quản lý danh mục</string>
+    <string name="notifications">Thông báo</string>
+    <string name="language">Ngôn ngữ</string>
+    <string name="theme">Giao diện</string>
+    <string name="friends">Bạn bè</string>
+    <string name="personal">Cá nhân</string>
+
+    <!-- Language Settings -->
+    <string name="title_language">Ngôn ngữ</string>
+    <string name="choose_language">Chọn ngôn ngữ</string>
     <string name="language_vietnamese">Tiếng Việt</string>
     <string name="language_english">Tiếng Anh</string>
+
+    <!-- Theme Settings -->
+    <string name="choose_theme">Chọn giao diện</string>
+    <string name="light_theme">Giao diện Sáng</string>
+    <string name="dark_theme">Giao diện Tối</string>
+    <string name="system_theme">Theo hệ thống</string>
+    <string name="system_theme_setting">Giao diện hệ thống</string>
+
+    <!-- Category -->
+    <string name="select_expense_group">Chọn nhóm chi tiêu</string>
+    <string name="select_income_group">Chọn nhóm thu nhập</string>
+    <string name="add_new_category_group">Thêm nhóm danh mục mới</string>
+
+    <!-- Account -->
+    <string name="enter_name_hint">Nhập họ và tên</string>
+    <string name="enter_email_hint">Nhập email</string>
+    <string name="enter_description_hint">Nhập mô tả</string>
+    <string name="toast_changes_saved">Đã lưu thay đổi!</string>
+    <string name="toast_change_avatar">Chạm để thay đổi ảnh đại diện</string>
+    <string name="toast_edit_mode">Chế độ chỉnh sửa</string>
+
+    <!-- Statistics -->
+    <string name="statistic_monthly_income">Thống kê thu nhập tháng</string>
+    <string name="statistic_monthly_expense">Thống kê chi tiêu tháng</string>
+    <string name="compare_income_types">So sánh các loại thu nhập</string>
+    <string name="compare_expense_types">So sánh các loại chi tiêu</string>
+    <string name="filter_by_category">Lọc theo danh mục</string>
+
+    <string-array name="theme_options">
+        <item>@string/light_theme</item>
+        <item>@string/dark_theme</item>
+        <item>@string/system_theme</item>
+    </string-array>
+
+    <string-array name="language_options">
+        <item>@string/language_vietnamese</item>
+        <item>@string/language_english</item>
+    </string-array>
+
 </resources>

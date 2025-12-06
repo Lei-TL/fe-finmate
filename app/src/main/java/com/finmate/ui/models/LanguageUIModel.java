@@ -2,17 +2,37 @@ package com.finmate.ui.models;
 
 public class LanguageUIModel {
 
-    private final int flagRes;       // R.drawable (cờ)
-    private final String languageName;
-    private final String languageCode; // "en", "vi", ...
+    private int flagResId;       // R.drawable lá cờ
+    private String name;         // "Vietnamese", "English"
+    private String code;         // "vi", "en"
+    private boolean selected;    // trạng thái đã chọn hay chưa
 
-    public LanguageUIModel(int flagRes, String languageName, String languageCode) {
-        this.flagRes = flagRes;
-        this.languageName = languageName;
-        this.languageCode = languageCode;
+    public LanguageUIModel(int flagResId, String name, String code, boolean selected) {
+        this.flagResId = flagResId;
+        this.name = name;
+        this.code = code;
+        this.selected = selected;
     }
 
-    public int getFlagRes() { return flagRes; }
-    public String getLanguageName() { return languageName; }
-    public String getLanguageCode() { return languageCode; }
+    // Adapter dùng các hàm này ↓↓↓↓
+
+    public int getFlagResId() {
+        return flagResId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
 }

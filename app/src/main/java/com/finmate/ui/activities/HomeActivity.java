@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.Toast;
-
+import com.finmate.ui.base.BaseActivity;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;

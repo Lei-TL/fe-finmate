@@ -1,4 +1,4 @@
-package com.finmate.models;
+package com.finmate.data.dto;
 
 import com.google.gson.annotations.SerializedName;
 

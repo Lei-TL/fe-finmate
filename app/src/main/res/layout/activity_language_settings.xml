@@ -1,31 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/backgroundColor">
+    android:background="#0F1624"
+    tools:context=".UI.activities.LanguageActivity"> <!-- Giả sử tên Activity là LanguageActivity -->
 
-    <!-- ===== MAIN CONTENT ===== -->
+    <!-- Scrollable Content -->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="16dp">
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottomNavigation">
 
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/ic_back"
-            android:padding="4dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            app:tint="?attr/iconTint" />
-
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="16dp">
 
             <!-- ===== HEADER ===== -->
             <LinearLayout
@@ -39,9 +31,9 @@
                     android:id="@+id/btnBack"
                     android:layout_width="28dp"
                     android:layout_height="28dp"
-                    android:src="@drawable/ic_back"
-                    android:padding="4dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_back"
                     app:tint="#FFFFFF" />
 
                 <!-- TITLE -->
@@ -49,11 +41,11 @@
                     android:id="@+id/tvTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
                     android:text="@string/title_language"
                     android:textColor="#FFFFFF"
-                    android:textStyle="bold"
                     android:textSize="20sp"
-                    android:layout_marginStart="16dp" />
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <!-- ====== LANGUAGE: TIẾNG VIỆT ====== -->
@@ -61,25 +53,25 @@
                 android:id="@+id/btnVietnamese"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
+                android:layout_marginTop="24dp"
                 android:background="@drawable/bg_card"
-                android:paddingHorizontal="16dp"
-                android:layout_marginTop="24dp">
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp">
 
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/ic_flag_vn"
-                    android:contentDescription="@string/language_vietnamese" />
+                    android:contentDescription="@string/language_vietnamese"
+                    android:src="@drawable/ic_flag_vn" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
                     android:text="@string/language_vietnamese"
                     android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:layout_marginStart="12dp" />
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <!-- ====== LANGUAGE: ENGLISH ====== -->
@@ -87,25 +79,25 @@
                 android:id="@+id/btnEnglish"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
+                android:layout_marginTop="12dp"
                 android:background="@drawable/bg_card"
-                android:paddingHorizontal="16dp"
-                android:layout_marginTop="12dp">
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp">
 
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/ic_flag_us"
-                    android:contentDescription="@string/language_english" />
+                    android:contentDescription="@string/language_english"
+                    android:src="@drawable/ic_flag_us" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
                     android:text="@string/language_english"
                     android:textColor="#FFFFFF"
-                    android:textSize="16sp"
-                    android:layout_marginStart="12dp" />
+                    android:textSize="16sp" />
             </LinearLayout>
 
         </LinearLayout>
@@ -117,9 +109,9 @@
         android:layout_width="match_parent"
         android:layout_height="65dp"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/bg_bottom_nav"
-        app:itemIconTint="@color/selector_nav_color"
-        app:itemTextColor="@color/selector_nav_color"
+        android:background="#1A2232" 
+        app:itemIconTint="@drawable/bottom_nav_color_selector" 
+        app:itemTextColor="@drawable/bottom_nav_color_selector" 
         app:menu="@menu/menu_bottom" />
 
 </RelativeLayout>

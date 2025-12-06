@@ -10,6 +10,7 @@ import com.finmate.R;
 import com.finmate.ui.models.FriendUIModel;
 import com.finmate.adapters.FriendAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.finmate.ui.base.BaseActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,10 +22,10 @@ public class FriendActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend);
 
-        // Back button
+        // Nút Back
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
-        // RecyclerView setup
+        // RecyclerView
         RecyclerView rvFriends = findViewById(R.id.rvFriends);
         rvFriends.setLayoutManager(new LinearLayoutManager(this));
 
@@ -36,7 +37,6 @@ public class FriendActivity extends BaseActivity {
         friendList.add(new FriendUIModel(R.drawable.ic_friend, "Lê Văn D vừa gửi bạn một yêu cầu chia tiền"));
         friendList.add(new FriendUIModel(R.drawable.ic_friend, "Bạn và Phạm Thị E đã hòa tiền"));
 
-        // Set adapter
         FriendAdapter adapter = new FriendAdapter(this, friendList);
         rvFriends.setAdapter(adapter);
 
