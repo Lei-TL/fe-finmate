@@ -3,7 +3,7 @@ package com.finmate;
 import android.app.Application;
 import android.content.SharedPreferences;
 
-import com.finmate.adapters.ThemeHelper;
+import com.finmate.core.ui.ThemeHelper;
 
 import dagger.hilt.android.HiltAndroidApp;
 

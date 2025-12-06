@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.finmate.data.local.database.AppDatabase;
 import com.finmate.data.local.database.dao.WalletDao;
-import com.finmate.entities.WalletEntity;
+import com.finmate.data.local.database.entity.WalletEntity;
 
 import java.util.List;
 import java.util.concurrent.Executors;

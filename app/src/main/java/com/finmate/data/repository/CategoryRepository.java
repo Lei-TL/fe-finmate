@@ -7,7 +7,7 @@ import com.finmate.data.dto.CategoryRequest;
 import com.finmate.data.dto.CategoryResponse;
 import com.finmate.data.local.database.AppDatabase;
 import com.finmate.data.local.database.dao.CategoryDao;
-import com.finmate.entities.CategoryEntity;
+import com.finmate.data.local.database.entity.CategoryEntity;
 
 import java.util.List;
 import java.util.concurrent.Executor;

@@ -4,6 +4,7 @@ import com.finmate.core.network.interceptor.AuthInterceptor;
 import com.finmate.core.session.SessionManager;
 import com.finmate.data.remote.api.AuthService;
 import com.finmate.data.remote.api.CategoryService;
+import com.finmate.data.remote.api.FriendService;
 import com.finmate.data.remote.api.TransactionService;
 import com.finmate.data.remote.api.WalletService;
 
@@ -46,6 +47,12 @@ public class NetworkModule {
     @Singleton
     public CategoryService provideCategoryService(Retrofit retrofit) {
         return retrofit.create(CategoryService.class);
+    }
+
+    @Provides
+    @Singleton
+    public FriendService provideFriendService(Retrofit retrofit) {
+        return retrofit.create(FriendService.class);
     }
 
     @Provides
