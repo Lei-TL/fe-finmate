@@ -60,9 +60,7 @@ dependencies {
     implementation(libs.lifecycle.livedata)
 
     // Retrofit
-    implementation(libs.retrofit)
-    implementation(libs.converter.gson)
-    implementation(libs.gson)
+    implementation("com.google.code.gson:gson:2.10.1")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

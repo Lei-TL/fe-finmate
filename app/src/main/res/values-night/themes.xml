@@ -1,34 +1,41 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme for Night mode. -->
-    <style name="Theme.FinMate" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Primary brand color. -->
+
+    <style name="Theme.FinMate.night" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color -->
         <item name="colorPrimary">@color/purple_200</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/black</item>
-        <!-- Secondary brand color. -->
+
+        <!-- Secondary brand color -->
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorSecondaryVariant">@color/teal_200</item>
         <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
-        <item name="bottomNavigationStyle">@style/Widget.FinMate.BottomNavigationView</item>
 
-        <!-- Define theme attributes for Dark Mode -->
+        <!-- Status bar -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+
+        <!-- Custom dark-mode attributes -->
         <item name="backgroundColor">#121212</item>
         <item name="surfaceColor">#1E1E1E</item>
         <item name="cardBackgroundColor">#1E1E1E</item>
         <item name="bottomNavBackgroundColor">#1E1E1E</item>
+
         <item name="textColorPrimary">@color/white</item>
         <item name="textColorSecondary">#AFAFAF</item>
-        <item name="textColorPositive">#66BB6A</item> <!-- Lighter green -->
-        <item name="textColorNegative">#EF5350</item> <!-- Lighter red -->
-        <item name="editTextBackground">@drawable/edittext_bg_dark</item> <!-- Optional: different bg for dark -->
+        <item name="textColorPositive">#66BB6A</item>
+        <item name="textColorNegative">#EF5350</item>
+
+        <item name="editTextBackground">@drawable/edittext_bg_dark</item>
         <item name="editTextColor">@color/white</item>
         <item name="editTextColorHint">#AFAFAF</item>
-        <item name="buttonBackground">@drawable/login_button_bg</item> <!-- Assuming this works for dark too -->
+
+        <item name="buttonBackground">@drawable/login_button_bg</item>
         <item name="buttonTextColor">@color/white</item>
+
         <item name="iconTint">@color/white</item>
         <item name="progressBarBackgroundColor">#424242</item>
+
+        <item name="bottomNavigationStyle">@style/Widget.FinMate.BottomNavigationView</item>
     </style>
+
 </resources>

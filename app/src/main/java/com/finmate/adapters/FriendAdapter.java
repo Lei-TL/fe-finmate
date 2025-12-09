@@ -6,24 +6,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
-import com.finmate.ui.models.FriendUIModel;
+import com.finmate.models.Friend;
 
 import java.util.List;
 
 public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> {
 
     private Context context;
-    private List<FriendUIModel> friendList;
+    private List<Friend> friendList;
 
-    public FriendAdapter(Context context, List<FriendUIModel> friendList) {
+    public FriendAdapter(Context context, List<Friend> friendList) {
         this.context = context;
         this.friendList = friendList;
+    }
+
+    public void updateData(List<Friend> newFriendList) {
+        this.friendList = newFriendList;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -35,14 +39,9 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
 
     @Override
     public void onBindViewHolder(@NonNull FriendViewHolder holder, int position) {
-        FriendUIModel friend = friendList.get(position);
-
-        holder.ivAvatar.setImageResource(friend.getAvatarResId());
-        holder.tvStatus.setText(friend.getStatus());
-
-        holder.ivMoreOptions.setOnClickListener(v ->
-                Toast.makeText(context, "Tùy chọn cho: " + friend.getStatus(), Toast.LENGTH_SHORT).show()
-        );
+        Friend friend = friendList.get(position);
+        holder.tvFriendName.setText(friend.getName());
+        holder.ivFriendAvatar.setImageResource(friend.getAvatarResId());
     }
 
     @Override
@@ -50,17 +49,14 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
         return friendList.size();
     }
 
-    static class FriendViewHolder extends RecyclerView.ViewHolder {
-
-        ImageView ivAvatar, ivMoreOptions;
-        TextView tvStatus;
+    public static class FriendViewHolder extends RecyclerView.ViewHolder {
+        ImageView ivFriendAvatar;
+        TextView tvFriendName;
 
         public FriendViewHolder(@NonNull View itemView) {
             super(itemView);
-
-            ivAvatar = itemView.findViewById(R.id.ivFriendAvatar);
-            tvStatus = itemView.findViewById(R.id.tvFriendStatus);
-            ivMoreOptions = itemView.findViewById(R.id.ivMoreOptions);
+            ivFriendAvatar = itemView.findViewById(R.id.ivFriendAvatar);
+            tvFriendName = itemView.findViewById(R.id.tvFriendName);
         }
     }
 }

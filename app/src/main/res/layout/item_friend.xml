@@ -2,40 +2,30 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
+    android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:background="@drawable/bg_card"
+    android:background="@drawable/bg_white_rounded_corner"
     android:gravity="center_vertical"
-    android:padding="12dp">
+    android:padding="12dp"
+    android:layout_marginBottom="12dp">
 
     <!-- Avatar -->
     <ImageView
         android:id="@+id/ivFriendAvatar"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:src="@drawable/friend"
-        android:background="@drawable/bg_circle"
-        android:padding="6dp" />
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_avatar" />
 
-    <!-- Text -->
+    <!-- Friend Name -->
     <TextView
-        android:id="@+id/tvFriendStatus"
+        android:id="@+id/tvFriendName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="16dp"
         android:layout_weight="1"
-        android:text="Hiển thị trạng thái"
-        android:textColor="#FFFFFF"
-        android:textSize="14sp"
-        android:maxLines="2" />
-
-    <!-- MORE OPTIONS -->
-    <ImageView
-        android:id="@+id/ivMoreOptions"
-        android:layout_width="26dp"
-        android:layout_height="26dp"
-        android:src="@drawable/ic_more_vertical"
-        app:tint="#FFFFFF"
-        android:padding="4dp" />
+        android:text="Phan Hữu Linh Phong"
+        android:textColor="?attr/textColorPrimary"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
 </LinearLayout>
