@@ -1,4 +1,4 @@
-package com.finmate.ui.activities;
+package com.finmate.ui.auth;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -102,7 +102,8 @@ public class AccountActivity extends AppCompatActivity {
     }
 
     private void loadLanguageSelection() {
-        String currentLanguage = getLanguagePreference(this);
+        SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        String currentLanguage = prefs.getString("language", "en");
         if (currentLanguage.equals("vi")) {
             spnLanguage.setSelection(1);
         } else {

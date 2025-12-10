@@ -36,18 +36,16 @@ public class LoginViewModel extends ViewModel {
         }
         
         _isLoading.setValue(true);
-        authRepository.login(email, password, new AuthRepository.LoginCallback() {
-            @Override
-            public void onSuccess() {
-                _isLoading.setValue(false);
-                _loginSuccess.setValue(true);
-            }
-
-            @Override
-            public void onError(String message) {
-                _isLoading.setValue(false);
-                _errorMessage.setValue(message);
-            }
-        });
+        authRepository.login(email, password)
+                .subscribe(
+                        () -> {
+                            _isLoading.postValue(false);
+                            _loginSuccess.postValue(true);
+                        },
+                        error -> {
+                            _isLoading.postValue(false);
+                            _errorMessage.postValue(error.getMessage() != null ? error.getMessage() : "Login failed");
+                        }
+                );
     }
 }

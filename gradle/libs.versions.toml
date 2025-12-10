@@ -31,6 +31,8 @@ room-compiler = { group = "androidx.room", name = "room-compiler", version.ref =
 
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+retrofit-rxjava3-adapter = { group = "com.squareup.retrofit2", name = "adapter-rxjava3", version.ref = "retrofit" }
+
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 
 datastore-prefs = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }

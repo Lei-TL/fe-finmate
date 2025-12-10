@@ -9,9 +9,9 @@ public class CategoryEntity {
     @PrimaryKey(autoGenerate = true)
     public int id;
 
-    public String name;      // tên category: ăn uống, mua sắm...
-    public String type;      // income / expense
-    public int iconRes;      // icon R.drawable.xxx
+    public String name;
+    public String type;
+    public int iconRes;
 
     public CategoryEntity(String name, String type, int iconRes) {
         this.name = name;

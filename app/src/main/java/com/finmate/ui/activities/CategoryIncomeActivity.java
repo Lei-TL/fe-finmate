@@ -18,7 +18,7 @@ import com.finmate.ui.transaction.CategoryUIModel;
 import com.finmate.ui.transaction.CategoryGridAdapter;
 import com.finmate.ui.transaction.CategoryListAdapter;
 import com.finmate.data.local.database.entity.CategoryEntity;
-import com.finmate.data.repository.CategoryRepository;
+import com.finmate.data.repository.CategoryLocalRepository;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import javax.inject.Inject;
 public class CategoryIncomeActivity extends AppCompatActivity {
 
     @Inject
-    CategoryRepository categoryRepository;
+    CategoryLocalRepository categoryRepository;
 
     private RecyclerView rvCategories;
     private CategoryGridAdapter gridAdapter;
@@ -42,7 +42,7 @@ public class CategoryIncomeActivity extends AppCompatActivity {
     private TextView tabExpense, tabIncome;
     private View btnAddNew;
 
-    private CategoryRepository repo;
+    private CategoryLocalRepository repo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

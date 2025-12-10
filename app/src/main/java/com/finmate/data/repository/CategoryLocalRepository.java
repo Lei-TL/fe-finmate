@@ -2,12 +2,12 @@ package com.finmate.data.repository;
 
 import android.content.Context;
 
-import com.finmate.core.network.ApiCallback;
 import com.finmate.data.dto.CategoryRequest;
 import com.finmate.data.dto.CategoryResponse;
 import com.finmate.data.local.database.AppDatabase;
 import com.finmate.data.local.database.dao.CategoryDao;
 import com.finmate.data.local.database.entity.CategoryEntity;
+import com.finmate.data.remote.api.ApiCallback;
 
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -19,7 +19,7 @@ import javax.inject.Singleton;
 import dagger.hilt.android.qualifiers.ApplicationContext;
 
 @Singleton
-public class CategoryRepository {
+public class CategoryLocalRepository {
 
     private static final Executor EXECUTOR = Executors.newSingleThreadExecutor();
 
@@ -27,8 +27,8 @@ public class CategoryRepository {
     private final CategoryRemoteRepository remoteRepository;
 
     @Inject
-    public CategoryRepository(@ApplicationContext Context ctx,
-                              CategoryRemoteRepository remoteRepository) {
+    public CategoryLocalRepository(@ApplicationContext Context ctx,
+                                   CategoryRemoteRepository remoteRepository) {
         this.dao = AppDatabase.getDatabase(ctx).categoryDao();
         this.remoteRepository = remoteRepository;
     }
@@ -90,10 +90,12 @@ public class CategoryRepository {
                 // Map CategoryResponse -> CategoryEntity
                 List<CategoryEntity> mapped = new java.util.ArrayList<>();
                 for (CategoryResponse res : body) {
+                    // Parse icon từ string sang int (iconRes)
+                    int iconRes = parseIconToResId(res.getIcon());
                     CategoryEntity entity = new CategoryEntity(
                             res.getName(),
-                            type,      // hoặc res.getType() nếu FE/BE dùng cùng format
-                            res.getIcon()
+                            res.getType() != null ? res.getType() : type,
+                            iconRes
                     );
                     mapped.add(entity);
                 }
@@ -106,9 +108,8 @@ public class CategoryRepository {
             }
 
             @Override
-            public void onError(String message) {
+            public void onError(String message, Integer code) {
                 // BE lỗi -> bỏ qua, cứ dùng local
-                // optional: callback.onResult(...) / callback.onError(...)
             }
         });
     }
@@ -126,22 +127,21 @@ public class CategoryRepository {
                                           OperationCallback callback) {
 
         CategoryRequest request = new CategoryRequest(
-                localDraft.getName(),
-                localDraft.getType(),
-                localDraft.getIcon()
+                localDraft.name,
+                localDraft.type,
+                String.valueOf(localDraft.iconRes)
         );
 
         remoteRepository.createCategory(request, new ApiCallback<CategoryResponse>() {
             @Override
             public void onSuccess(CategoryResponse res) {
                 // Map CategoryResponse -> CategoryEntity chuẩn theo server
+                int iconRes = parseIconToResId(res.getIcon());
                 CategoryEntity entity = new CategoryEntity(
                         res.getName(),
                         res.getType(),
-                        res.getIcon()
+                        iconRes
                 );
-                // nếu CategoryEntity có id từ server:
-                // entity.setId(res.getId());
 
                 // Lưu vào Room
                 EXECUTOR.execute(() -> dao.insert(entity));
@@ -150,7 +150,7 @@ public class CategoryRepository {
             }
 
             @Override
-            public void onError(String message) {
+            public void onError(String message, Integer code) {
                 callback.onError(message);
             }
         });
@@ -159,26 +159,27 @@ public class CategoryRepository {
     public void updateCategoryOnlineFirst(CategoryEntity localEdit,
                                           OperationCallback callback) {
 
-        // Giả định entity có id là id server
-        String id = localEdit.getId();
+        // Giả định entity có id là id server (dùng remoteId nếu có, hoặc id local)
+        String id = String.valueOf(localEdit.id);
 
         CategoryRequest request = new CategoryRequest(
-                localEdit.getName(),
-                localEdit.getType(),
-                localEdit.getIcon()
+                localEdit.name,
+                localEdit.type,
+                String.valueOf(localEdit.iconRes)
         );
 
         remoteRepository.updateCategory(id, request, new ApiCallback<CategoryResponse>() {
             @Override
             public void onSuccess(CategoryResponse res) {
                 // Map response -> entity cập nhật
+                int iconRes = parseIconToResId(res.getIcon());
                 CategoryEntity updated = new CategoryEntity(
                         res.getName(),
                         res.getType(),
-                        res.getIcon()
+                        iconRes
                 );
-                // giữ lại id server
-                updated.setId(res.getId());
+                // giữ lại id local
+                updated.id = localEdit.id;
 
                 EXECUTOR.execute(() -> dao.update(updated));
 
@@ -186,7 +187,7 @@ public class CategoryRepository {
             }
 
             @Override
-            public void onError(String message) {
+            public void onError(String message, Integer code) {
                 callback.onError(message);
             }
         });
@@ -195,7 +196,7 @@ public class CategoryRepository {
     public void deleteCategoryOnlineFirst(CategoryEntity category,
                                           OperationCallback callback) {
 
-        String id = category.getId();
+        String id = String.valueOf(category.id);
 
         remoteRepository.deleteCategory(id, new ApiCallback<Void>() {
             @Override
@@ -206,11 +207,24 @@ public class CategoryRepository {
             }
 
             @Override
-            public void onError(String message) {
+            public void onError(String message, Integer code) {
                 callback.onError(message);
             }
         });
     }
 
+    /**
+     * Helper method để parse icon string sang resource ID
+     * Có thể cần implement logic mapping icon name -> drawable resource ID
+     */
+    private int parseIconToResId(String iconString) {
+        // Tạm thời return 0 hoặc implement logic mapping
+        // Có thể dùng ResourceHelper hoặc mapping table
+        try {
+            return Integer.parseInt(iconString);
+        } catch (NumberFormatException e) {
+            return 0; // Default icon
+        }
+    }
 
 }

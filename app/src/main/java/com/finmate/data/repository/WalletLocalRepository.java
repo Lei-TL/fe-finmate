@@ -15,12 +15,12 @@ import javax.inject.Singleton;
 import dagger.hilt.android.qualifiers.ApplicationContext;
 
 @Singleton
-public class WalletRepository {
+public class WalletLocalRepository {
 
     private final WalletDao dao;
 
     @Inject
-    public WalletRepository(@ApplicationContext Context context) {
+    public WalletLocalRepository(@ApplicationContext Context context) {
         dao = AppDatabase.getDatabase(context).walletDao();
     }
 

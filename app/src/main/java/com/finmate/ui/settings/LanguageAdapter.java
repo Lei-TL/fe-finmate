@@ -11,24 +11,31 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
-import com.finmate.models.Language;
 
 import java.util.List;
 
 public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.LanguageViewHolder> {
 
     private Context context;
-    private List<Language> languageList;
+    private List<LanguageUIModel> languageList;
     private OnItemClickListener listener;
+    private int selectedPosition = -1;
 
     public interface OnItemClickListener {
         void onItemClick(int position);
     }
 
-    public LanguageAdapter(Context context, List<Language> languageList, OnItemClickListener listener) {
+    public LanguageAdapter(Context context, List<LanguageUIModel> languageList, OnItemClickListener listener) {
         this.context = context;
         this.languageList = languageList;
         this.listener = listener;
+    }
+    
+    public void setSelectedPosition(int position) {
+        int oldPosition = selectedPosition;
+        selectedPosition = position;
+        if (oldPosition != -1) notifyItemChanged(oldPosition);
+        if (selectedPosition != -1) notifyItemChanged(selectedPosition);
     }
 
     @NonNull
@@ -40,17 +47,18 @@ public class LanguageAdapter extends RecyclerView.Adapter<LanguageAdapter.Langua
 
     @Override
     public void onBindViewHolder(@NonNull LanguageViewHolder holder, int position) {
-        Language language = languageList.get(position);
-        holder.tvLanguageName.setText(language.getName());
-        holder.imgFlag.setImageResource(language.getFlagResId());
+        LanguageUIModel language = languageList.get(position);
+        holder.tvLanguageName.setText(language.getLanguageName());
+        holder.imgFlag.setImageResource(language.getFlagRes());
 
-        if (language.isSelected()) {
+        if (position == selectedPosition) {
             holder.ivCheckmark.setVisibility(View.VISIBLE);
         } else {
             holder.ivCheckmark.setVisibility(View.GONE);
         }
 
         holder.itemView.setOnClickListener(v -> {
+            setSelectedPosition(position);
             if (listener != null) {
                 listener.onItemClick(position);
             }

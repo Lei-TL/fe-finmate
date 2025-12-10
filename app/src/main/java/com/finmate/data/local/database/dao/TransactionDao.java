@@ -14,20 +14,20 @@ import java.util.List;
 public interface TransactionDao {
 
     @Insert
-    void insert(TransactionEntity transaction);
+    void insert(TransactionEntity entity);
+
+    @Update
+    void update(TransactionEntity entity);
+
+    @Delete
+    void delete(TransactionEntity entity);
 
     @Query("SELECT * FROM transactions ORDER BY id DESC")
     List<TransactionEntity> getAll();
 
-    @Query("SELECT * FROM transactions WHERE id = :id")
-    TransactionEntity getById(int id);
+    @Query("DELETE FROM transactions WHERE syncStatus = :status")
+    void deleteByStatus(String status);
 
-    @Update
-    void update(TransactionEntity transaction);
-
-    @Delete
-    void delete(TransactionEntity transaction);
-
-    @Query("DELETE FROM transactions WHERE id = :id")
-    void deleteById(int id);
+    @Query("SELECT * FROM transactions WHERE syncStatus != 'SYNCED'")
+    List<TransactionEntity> getPendingTransactions();
 }

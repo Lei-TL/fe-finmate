@@ -25,16 +25,10 @@ public class SplashViewModel extends ViewModel {
     }
 
     private void checkLoginStatus() {
-        authRepository.checkLoginStatus(new AuthRepository.LoginCallback() {
-            @Override
-            public void onSuccess() {
-                _isLoggedIn.postValue(true);
-            }
-
-            @Override
-            public void onError(String message) {
-                _isLoggedIn.postValue(false);
-            }
-        });
+        authRepository.checkLoginStatus()
+                .subscribe(
+                        isLoggedIn -> _isLoggedIn.postValue(isLoggedIn),
+                        error -> _isLoggedIn.postValue(false)
+                );
     }
 }

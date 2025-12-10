@@ -10,7 +10,7 @@ android {
     defaultConfig {
         applicationId = "com.finmate"
         minSdk = 26
-        targetSdkVersion(rootProject.extra["defaultTargetSdkVersion"] as Int)
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -46,6 +46,7 @@ dependencies {
     // Retrofit & OkHttp
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
+    implementation(libs.retrofit.rxjava3.adapter)
     implementation(libs.okhttp.logging)
 
     // DataStore

@@ -1,10 +1,16 @@
-package com.finmate.ui.activities;
+package com.finmate.ui.settings;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.finmate.R;
+import com.finmate.ui.auth.AccountActivity;
+import com.finmate.ui.activities.CategoryIncomeActivity;
+import com.finmate.ui.activities.LanguageSettingActivity;
+import com.finmate.ui.activities.NotificationSettingsActivity;
+import com.finmate.ui.base.BaseActivity;
 import com.finmate.ui.dialogs.ThemeDialog;
 import com.finmate.ui.friend.FriendActivity;
 
@@ -21,12 +27,6 @@ public class SettingsActivity extends BaseActivity {
 
         // ÁNH XẠ
         initViews();
-
-        // XỬ LÝ SỰ KIỆN
-        setupListeners();
-
-        // Chọn tab Cài đặt trên Bottom Nav
-        bottomNavigation.setSelectedItemId(R.id.nav_settings);
     }
 
     private void initViews() {

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
+import com.finmate.ui.base.BaseActivity;
 import com.finmate.ui.transaction.CategoryUIModel;
 import com.finmate.ui.transaction.CategoryGridAdapter;
 import com.finmate.ui.transaction.CategoryListAdapter;

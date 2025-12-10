@@ -11,11 +11,11 @@ import com.finmate.data.local.database.dao.TokenDao;
 import com.finmate.data.local.database.dao.TransactionDao;
 import com.finmate.data.local.database.dao.WalletDao;
 import com.finmate.data.local.database.entity.CategoryEntity;
-import com.finmate.data.local.datastore.entity.TokenEntity;
 import com.finmate.data.local.database.entity.TransactionEntity;
 import com.finmate.data.local.database.entity.WalletEntity;
+import com.finmate.data.local.datastore.entity.TokenEntity;
 
-@Database(entities = {TokenEntity.class, CategoryEntity.class, WalletEntity.class, TransactionEntity.class}, version = 2, exportSchema = false)
+@Database(entities = {TokenEntity.class, CategoryEntity.class, WalletEntity.class, TransactionEntity.class}, version = 4, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract TokenDao tokenDao();
     public abstract CategoryDao categoryDao();
@@ -30,8 +30,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                             AppDatabase.class, "finmate_database")
-                            .allowMainThreadQueries()
-                            .fallbackToDestructiveMigration() // Xóa dữ liệu cũ khi schema thay đổi
+                            .fallbackToDestructiveMigration() 
                             .build();
                 }
             }

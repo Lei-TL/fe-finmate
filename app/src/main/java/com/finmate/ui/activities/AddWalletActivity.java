@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.finmate.R;
 import com.finmate.data.local.database.entity.WalletEntity;
-import com.finmate.data.repository.WalletRepository;
+import com.finmate.data.repository.WalletLocalRepository;
 
 public class AddWalletActivity extends AppCompatActivity {
 
@@ -18,14 +18,14 @@ public class AddWalletActivity extends AppCompatActivity {
     private Button btnSave, btnCancel;
     private ImageView btnBack;
 
-    private WalletRepository repo;
+    private WalletLocalRepository repo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_wallet);
 
-        repo = new WalletRepository(this);
+        repo = new WalletLocalRepository(this);
 
         mapViews();
         handleEvents();

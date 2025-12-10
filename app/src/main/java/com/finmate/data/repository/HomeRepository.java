@@ -1,11 +1,14 @@
 package com.finmate.data.repository;
 
-import com.finmate.core.network.ApiCallback;
+import androidx.annotation.Nullable;
+
+import com.finmate.data.local.database.entity.SyncStatus;
 import com.finmate.data.dto.TransactionPageResponse;
 import com.finmate.data.dto.TransactionResponse;
 import com.finmate.data.dto.WalletResponse;
 import com.finmate.data.local.database.entity.TransactionEntity;
 import com.finmate.data.local.database.entity.WalletEntity;
+import com.finmate.data.remote.api.ApiCallback;
 
 import java.util.List;
 
@@ -16,12 +19,12 @@ import javax.inject.Singleton;
 public class HomeRepository {
 
     private final WalletRemoteRepository walletRemoteRepository;
-    private final WalletRepository walletLocalRepository;
+    private final WalletLocalRepository walletLocalRepository;
     private final TransactionRemoteRepository transactionRemoteRepository;
-    private final TransactionRepository transactionLocalRepository;
+    private final TransactionLocalRepository transactionLocalRepository;
 
     @Inject
-    public HomeRepository(WalletRemoteRepository walletRemoteRepository, WalletRepository walletLocalRepository, TransactionRemoteRepository transactionRemoteRepository, TransactionRepository transactionLocalRepository) {
+    public HomeRepository(WalletRemoteRepository walletRemoteRepository, WalletLocalRepository walletLocalRepository, TransactionRemoteRepository transactionRemoteRepository, TransactionLocalRepository transactionLocalRepository) {
         this.walletRemoteRepository = walletRemoteRepository;
         this.walletLocalRepository = walletLocalRepository;
         this.transactionRemoteRepository = transactionRemoteRepository;
@@ -33,21 +36,17 @@ public class HomeRepository {
         void onError(String message);
     }
 
-    // Tạm thời dùng dữ liệu giả
     public void fetchWallets(DataCallback<List<WalletEntity>> callback) {
-        // 1) Luôn load local trước để UI có gì đó hiển thị (offline vẫn chạy được)
-        walletLocalRepository.getAll(new WalletRepository.Callback() {
+        walletLocalRepository.getAll(new WalletLocalRepository.Callback() {
             @Override
             public void onResult(List<WalletEntity> list) {
                 callback.onDataLoaded(list);
             }
         });
 
-        // 2) Sau đó, thử gọi BE để lấy dữ liệu mới nhất
         walletRemoteRepository.fetchMyWallets(new ApiCallback<List<WalletResponse>>() {
             @Override
             public void onSuccess(List<WalletResponse> body) {
-                // Map WalletResponse -> WalletEntity
                 List<WalletEntity> mapped = new java.util.ArrayList<>();
                 if (body != null) {
                     for (WalletResponse w : body) {
@@ -60,41 +59,30 @@ public class HomeRepository {
                         WalletEntity entity = new WalletEntity(
                                 w.getName(),
                                 formattedBalance,
-                                0 // iconRes tạm thời = 0, sau này anh map theo type
+                                0
                         );
                         mapped.add(entity);
                     }
                 }
-
-                // 2.1) Ghi đè vào local cache
                 walletLocalRepository.replaceAll(mapped);
-
-                // 2.2) Đẩy list mới lên UI
                 callback.onDataLoaded(mapped);
             }
 
             @Override
-            public void onError(String message) {
-                // BE lỗi (mất mạng, 401 refresh fail, server down...)
-                // -> cứ để UI dùng data local đã load ở bước 1
-                // optional: callback.onError(message);
+            public void onError(String message, @Nullable Integer code) {
+                // Error from API, do nothing, UI will use local data
             }
         });
     }
 
-
-
     public void fetchTransactions(String walletId, DataCallback<List<TransactionEntity>> callback) {
-        // 1) Luôn load local trước → offline vẫn xem được
-        transactionLocalRepository.getAll(new TransactionRepository.OnResultCallback<List<TransactionEntity>>() {
+        transactionLocalRepository.getAll(new TransactionLocalRepository.OnResultCallback<List<TransactionEntity>>() {
             @Override
             public void onResult(List<TransactionEntity> data) {
-                // Nếu anh muốn filter theo walletId ở local luôn thì filter thêm ở đây
                 callback.onDataLoaded(data);
             }
         });
 
-        // 2) Gọi BE để lấy dữ liệu mới nhất nếu có mạng
         transactionRemoteRepository.fetchTransactions(walletId, new ApiCallback<TransactionPageResponse>() {
             @Override
             public void onSuccess(TransactionPageResponse page) {
@@ -104,46 +92,29 @@ public class HomeRepository {
 
                 List<TransactionEntity> mapped = new java.util.ArrayList<>();
                 for (TransactionResponse t : page.getContent()) {
-                    // Format số tiền + thời gian → map vào TransactionEntity hiện tại
-                    String amountFormatted = String.format(
-                            "%,.0f",
-                            t.getAmount()
-                    );
-
-                    // TODO: format occurredAt (ISO) thành "dd/MM/yyyy" nếu muốn
-                    String dateDisplay = t.getOccurredAt(); // tạm thời dùng raw string
-
-                    // Ở HomeRepository cũ anh đang dùng ctor:
-                    // new TransactionEntity(title, category, amountText, walletName, dateText)
-                    String title = (t.getNote() != null && !t.getNote().isEmpty())
-                            ? t.getNote()
-                            : t.getCategoryName();
-
+                    String title = (t.getNote() != null && !t.getNote().isEmpty()) ? t.getNote() : t.getCategoryName();
+                    // Giữ raw data: amount là double, occurredAt là ISO string từ BE
                     TransactionEntity entity = new TransactionEntity(
                             title,
                             t.getCategoryName(),
-                            amountFormatted,
+                            t.getAmount(),
                             t.getWalletName(),
-                            dateDisplay
+                            t.getOccurredAt()
                     );
-
+                    entity.remoteId = t.getId();
+                    entity.syncStatus = SyncStatus.SYNCED;
+                    entity.pendingAction = "NONE";
                     mapped.add(entity);
                 }
 
-                // 2.1) Ghi đè vào local cache
-                transactionLocalRepository.replaceAll(mapped);
-
-                // 2.2) Đẩy list mới lên UI
+                transactionLocalRepository.replaceAllSynced(mapped);
                 callback.onDataLoaded(mapped);
             }
 
             @Override
-            public void onError(String message) {
-                // BE lỗi (mất mạng, refresh fail, server down...)
-                // → cứ để UI dùng data local đã load ở bước 1
-                // optional: callback.onError(message);
+            public void onError(String message, @Nullable Integer code) {
+                // Error from API, do nothing, UI will use local data
             }
         });
     }
-
 }

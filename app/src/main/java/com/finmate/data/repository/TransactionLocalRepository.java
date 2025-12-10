@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.finmate.data.local.database.AppDatabase;
 import com.finmate.data.local.database.dao.TransactionDao;
+import com.finmate.data.local.database.entity.SyncStatus;
 import com.finmate.data.local.database.entity.TransactionEntity;
 
 import java.util.List;
@@ -16,14 +17,14 @@ import javax.inject.Singleton;
 import dagger.hilt.android.qualifiers.ApplicationContext;
 
 @Singleton
-public class TransactionRepository {
+public class TransactionLocalRepository {
 
     private static final Executor EXECUTOR = Executors.newSingleThreadExecutor();
 
     private final TransactionDao dao;
 
     @Inject
-    public TransactionRepository(@ApplicationContext Context context) {
+    public TransactionLocalRepository(@ApplicationContext Context context) {
         dao = AppDatabase.getDatabase(context).transactionDao();
     }
 
@@ -35,6 +36,10 @@ public class TransactionRepository {
         EXECUTOR.execute(() -> callback.onResult(dao.getAll()));
     }
 
+    public void getPendingTransactions(OnResultCallback<List<TransactionEntity>> callback) {
+        EXECUTOR.execute(() -> callback.onResult(dao.getPendingTransactions()));
+    }
+
     public void update(TransactionEntity entity) {
         EXECUTOR.execute(() -> dao.update(entity));
     }
@@ -43,22 +48,22 @@ public class TransactionRepository {
         EXECUTOR.execute(() -> dao.delete(entity));
     }
 
-    /**
-     * Ghi đè toàn bộ transaction local = data mới từ server.
-     * Anh có thể sau này đổi thành sync thông minh hơn.
-     */
-    public void replaceAll(List<TransactionEntity> transactions) {
+    public void replaceAllSynced(List<TransactionEntity> transactions) {
         EXECUTOR.execute(() -> {
-            List<TransactionEntity> existing = dao.getAll();
-            for (TransactionEntity t : existing) {
-                dao.delete(t);
-            }
+            dao.deleteByStatus(SyncStatus.SYNCED);
             for (TransactionEntity t : transactions) {
                 dao.insert(t);
             }
         });
     }
 
+    public void markAsSyncedAfterCreate(TransactionEntity oldPending, TransactionEntity newSynced) {
+        EXECUTOR.execute(() -> {
+            dao.delete(oldPending);
+            dao.insert(newSynced);
+        });
+    }
+    
     public interface OnResultCallback<T> {
         void onResult(T data);
     }
