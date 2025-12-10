@@ -20,7 +20,12 @@ public class DataStoreModule {
 
     @Provides
     @Singleton
-    public RxDataStore<Preferences> provideDataStore(@ApplicationContext Context context) {
-        return new RxPreferenceDataStoreBuilder(context, "auth_prefs").build();
+    public RxDataStore<Preferences> provideDataStore(
+            @ApplicationContext Context context
+    ) {
+        return new RxPreferenceDataStoreBuilder(
+                context,
+                "auth_prefs"   // tên file DataStore
+        ).build();
     }
 }
