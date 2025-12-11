@@ -5,7 +5,7 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
-import com.finmate.entities.TokenEntity;
+import com.finmate.data.local.datastore.entity.TokenEntity;
 
 @Dao
 public interface TokenDao {

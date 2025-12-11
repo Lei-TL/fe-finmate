@@ -9,7 +9,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.finmate.R;
-import com.finmate.entities.WalletEntity;
+import com.finmate.data.local.database.entity.WalletEntity;
 import com.finmate.data.repository.WalletRepository;
 
 public class AddWalletActivity extends AppCompatActivity {

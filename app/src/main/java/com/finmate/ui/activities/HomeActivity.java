@@ -3,15 +3,20 @@ package com.finmate.ui.activities;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
+import com.finmate.ui.base.BaseActivity;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
 import com.finmate.adapters.TransactionAdapter;
-import com.finmate.models.Transaction;
+import com.finmate.ui.models.TransactionUIModel;
+import com.finmate.entities.TransactionEntity;
+import com.finmate.data.repository.TransactionRepository;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -27,67 +32,132 @@ import java.util.List;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.finmate.R;
+
 public class HomeActivity extends BaseActivity {
 
-    LineChart lineChart;
-    BottomNavigationView bottomNavigation;
-    RecyclerView rvTransactions;
-    TransactionAdapter transactionAdapter;
-    List<Transaction> transactionList;
+    private LineChart lineChart;
+    private BottomNavigationView bottomNavigation;
+    private RecyclerView rvTransactions;
+
+    private TransactionAdapter transactionAdapter;
+    private List<TransactionUIModel> transactionList;
+
+    private TransactionRepository repository;
+
+    private ImageView btnMenuMore;  // MENU 3 CHẤM
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        lineChart = findViewById(R.id.lineChart);
-        bottomNavigation = findViewById(R.id.bottomNavigation);
-        rvTransactions = findViewById(R.id.rvTransactions);
+        repository = new TransactionRepository(this);
 
-        bottomNavigation.setSelectedItemId(R.id.nav_home);
-
+        mapViews();
+        setupMenuMore();         // <–– Thêm MENU 3 CHẤM
         setupChart();
         setupBottomNavigation();
         setupRecyclerView();
+        loadTransactionsFromDB();
+    }
 
-        // Register RecyclerView for context menu
-        registerForContextMenu(rvTransactions);
+    private void mapViews() {
+        lineChart = findViewById(R.id.lineChart);
+        bottomNavigation = findViewById(R.id.bottomNavigation);
+        rvTransactions = findViewById(R.id.rvTransactions);
+        btnMenuMore = findViewById(R.id.btnMenuMore); // ánh xạ nút 3 chấm
+
+        bottomNavigation.setSelectedItemId(R.id.nav_home);
+    }
+
+    // =======================================
+    // 🚀 MENU 3 CHẤM: CHỌN VÍ – THÊM VÍ
+    // =======================================
+    private void setupMenuMore() {
+        btnMenuMore.setOnClickListener(v -> {
+            PopupMenu popup = new PopupMenu(HomeActivity.this, btnMenuMore);
+            popup.getMenuInflater().inflate(R.menu.menu_wallet_options, popup.getMenu());
+
+            popup.setOnMenuItemClickListener(item -> {
+                int id = item.getItemId();
+
+                if (id == R.id.action_choose_wallet) {
+                    openChooseWalletDialog();
+                    return true;
+                }
+
+                if (id == R.id.action_add_wallet) {
+                    startActivity(new Intent(HomeActivity.this, AddWalletActivity.class));
+                    return true;
+                }
+
+                return false;
+            });
+
+            popup.show();
+        });
+    }
+
+    private void openChooseWalletDialog() {
+        // Tạm thời dùng dữ liệu mẫu
+        String[] wallets = {"Ví của tôi", "Ví ngân hàng", "Ví tiền mặt"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Chọn ví");
+
+        builder.setItems(wallets, (dialog, which) -> {
+            Toast.makeText(this, "Đã chọn: " + wallets[which], Toast.LENGTH_SHORT).show();
+        });
+
+        builder.show();
+    }
+
+    // =======================================
+    // 🚀 LOAD DATA TRANSACTION
+    // =======================================
+    private void loadTransactionsFromDB() {
+        repository.getAll(entities -> {
+            List<TransactionUIModel> uiList = new ArrayList<>();
+
+            for (TransactionEntity e : entities) {
+                uiList.add(new TransactionUIModel(
+                        e.name,
+                        e.category,
+                        e.amount,
+                        e.wallet,
+                        e.date
+                ));
+            }
+
+            runOnUiThread(() -> {
+                transactionList.clear();
+                transactionList.addAll(uiList);
+                transactionAdapter.notifyDataSetChanged();
+            });
+        });
+    }
+
+    // =======================================
+    // 🚀 RECYCLERVIEW
+    // =======================================
+    private void setupRecyclerView() {
+        transactionList = new ArrayList<>();
+        transactionAdapter = new TransactionAdapter(transactionList);
+
+        rvTransactions.setLayoutManager(new LinearLayoutManager(this));
+        rvTransactions.setAdapter(transactionAdapter);
     }
 
     @Override
-    public boolean onContextItemSelected(@NonNull MenuItem item) {
-        int position = transactionAdapter.getLongClickedPosition();
-        if (position == -1) {
-            return super.onContextItemSelected(item);
-        }
-
-        Transaction selectedTransaction = transactionAdapter.getTransactionAt(position);
-
-        switch (item.getItemId()) {
-            case R.id.action_edit:
-                // Navigate to AddTransactionActivity to edit
-                Intent intent = new Intent(this, AddTransactionActivity.class);
-                // TODO: Pass transaction data to the activity
-                // intent.putExtra("transaction_id", selectedTransaction.getId());
-                startActivity(intent);
-                return true;
-
-            case R.id.action_delete:
-                // Show a confirmation dialog before deleting
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.delete)
-                        .setMessage("Are you sure you want to delete this transaction?") // TODO: Add to strings.xml
-                        .setPositiveButton(R.string.delete, (dialog, which) -> {
-                            // TODO: Implement delete logic
-                            Toast.makeText(this, "Transaction deleted (simulation)", Toast.LENGTH_SHORT).show();
-                        })
-                        .setNegativeButton(R.string.cancel, null)
-                        .show();
-                return true;
-        }
-        return super.onContextItemSelected(item);
+    protected void onResume() {
+        super.onResume();
+        loadTransactionsFromDB();
     }
 
+    // =======================================
+    // 🚀 BIỂU ĐỒ
+    // =======================================
     private void setupChart() {
         ArrayList<Entry> income = new ArrayList<>();
         ArrayList<Entry> expense = new ArrayList<>();
@@ -95,12 +165,9 @@ public class HomeActivity extends BaseActivity {
         income.add(new Entry(1, 60));
         income.add(new Entry(2, 80));
         income.add(new Entry(3, 90));
-        income.add(new Entry(4, 70));
-
         expense.add(new Entry(1, 20));
         expense.add(new Entry(2, 40));
         expense.add(new Entry(3, 35));
-        expense.add(new Entry(4, 50));
 
         LineDataSet incomeSet = new LineDataSet(income, "Thu nhập");
         incomeSet.setColor(Color.GREEN);
@@ -115,48 +182,41 @@ public class HomeActivity extends BaseActivity {
 
         XAxis xAxis = lineChart.getXAxis();
         xAxis.setTextColor(Color.WHITE);
+        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
+
         YAxis leftAxis = lineChart.getAxisLeft();
         leftAxis.setTextColor(Color.WHITE);
+
         lineChart.getAxisRight().setEnabled(false);
         lineChart.getDescription().setEnabled(false);
+
         Legend legend = lineChart.getLegend();
         legend.setTextColor(Color.WHITE);
-        lineChart.animateY(1000);
+
+        lineChart.animateY(800);
     }
 
+    // =======================================
+    // 🚀 NAVIGATION
+    // =======================================
     private void setupBottomNavigation() {
         bottomNavigation.setOnNavigationItemSelectedListener(item -> {
             Intent intent = null;
-            int itemId = item.getItemId();
 
-            if (itemId == R.id.nav_home) {
+            if (item.getItemId() == R.id.nav_home) {
                 return true;
-            } else if (itemId == R.id.nav_wallet) {
+            } else if (item.getItemId() == R.id.nav_wallet) {
                 intent = new Intent(this, WalletActivity.class);
-            } else if (itemId == R.id.nav_add) {
+            } else if (item.getItemId() == R.id.nav_add) {
                 intent = new Intent(this, AddTransactionActivity.class);
-            } else if (itemId == R.id.nav_statistic) {
+            } else if (item.getItemId() == R.id.nav_statistic) {
                 intent = new Intent(this, StatisticActivity.class);
-            } else if (itemId == R.id.nav_settings) {
+            } else if (item.getItemId() == R.id.nav_settings) {
                 intent = new Intent(this, SettingsActivity.class);
             }
 
-            if (intent != null) {
-                startActivity(intent);
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-            }
+            if (intent != null) startActivity(intent);
             return true;
         });
-    }
-
-    private void setupRecyclerView() {
-        transactionList = new ArrayList<>();
-        transactionList.add(new Transaction("Ăn uống", "Riêng tôi", "-100,000 đ", "Ví của tôi", "22/04/2022"));
-        transactionList.add(new Transaction("Lương", "Công ty", "+15,000,000 đ", "Ví ngân hàng", "21/04/2022"));
-        transactionList.add(new Transaction("Xăng xe", "Riêng tôi", "-50,000 đ", "Ví của tôi", "20/04/2022"));
-
-        transactionAdapter = new TransactionAdapter(transactionList);
-        rvTransactions.setLayoutManager(new LinearLayoutManager(this));
-        rvTransactions.setAdapter(transactionAdapter);
     }
 }

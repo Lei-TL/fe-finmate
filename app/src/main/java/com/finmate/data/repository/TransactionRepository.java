@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.finmate.data.local.database.AppDatabase;
 import com.finmate.data.local.database.dao.TransactionDao;
-import com.finmate.entities.TransactionEntity;
+import com.finmate.data.local.database.entity.TransactionEntity;
 
 import java.util.List;
 import java.util.concurrent.Executor;

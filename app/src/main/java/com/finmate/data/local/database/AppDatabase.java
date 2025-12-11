@@ -10,13 +10,19 @@ import com.finmate.data.local.database.dao.CategoryDao;
 import com.finmate.data.local.database.dao.TokenDao;
 import com.finmate.data.local.database.dao.TransactionDao;
 import com.finmate.data.local.database.dao.WalletDao;
-import com.finmate.entities.CategoryEntity;
-import com.finmate.entities.TokenEntity;
-import com.finmate.entities.TransactionEntity;
-import com.finmate.entities.WalletEntity;
+import com.finmate.data.local.database.entity.CategoryEntity;
+import com.finmate.data.local.datastore.entity.TokenEntity;
+import com.finmate.data.local.database.entity.TransactionEntity;
+import com.finmate.data.local.database.entity.WalletEntity;
 
-@Database(entities = {TokenEntity.class, CategoryEntity.class, WalletEntity.class, TransactionEntity.class}, version = 2, exportSchema = false)
+@Database(entities = {
+        TokenEntity.class,
+        CategoryEntity.class,
+        WalletEntity.class,
+        TransactionEntity.class
+}, version = 2, exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
+
     public abstract TokenDao tokenDao();
     public abstract CategoryDao categoryDao();
     public abstract WalletDao walletDao();
@@ -29,9 +35,8 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
-                            AppDatabase.class, "finmate_database")
-                            .allowMainThreadQueries()
-                            .fallbackToDestructiveMigration() // Xóa dữ liệu cũ khi schema thay đổi
+                                    AppDatabase.class, "finmate_database")
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }
