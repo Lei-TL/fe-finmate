@@ -11,6 +11,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.finmate.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +40,7 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
         FriendUIModel friend = friendList.get(position);
 
         // Avatar tạm thời dùng icon chung
-        holder.ivAvatar.setImageResource(R.drawable.ic_person); // đổi icon nếu anh có
+        holder.ivAvatar.setImageResource(R.drawable.taikhoan); // đổi icon nếu anh có
 
         holder.tvStatus.setText(friend.getStatus());
 

@@ -1,8 +1,10 @@
 package com.finmate.data.repository;
 
 import com.finmate.core.network.ApiCallExecutor;
-import com.finmate.core.network.ApiCallback;
+import com.finmate.data.dto.WalletRequest;
 import com.finmate.data.dto.WalletResponse;
+import com.finmate.data.remote.api.ApiCallback;
+import com.finmate.data.remote.api.WalletService;
 
 import java.util.List;
 
@@ -14,12 +16,11 @@ import retrofit2.Call;
 @Singleton
 public class WalletRemoteRepository {
 
-    private final com.finmate.data.remote.api.WalletService walletApi;
+    private final WalletService walletApi;
     private final ApiCallExecutor apiCallExecutor;
 
     @Inject
-    public WalletRemoteRepository(com.finmate.data.remote.api.WalletService walletApi,
-                                  ApiCallExecutor apiCallExecutor) {
+    public WalletRemoteRepository(WalletService walletApi, ApiCallExecutor apiCallExecutor) {
         this.walletApi = walletApi;
         this.apiCallExecutor = apiCallExecutor;
     }
@@ -27,5 +28,17 @@ public class WalletRemoteRepository {
     public void fetchMyWallets(ApiCallback<List<WalletResponse>> callback) {
         Call<List<WalletResponse>> call = walletApi.getMyWallets();
         apiCallExecutor.execute(call, callback);
+    }
+
+    public void createWallet(WalletRequest request, ApiCallback<WalletResponse> callback) {
+        apiCallExecutor.execute(walletApi.createWallet(request), callback);
+    }
+
+    public void updateWallet(String id, WalletRequest request, ApiCallback<WalletResponse> callback) {
+        apiCallExecutor.execute(walletApi.updateWallet(id, request), callback);
+    }
+
+    public void deleteWallet(String id, ApiCallback<Void> callback) {
+        apiCallExecutor.execute(walletApi.deleteWallet(id), callback);
     }
 }

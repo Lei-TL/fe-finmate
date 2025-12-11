@@ -97,22 +97,13 @@
     </LinearLayout>
 
     <!-- ====== DANH SÁCH GIAO DỊCH ====== -->
-    <ScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvTransactions"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <LinearLayout
-            android:id="@+id/container_transaction"
-            android:orientation="vertical"
-            android:paddingHorizontal="16dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <include layout="@layout/item_transaction" />
-
-        </LinearLayout>
-    </ScrollView>
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="16dp" />
 
     <!-- ====== BOTTOM NAV ====== -->
     <com.google.android.material.bottomnavigation.BottomNavigationView

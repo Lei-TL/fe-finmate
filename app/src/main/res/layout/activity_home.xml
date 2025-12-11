@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="?attr/backgroundColor"
     android:orientation="vertical"
-    tools:context=".ui.activities.HomeActivity">
+    tools:context=".ui.home.HomeActivity">
 
     <!-- ====== HEADER NGƯỜI DÙNG + MENU 3 CHẤM ====== -->
     <LinearLayout

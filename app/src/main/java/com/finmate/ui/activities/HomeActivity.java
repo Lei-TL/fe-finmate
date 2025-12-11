@@ -8,15 +8,18 @@ import android.widget.PopupMenu;
 import android.widget.Toast;
 import com.finmate.ui.base.BaseActivity;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
-import com.finmate.adapters.TransactionAdapter;
-import com.finmate.ui.models.TransactionUIModel;
-import com.finmate.entities.TransactionEntity;
-import com.finmate.data.repository.TransactionRepository;
+import com.finmate.core.util.TransactionFormatter;
+import com.finmate.data.local.database.entity.TransactionEntity;
+import com.finmate.data.repository.TransactionLocalRepository;
+import com.finmate.ui.home.WalletActivity;
+import com.finmate.ui.settings.SettingsActivity;
+import com.finmate.ui.transaction.StatisticActivity;
+import com.finmate.ui.transaction.TransactionAdapter;
+import com.finmate.ui.transaction.TransactionUIModel;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.components.XAxis;
@@ -29,11 +32,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
 import java.util.List;
 
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.finmate.R;
-
 public class HomeActivity extends BaseActivity {
 
     private LineChart lineChart;
@@ -43,7 +41,7 @@ public class HomeActivity extends BaseActivity {
     private TransactionAdapter transactionAdapter;
     private List<TransactionUIModel> transactionList;
 
-    private TransactionRepository repository;
+    private TransactionLocalRepository repository;
 
     private ImageView btnMenuMore;  // MENU 3 CHẤM
 
@@ -52,7 +50,7 @@ public class HomeActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        repository = new TransactionRepository(this);
+        repository = new TransactionLocalRepository(getApplicationContext());
 
         mapViews();
         setupMenuMore();         // <–– Thêm MENU 3 CHẤM
@@ -121,12 +119,14 @@ public class HomeActivity extends BaseActivity {
             List<TransactionUIModel> uiList = new ArrayList<>();
 
             for (TransactionEntity e : entities) {
+                String amount = TransactionFormatter.formatAmount(e.getAmount());
+                String date = TransactionFormatter.formatDate(e.getOccurredAt());
                 uiList.add(new TransactionUIModel(
-                        e.name,
-                        e.category,
-                        e.amount,
-                        e.wallet,
-                        e.date
+                        e.getName(),
+                        e.getCategoryName(),
+                        amount,
+                        e.getWalletName(),
+                        date
                 ));
             }
 

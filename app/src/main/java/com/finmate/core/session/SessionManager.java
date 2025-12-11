@@ -1,29 +1,33 @@
 package com.finmate.core.session;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
 public class SessionManager {
 
-    private String accessToken;
+    // chỉ dùng trong RAM cho AuthInterceptor & UI
+    private volatile String accessToken;
 
     @Inject
     public SessionManager() {}
 
-    public void saveAccessToken(String token) {
+    public synchronized void saveAccessToken(@Nullable String token) {
         this.accessToken = token;
     }
 
+    @Nullable
     public String getAccessToken() {
         return accessToken;
     }
 
     public void clear() {
-        this.accessToken = null;
+        saveAccessToken(null);
     }
 
     public boolean isLoggedIn() {
         return accessToken != null && !accessToken.isEmpty();
     }
 }
+

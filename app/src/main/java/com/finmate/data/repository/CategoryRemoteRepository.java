@@ -1,9 +1,9 @@
 package com.finmate.data.repository;
 
 import com.finmate.core.network.ApiCallExecutor;
-import com.finmate.core.network.ApiCallback;
 import com.finmate.data.dto.CategoryRequest;
 import com.finmate.data.dto.CategoryResponse;
+import com.finmate.data.remote.api.ApiCallback;
 
 import java.util.List;
 

@@ -4,10 +4,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.finmate.core.network.ApiCallback;
 import com.finmate.data.dto.FriendResponse;
+import com.finmate.data.remote.api.ApiCallback;
 import com.finmate.data.repository.FriendRemoteRepository;
-import com.finmate.ui.friend.FriendUIModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +58,7 @@ public class FriendViewModel extends ViewModel {
             }
 
             @Override
-            public void onError(String message) {
+            public void onError(String message, Integer code) {
                 _error.postValue(message);
                 _loading.postValue(false);
             }
@@ -76,7 +75,7 @@ public class FriendViewModel extends ViewModel {
             }
 
             @Override
-            public void onError(String message) {
+            public void onError(String message, Integer code) {
                 _error.postValue(message);
                 _loading.postValue(false);
             }
@@ -92,7 +91,7 @@ public class FriendViewModel extends ViewModel {
             }
 
             @Override
-            public void onError(String message) {
+            public void onError(String message, Integer code) {
                 _error.postValue(message);
                 _loading.postValue(false);
             }
@@ -108,7 +107,7 @@ public class FriendViewModel extends ViewModel {
             }
 
             @Override
-            public void onError(String message) {
+            public void onError(String message, Integer code) {
                 _error.postValue(message);
                 _loading.postValue(false);
             }
@@ -124,7 +123,7 @@ public class FriendViewModel extends ViewModel {
             }
 
             @Override
-            public void onError(String message) {
+            public void onError(String message, Integer code) {
                 _error.postValue(message);
                 _loading.postValue(false);
             }

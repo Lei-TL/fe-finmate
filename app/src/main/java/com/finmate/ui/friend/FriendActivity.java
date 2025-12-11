@@ -2,8 +2,7 @@ package com.finmate.ui.friend;
 
 
 import android.os.Bundle;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 import com.finmate.R;
 
@@ -21,9 +20,8 @@ public class FriendActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private FriendAdapter adapter;
-
-    private EditText etEmail;
-    private Button btnAdd;
+    private ImageView btnBack;
+    private ImageView btnMore;
 
     private FriendViewModel viewModel;
 
@@ -35,12 +33,17 @@ public class FriendActivity extends AppCompatActivity {
         viewModel = new ViewModelProvider(this).get(FriendViewModel.class);
 
         recyclerView = findViewById(R.id.rvFriends);
-        etEmail = findViewById(R.id.etEmail);
-        btnAdd = findViewById(R.id.btnFriend);
+        btnBack = findViewById(R.id.btnBack);
+        btnMore = findViewById(R.id.btnMore);
 
         adapter = new FriendAdapter(new ArrayList<>());
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+
+        btnBack.setOnClickListener(v -> finish());
+        btnMore.setOnClickListener(v -> {
+            // TODO: Show menu options
+        });
 
         observeViewModel();
         setupActions();
@@ -65,15 +68,6 @@ public class FriendActivity extends AppCompatActivity {
     }
 
     private void setupActions() {
-        btnAdd.setOnClickListener(v -> {
-            String email = etEmail.getText().toString().trim();
-            if (email.isEmpty()) {
-                Toast.makeText(this, "Nhập email bạn bè", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            viewModel.sendRequest(email);
-        });
-
         // nếu FriendAdapter có callback accept/reject/remove thì pass vào đây
         adapter.setOnActionListener(new FriendAdapter.OnActionListener() {
             @Override

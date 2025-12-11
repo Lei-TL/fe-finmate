@@ -1,4 +1,4 @@
-package com.finmate.ui.activities;
+package com.finmate.ui.settings;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,21 +6,27 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.finmate.R;
+import com.finmate.ui.auth.AccountActivity;
+import com.finmate.ui.activities.CategoryIncomeActivity;
+import com.finmate.ui.activities.LanguageSettingActivity;
+import com.finmate.ui.activities.NotificationSettingsActivity;
 import com.finmate.ui.base.BaseActivity;
 import com.finmate.ui.dialogs.ThemeDialog;
+import com.finmate.ui.friend.FriendActivity;
+
 
 public class SettingsActivity extends BaseActivity {
 
-    private ImageView btnBack;
-    private LinearLayout btnLanguage, btnCategory, btnTheme, btnFriend, btnAccount, btnNotification;
+    ImageView btnBack;
+    LinearLayout btnLanguage, btnCategory, btnTheme, btnFriend, btnAccount, btnNotification;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        // ÁNH XẠ
         initViews();
-        setupListeners();
     }
 
     private void initViews() {
@@ -31,39 +37,39 @@ public class SettingsActivity extends BaseActivity {
         btnFriend = findViewById(R.id.btnFriend);
         btnAccount = findViewById(R.id.btnAccount);
         btnNotification = findViewById(R.id.btnNotification);
-    }
 
-    private void setupListeners() {
-
+        // Nút quay lại
         btnBack.setOnClickListener(v -> finish());
 
-        // Ngôn ngữ
+        // ===================== XỬ LÝ CÁC NÚT ========================
+
+        // 1. Ngôn ngữ
         btnLanguage.setOnClickListener(v ->
                 startActivity(new Intent(this, LanguageSettingActivity.class))
         );
 
-        // Thể loại
+        // 2. Quản lý thể loại
         btnCategory.setOnClickListener(v ->
                 startActivity(new Intent(this, CategoryIncomeActivity.class))
         );
 
-        // Giao diện (Theme)
+        // 3. Giao diện hệ thống (mở BottomSheet / Dialog)
         btnTheme.setOnClickListener(v -> {
             ThemeDialog dialog = new ThemeDialog();
             dialog.show(getSupportFragmentManager(), "theme_dialog");
         });
 
-        // Bạn bè
+        // 4. Bạn bè
         btnFriend.setOnClickListener(v ->
                 startActivity(new Intent(this, FriendActivity.class))
         );
 
-        // Tài khoản
+        // 5. Tài khoản
         btnAccount.setOnClickListener(v ->
                 startActivity(new Intent(this, AccountActivity.class))
         );
 
-        // Thông báo
+        // 6. Thông báo
         btnNotification.setOnClickListener(v ->
                 startActivity(new Intent(this, NotificationSettingsActivity.class))
         );

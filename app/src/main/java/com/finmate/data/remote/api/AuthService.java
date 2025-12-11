@@ -1,21 +1,22 @@
 package com.finmate.data.remote.api;
 
 import com.finmate.data.dto.LoginRequest;
+import com.finmate.data.dto.RefreshTokenRequest;
 import com.finmate.data.dto.RegisterRequest;
 import com.finmate.data.dto.TokenResponse;
-import com.finmate.data.dto.RefreshTokenRequest;
 
-import retrofit2.Call;
+import io.reactivex.rxjava3.core.Single;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 
 public interface AuthService {
+
     @POST("auth/register")
-    Call<TokenResponse> register(@Body RegisterRequest request);
+    Single<TokenResponse> register(@Body RegisterRequest request);
 
     @POST("auth/login")
-    Call<TokenResponse> login(@Body LoginRequest request);
+    Single<TokenResponse> login(@Body LoginRequest request);
 
     @POST("auth/refresh")
-    Call<TokenResponse> refresh(@Body RefreshTokenRequest request);
+    Single<TokenResponse> refreshToken(@Body RefreshTokenRequest request);
 }
