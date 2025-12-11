@@ -52,45 +52,6 @@
             android:gravity="center" />
     </LinearLayout>
 
-    <!-- FILTERS -->
-    <LinearLayout
-        android:id="@+id/layoutFilters"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        android:paddingBottom="8dp">
-
-        <TextView
-            android:id="@+id/tvDateFilter"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="12dp"
-            android:text="Tháng này"
-            android:background="?attr/editTextBackground"
-            android:textColor="?attr/editTextColor"
-            android:textSize="14sp" />
-
-        <Space
-            android:layout_width="12dp"
-            android:layout_height="1dp" />
-
-        <TextView
-            android:id="@+id/tvWalletFilter"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="12dp"
-            android:text="Tất cả ví"
-            android:background="?attr/editTextBackground"
-            android:textColor="?attr/editTextColor"
-            android:textSize="14sp" />
-
-    </LinearLayout>
-
     <!-- TOTAL EXPENSE -->
     <TextView
         android:id="@+id/tvTotalExpense"

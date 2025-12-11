@@ -6,9 +6,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.finmate.R;
 import com.finmate.ui.auth.LoginActivity;
-import com.finmate.ui.home.HomeActivity;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
@@ -18,7 +16,6 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
 
         SplashViewModel viewModel = new ViewModelProvider(this).get(SplashViewModel.class);
 

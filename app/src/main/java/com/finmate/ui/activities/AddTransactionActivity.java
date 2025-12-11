@@ -14,30 +14,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.finmate.ui.base.BaseActivity;
 
-import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.finmate.R;
-import com.finmate.core.util.NetworkUtils;
-import com.finmate.core.util.TransactionFormatter;
-import com.finmate.data.local.database.entity.TransactionEntity;
-import com.finmate.data.repository.TransactionLocalRepository;
-import com.finmate.data.repository.TransactionSyncManager;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
-import java.text.ParseException;
 import java.util.Calendar;
 
-import javax.inject.Inject;
-
-import dagger.hilt.android.AndroidEntryPoint;
-
-@AndroidEntryPoint
 public class AddTransactionActivity extends BaseActivity {
-
-    @Inject
-    TransactionLocalRepository localRepository;
-    @Inject
-    TransactionSyncManager syncManager;
 
     EditText etCategory, etTitle, etAmount, tvFriend, etNote;
     TextView tvDate;
@@ -45,6 +29,7 @@ public class AddTransactionActivity extends BaseActivity {
 
     String selectedGroup = "";
 
+    // Ngày
     String startDate = "";
     String endDate = "";
 
@@ -58,61 +43,6 @@ public class AddTransactionActivity extends BaseActivity {
         setupEvents();
     }
 
-    private void saveTransaction() {
-        String group = etCategory.getText().toString().trim();
-        String title = etTitle.getText().toString().trim();
-        String amountInput = etAmount.getText().toString().trim();
-        String dateDisplay = tvDate.getText().toString().trim();
-        String wallet = "Ví của tôi";
-
-        if (group.isEmpty() || title.isEmpty() || amountInput.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Parse amount từ String input → double
-        double amount;
-        try {
-            amount = TransactionFormatter.parseAmount(amountInput);
-        } catch (NumberFormatException e) {
-            Toast.makeText(this, "Số tiền không hợp lệ!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Convert date từ display format (dd/MM/yyyy) → ISO format
-        String occurredAt;
-        try {
-            if (dateDisplay.isEmpty() || dateDisplay.equals("Đến hạn")) {
-                // Nếu chưa chọn date, dùng ngày hiện tại
-                Calendar c = Calendar.getInstance();
-                occurredAt = TransactionFormatter.calendarToISO(
-                        c.get(Calendar.YEAR),
-                        c.get(Calendar.MONTH) + 1,
-                        c.get(Calendar.DAY_OF_MONTH)
-                );
-            } else {
-                // Parse từ format hiển thị (dd/MM/yyyy) sang ISO
-                occurredAt = TransactionFormatter.parseDateToISO(dateDisplay);
-            }
-        } catch (ParseException e) {
-            Toast.makeText(this, "Ngày không hợp lệ!", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        TransactionEntity transaction = new TransactionEntity(title, group, amount, wallet, occurredAt);
-        localRepository.insert(transaction);
-
-        if (NetworkUtils.isOnline(this)) {
-            syncManager.syncPendingTransactions();
-            Toast.makeText(this, "Đã lưu, đang đồng bộ…", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "Lưu tạm (offline)!", Toast.LENGTH_SHORT).show();
-        }
-        finish();
-    }
-
-    // ... (the rest of the methods are unchanged)
-
     private void initViews() {
         etCategory = findViewById(R.id.etCategory);
         etTitle    = findViewById(R.id.etTitle);
@@ -125,6 +55,9 @@ public class AddTransactionActivity extends BaseActivity {
         btnSave    = findViewById(R.id.btnSave);
     }
 
+    // ============================================
+    // MÀU TEXT: Trống = trắng / Có chữ = đen
+    // ============================================
     private void setupEditTextColor() {
         applyWatcher(etCategory);
         applyWatcher(etTitle);
@@ -163,6 +96,7 @@ public class AddTransactionActivity extends BaseActivity {
 
         tvFriend.setOnClickListener(v -> showFriendBottomSheet());
 
+        // Chọn ngày
         tvDate.setOnClickListener(v -> showDueDateBottomSheet());
 
         btnCancel.setOnClickListener(v -> finish());
@@ -170,6 +104,9 @@ public class AddTransactionActivity extends BaseActivity {
         btnSave.setOnClickListener(v -> saveTransaction());
     }
 
+    // ================================
+    // 1) BottomSheet: Chọn nhóm
+    // ================================
     private void showGroupBottomSheet() {
 
         BottomSheetDialog dialog = new BottomSheetDialog(this);
@@ -196,6 +133,9 @@ public class AddTransactionActivity extends BaseActivity {
         dialog.show();
     }
 
+    // ================================
+    // 2) BottomSheet: Mục con
+    // ================================
     private void showCategoryItemsBottomSheet() {
 
         BottomSheetDialog dialog = new BottomSheetDialog(this);
@@ -232,6 +172,9 @@ public class AddTransactionActivity extends BaseActivity {
         dialog.show();
     }
 
+    // ================================
+    // 3) BottomSheet: Danh sách bạn
+    // ================================
     private void showFriendBottomSheet() {
 
         BottomSheetDialog dialog = new BottomSheetDialog(this);
@@ -275,6 +218,9 @@ public class AddTransactionActivity extends BaseActivity {
         dialog.show();
     }
 
+    // ================================
+    // 4) BottomSheet: Chọn ngày
+    // ================================
     private void showDueDateBottomSheet() {
 
         BottomSheetDialog dialog = new BottomSheetDialog(this);
@@ -285,6 +231,7 @@ public class AddTransactionActivity extends BaseActivity {
         TextView tvRange  = view.findViewById(R.id.tvDueRange);
         TextView tvClear  = view.findViewById(R.id.tvDueClear);
 
+        // 1) Trong ngày
         tvToday.setOnClickListener(v -> {
             Calendar c = Calendar.getInstance();
             int y = c.get(Calendar.YEAR);
@@ -296,16 +243,19 @@ public class AddTransactionActivity extends BaseActivity {
             dialog.dismiss();
         });
 
+        // 2) Chọn 1 ngày
         tvSingle.setOnClickListener(v -> {
             dialog.dismiss();
             showSingleDatePicker();
         });
 
+        // 3) Chọn từ → đến
         tvRange.setOnClickListener(v -> {
             dialog.dismiss();
             showStartDatePicker();
         });
 
+        // 4) Xóa
         tvClear.setOnClickListener(v -> {
             tvDate.setText("Đến hạn");
             tvDate.setTextColor(Color.GRAY);
@@ -318,6 +268,7 @@ public class AddTransactionActivity extends BaseActivity {
         dialog.show();
     }
 
+    // 1 NGÀY
     private void showSingleDatePicker() {
         Calendar c = Calendar.getInstance();
 
@@ -336,6 +287,7 @@ public class AddTransactionActivity extends BaseActivity {
         picker.show();
     }
 
+    // CHỌN TỪ NGÀY
     private void showStartDatePicker() {
 
         Calendar c = Calendar.getInstance();
@@ -355,6 +307,7 @@ public class AddTransactionActivity extends BaseActivity {
         picker.show();
     }
 
+    // CHỌN ĐẾN NGÀY
     private void showEndDatePicker() {
 
         Calendar c = Calendar.getInstance();
@@ -374,5 +327,23 @@ public class AddTransactionActivity extends BaseActivity {
 
         picker.setTitle("Chọn ngày kết thúc");
         picker.show();
+    }
+
+    // ================================
+    // 5) Lưu giao dịch
+    // ================================
+    private void saveTransaction() {
+
+        String group  = etCategory.getText().toString().trim();
+        String title  = etTitle.getText().toString().trim();
+        String amount = etAmount.getText().toString().trim();
+
+        if (group.isEmpty() || title.isEmpty() || amount.isEmpty()) {
+            Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Toast.makeText(this, "Đã lưu giao dịch!", Toast.LENGTH_SHORT).show();
+        finish();
     }
 }

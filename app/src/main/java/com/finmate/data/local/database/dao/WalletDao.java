@@ -5,15 +5,11 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
-
-import com.finmate.core.offline.PendingAction;
-import com.finmate.core.offline.SyncDao;
 import com.finmate.data.local.database.entity.WalletEntity;
-
 import java.util.List;
 
 @Dao
-public interface WalletDao extends SyncDao<WalletEntity> {
+public interface WalletDao {
 
     @Insert
     void insert(WalletEntity wallet);
@@ -29,12 +25,4 @@ public interface WalletDao extends SyncDao<WalletEntity> {
 
     @Query("SELECT * FROM wallets WHERE id = :id LIMIT 1")
     WalletEntity getById(int id);
-
-    @Query("SELECT * FROM wallets WHERE pendingAction != :noneAction ORDER BY updatedAt ASC")
-    List<WalletEntity> getPendingForSyncInternal(String noneAction);
-
-    @Override
-    default List<WalletEntity> getPendingForSync() {
-        return getPendingForSyncInternal(PendingAction.NONE);
-    }
 }

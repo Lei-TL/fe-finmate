@@ -1,6 +1,8 @@
+import org.gradle.api.JavaVersion
+
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.hilt)
+    id("com.android.application")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -26,42 +28,58 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
+    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.activity:activity:1.8.0")
+
+    // Chart
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
-    implementation(libs.appcompat)
-    implementation(libs.material)
-    implementation(libs.room.runtime)
-    annotationProcessor(libs.room.compiler)
 
-    // Hilt
-    implementation(libs.hilt.android)
-    annotationProcessor(libs.hilt.compiler)
+    // Room
+    implementation("androidx.room:room-runtime:2.6.1")
+    annotationProcessor("androidx.room:room-compiler:2.6.1")
 
-    // Retrofit & OkHttp
-    implementation(libs.retrofit)
-    implementation(libs.retrofit.gson)
-    implementation(libs.retrofit.rxjava3.adapter)
-    implementation(libs.okhttp.logging)
-
-    // DataStore
-    implementation(libs.datastore.prefs)
-    implementation(libs.datastore.rxjava3) // For Java support
-
-    // RxJava
-    implementation(libs.rxjava)
-    implementation(libs.rxandroid)
+    // -------------------------
+    // ✅ Datastore CHUẨN RxJava3
+    // -------------------------
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    implementation("androidx.datastore:datastore-preferences-rxjava3:1.1.1")
 
     // Lifecycle
-    implementation(libs.lifecycle.viewmodel)
-    implementation(libs.lifecycle.livedata)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.0")
 
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.ext.junit)
-    androidTestImplementation(libs.espresso.core)
+    // Hilt
+    implementation("com.google.dagger:hilt-android:2.51.1")
+    annotationProcessor("com.google.dagger:hilt-compiler:2.51.1")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.google.code.gson:gson:2.10.1")
+
+    // OkHttp
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.11.0")
+
+    // RxJava
+    implementation("io.reactivex.rxjava3:rxjava:3.1.8")
+
+    // Test
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }

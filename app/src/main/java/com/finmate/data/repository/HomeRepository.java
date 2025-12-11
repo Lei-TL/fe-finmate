@@ -1,20 +1,13 @@
 package com.finmate.data.repository;
 
-import androidx.annotation.Nullable;
-
-import com.finmate.core.offline.PendingAction;
-import com.finmate.core.offline.SyncStatus;
+import com.finmate.core.network.ApiCallback;
 import com.finmate.data.dto.TransactionPageResponse;
 import com.finmate.data.dto.TransactionResponse;
 import com.finmate.data.dto.WalletResponse;
 import com.finmate.data.local.database.entity.TransactionEntity;
 import com.finmate.data.local.database.entity.WalletEntity;
-import com.finmate.data.local.database.entity.CategoryEntity;
-import com.finmate.data.remote.api.ApiCallback;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -23,22 +16,16 @@ import javax.inject.Singleton;
 public class HomeRepository {
 
     private final WalletRemoteRepository walletRemoteRepository;
-    private final WalletLocalRepository walletLocalRepository;
+    private final WalletRepository walletLocalRepository;
     private final TransactionRemoteRepository transactionRemoteRepository;
-    private final TransactionLocalRepository transactionLocalRepository;
-    private final CategoryLocalRepository categoryLocalRepository;
+    private final TransactionRepository transactionLocalRepository;
 
     @Inject
-    public HomeRepository(WalletRemoteRepository walletRemoteRepository, 
-                          WalletLocalRepository walletLocalRepository, 
-                          TransactionRemoteRepository transactionRemoteRepository, 
-                          TransactionLocalRepository transactionLocalRepository,
-                          CategoryLocalRepository categoryLocalRepository) {
+    public HomeRepository(WalletRemoteRepository walletRemoteRepository, WalletRepository walletLocalRepository, TransactionRemoteRepository transactionRemoteRepository, TransactionRepository transactionLocalRepository) {
         this.walletRemoteRepository = walletRemoteRepository;
         this.walletLocalRepository = walletLocalRepository;
         this.transactionRemoteRepository = transactionRemoteRepository;
         this.transactionLocalRepository = transactionLocalRepository;
-        this.categoryLocalRepository = categoryLocalRepository;
     }
 
     public interface DataCallback<T> {
@@ -46,163 +33,117 @@ public class HomeRepository {
         void onError(String message);
     }
 
+    // Tạm thời dùng dữ liệu giả
     public void fetchWallets(DataCallback<List<WalletEntity>> callback) {
-        walletLocalRepository.getAll(new WalletLocalRepository.Callback() {
+        // 1) Luôn load local trước để UI có gì đó hiển thị (offline vẫn chạy được)
+        walletLocalRepository.getAll(new WalletRepository.Callback() {
             @Override
             public void onResult(List<WalletEntity> list) {
                 callback.onDataLoaded(list);
             }
         });
 
+        // 2) Sau đó, thử gọi BE để lấy dữ liệu mới nhất
         walletRemoteRepository.fetchMyWallets(new ApiCallback<List<WalletResponse>>() {
             @Override
             public void onSuccess(List<WalletResponse> body) {
+                // Map WalletResponse -> WalletEntity
                 List<WalletEntity> mapped = new java.util.ArrayList<>();
                 if (body != null) {
                     for (WalletResponse w : body) {
-                        // Use initialBalance from backend, or calculate currentBalance if needed
-                        double balance = w.getInitialBalance() != null ? 
-                                w.getInitialBalance().doubleValue() : w.getCurrentBalance();
+                        String formattedBalance = String.format(
+                                "%,.0f %s",
+                                w.getCurrentBalance(),
+                                w.getCurrency() != null ? w.getCurrency() : ""
+                        );
+
                         WalletEntity entity = new WalletEntity(
                                 w.getName(),
-                                w.getCurrency() != null ? w.getCurrency() : "VND",
-                                balance,
-                                0
+                                formattedBalance,
+                                0 // iconRes tạm thời = 0, sau này anh map theo type
                         );
-                        entity.setRemoteId(w.getId());
-                        entity.setSyncStatus(SyncStatus.SYNCED);
-                        entity.setPendingAction(PendingAction.NONE);
-                        entity.setUpdatedAt(System.currentTimeMillis());
                         mapped.add(entity);
                     }
                 }
+
+                // 2.1) Ghi đè vào local cache
                 walletLocalRepository.replaceAll(mapped);
+
+                // 2.2) Đẩy list mới lên UI
                 callback.onDataLoaded(mapped);
             }
 
             @Override
-            public void onError(String message, @Nullable Integer code) {
-                // Error from API, do nothing, UI will use local data
+            public void onError(String message) {
+                // BE lỗi (mất mạng, 401 refresh fail, server down...)
+                // -> cứ để UI dùng data local đã load ở bước 1
+                // optional: callback.onError(message);
             }
         });
     }
 
+
+
     public void fetchTransactions(String walletId, DataCallback<List<TransactionEntity>> callback) {
-        transactionLocalRepository.getAll(new TransactionLocalRepository.OnResultCallback<List<TransactionEntity>>() {
+        // 1) Luôn load local trước → offline vẫn xem được
+        transactionLocalRepository.getAll(new TransactionRepository.OnResultCallback<List<TransactionEntity>>() {
             @Override
             public void onResult(List<TransactionEntity> data) {
+                // Nếu anh muốn filter theo walletId ở local luôn thì filter thêm ở đây
                 callback.onDataLoaded(data);
             }
         });
 
-        // Load wallets and categories for mapping IDs to names
-        walletLocalRepository.getAll(new WalletLocalRepository.Callback() {
+        // 2) Gọi BE để lấy dữ liệu mới nhất nếu có mạng
+        transactionRemoteRepository.fetchTransactions(walletId, new ApiCallback<TransactionPageResponse>() {
             @Override
-            public void onResult(List<WalletEntity> wallets) {
-                // Now fetch transactions with wallet and category lookups
-                transactionRemoteRepository.fetchTransactions(
-                        walletId, null, null, null, null, 0, 20,
-                        new ApiCallback<TransactionPageResponse>() {
-                            @Override
-                            public void onSuccess(TransactionPageResponse page) {
-                                if (page == null || page.getContent() == null || page.getContent().isEmpty()) {
-                                    callback.onDataLoaded(new java.util.ArrayList<>());
-                                    return;
-                                }
+            public void onSuccess(TransactionPageResponse page) {
+                if (page == null || page.getContent() == null) {
+                    return;
+                }
 
-                                // Get all categories for all transaction types (INCOME, EXPENSE, TRANSFER)
-                                // We'll collect all unique types first
-                                Set<String> types = new HashSet<>();
-                                for (TransactionResponse t : page.getContent()) {
-                                    if (t.getType() != null) {
-                                        types.add(t.getType());
-                                    }
-                                }
-                                
-                                // If no types found, use default
-                                if (types.isEmpty()) {
-                                    types.add("EXPENSE");
-                                }
-                                
-                                // Collect all categories from all types
-                                final List<CategoryEntity> allCategories = new java.util.ArrayList<>();
-                                final int[] remainingTypes = {types.size()};
-                                
-                                for (String type : types) {
-                                    categoryLocalRepository.getByTypeSync(type, 
-                                        new CategoryLocalRepository.OnResultCallback<List<CategoryEntity>>() {
-                                            @Override
-                                            public void onResult(List<CategoryEntity> categories) {
-                                                if (categories != null) {
-                                                    allCategories.addAll(categories);
-                                                }
-                                                remainingTypes[0]--;
-                                                
-                                                // When all categories are loaded, map transactions
-                                                if (remainingTypes[0] == 0) {
-                                                    mapTransactions(page, wallets, allCategories, callback);
-                                                }
-                                            }
-                                        });
-                                }
-                            }
+                List<TransactionEntity> mapped = new java.util.ArrayList<>();
+                for (TransactionResponse t : page.getContent()) {
+                    // Format số tiền + thời gian → map vào TransactionEntity hiện tại
+                    String amountFormatted = String.format(
+                            "%,.0f",
+                            t.getAmount()
+                    );
 
-                            @Override
-                            public void onError(String message, @Nullable Integer code) {
-                                // Error from API, do nothing, UI will use local data
-                            }
-                        });
+                    // TODO: format occurredAt (ISO) thành "dd/MM/yyyy" nếu muốn
+                    String dateDisplay = t.getOccurredAt(); // tạm thời dùng raw string
+
+                    // Ở HomeRepository cũ anh đang dùng ctor:
+                    // new TransactionEntity(title, category, amountText, walletName, dateText)
+                    String title = (t.getNote() != null && !t.getNote().isEmpty())
+                            ? t.getNote()
+                            : t.getCategoryName();
+
+                    TransactionEntity entity = new TransactionEntity(
+                            title,
+                            t.getCategoryName(),
+                            amountFormatted,
+                            t.getWalletName(),
+                            dateDisplay
+                    );
+
+                    mapped.add(entity);
+                }
+
+                // 2.1) Ghi đè vào local cache
+                transactionLocalRepository.replaceAll(mapped);
+
+                // 2.2) Đẩy list mới lên UI
+                callback.onDataLoaded(mapped);
+            }
+
+            @Override
+            public void onError(String message) {
+                // BE lỗi (mất mạng, refresh fail, server down...)
+                // → cứ để UI dùng data local đã load ở bước 1
+                // optional: callback.onError(message);
             }
         });
     }
-    
-    private void mapTransactions(TransactionPageResponse page, 
-                                List<WalletEntity> wallets, 
-                                List<CategoryEntity> allCategories,
-                                DataCallback<List<TransactionEntity>> callback) {
-        List<TransactionEntity> mapped = new java.util.ArrayList<>();
-        for (TransactionResponse t : page.getContent()) {
-            // Look up wallet name
-            String walletName = "";
-            for (WalletEntity w : wallets) {
-                if (w.getRemoteId() != null && w.getRemoteId().equals(t.getWalletId())) {
-                    walletName = w.getName();
-                    break;
-                }
-            }
-            
-            // Look up category name
-            String categoryName = "Unknown";
-            if (t.getCategoryId() != null && allCategories != null) {
-                for (CategoryEntity c : allCategories) {
-                    if (c.getRemoteId() != null && c.getRemoteId().equals(t.getCategoryId())) {
-                        categoryName = c.getName();
-                        break;
-                    }
-                }
-            }
-            
-            String title = (t.getNote() != null && !t.getNote().isEmpty()) ? t.getNote() : categoryName;
-            
-            // Convert BigDecimal to double
-            double amount = t.getAmount() != null ? t.getAmount().doubleValue() : 0.0;
-            
-            TransactionEntity entity = new TransactionEntity(
-                    t.getId(),
-                    title,
-                    categoryName,
-                    amount,
-                    walletName,
-                    t.getOccurredAt() != null ? t.getOccurredAt() : "",
-                    t.getType() != null ? t.getType() : "EXPENSE"
-            );
-            entity.setSyncStatus(SyncStatus.SYNCED);
-            entity.setPendingAction(PendingAction.NONE);
-            entity.setUpdatedAt(System.currentTimeMillis());
-            mapped.add(entity);
-        }
-        
-        transactionLocalRepository.replaceAllSynced(mapped);
-        callback.onDataLoaded(mapped);
-    }
+
 }

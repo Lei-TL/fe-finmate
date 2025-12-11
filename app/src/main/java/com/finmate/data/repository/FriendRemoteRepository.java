@@ -1,9 +1,9 @@
 package com.finmate.data.repository;
 
 import com.finmate.core.network.ApiCallExecutor;
+import com.finmate.core.network.ApiCallback;
 import com.finmate.data.dto.FriendRequest;
 import com.finmate.data.dto.FriendResponse;
-import com.finmate.data.remote.api.ApiCallback;
 import com.finmate.data.remote.api.FriendService;
 
 import java.util.List;

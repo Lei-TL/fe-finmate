@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.finmate.R;
 import com.finmate.data.local.database.entity.WalletEntity;
-import com.finmate.data.repository.WalletLocalRepository;
+import com.finmate.data.repository.WalletRepository;
 
 public class AddWalletActivity extends AppCompatActivity {
 
@@ -18,14 +18,14 @@ public class AddWalletActivity extends AppCompatActivity {
     private Button btnSave, btnCancel;
     private ImageView btnBack;
 
-    private WalletLocalRepository repo;
+    private WalletRepository repo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_wallet);
 
-        repo = new WalletLocalRepository(this);
+        repo = new WalletRepository(this);
 
         mapViews();
         handleEvents();
@@ -61,15 +61,7 @@ public class AddWalletActivity extends AppCompatActivity {
             return;
         }
 
-        double balanceValue;
-        try {
-            balanceValue = Double.parseDouble(balance.replace(",", ""));
-        } catch (NumberFormatException e) {
-            edtWalletBalance.setError("Số dư không hợp lệ");
-            return;
-        }
-
-        WalletEntity wallet = new WalletEntity(name, "VND", balanceValue, R.drawable.ic_wallet);
+        WalletEntity wallet = new WalletEntity(name, balance, R.drawable.ic_wallet);
 
         repo.insert(wallet);
 

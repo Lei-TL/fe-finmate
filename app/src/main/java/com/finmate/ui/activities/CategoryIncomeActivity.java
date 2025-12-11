@@ -18,7 +18,7 @@ import com.finmate.ui.transaction.CategoryUIModel;
 import com.finmate.ui.transaction.CategoryGridAdapter;
 import com.finmate.ui.transaction.CategoryListAdapter;
 import com.finmate.data.local.database.entity.CategoryEntity;
-import com.finmate.data.repository.CategoryLocalRepository;
+import com.finmate.data.repository.CategoryRepository;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
@@ -26,13 +26,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import dagger.hilt.android.AndroidEntryPoint;
-
-@AndroidEntryPoint
 public class CategoryIncomeActivity extends AppCompatActivity {
 
     @Inject
-    CategoryLocalRepository categoryRepository;
+    CategoryRepository categoryRepository;
 
     private RecyclerView rvCategories;
     private CategoryGridAdapter gridAdapter;
@@ -45,6 +42,8 @@ public class CategoryIncomeActivity extends AppCompatActivity {
     private TextView tabExpense, tabIncome;
     private View btnAddNew;
 
+    private CategoryRepository repo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +52,11 @@ public class CategoryIncomeActivity extends AppCompatActivity {
         initViews();
         setupGrid();      // mặc định dạng GRID
         handleEvents();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         loadCategoriesFromDB();
     }
 
@@ -69,22 +73,24 @@ public class CategoryIncomeActivity extends AppCompatActivity {
     }
 
     private void loadCategoriesFromDB() {
-        if (categoryRepository == null) return;
+        repo.getByType("income", entities -> {
 
-        categoryRepository.getByType("income").observe(this, entities -> {
             List<CategoryUIModel> uiModels = new ArrayList<>();
-            for (CategoryEntity entity : entities) {
-                uiModels.add(new CategoryUIModel(entity.getIconRes(), entity.getName()));
-            }
-            incomeList = uiModels;
 
-            if (isGrid && gridAdapter != null) {
-                gridAdapter.updateList(uiModels);
-            } else if (!isGrid && listAdapter != null) {
-                listAdapter.updateList(uiModels);
+            for (CategoryEntity entity : entities) {
+                uiModels.add(new CategoryUIModel(entity.iconRes, entity.name));
             }
+
+            runOnUiThread(() -> {
+                incomeList = uiModels;
+
+                if (isGrid && gridAdapter != null) {
+                    gridAdapter.updateList(uiModels);
+                } else if (!isGrid && listAdapter != null) {
+                    listAdapter.updateList(uiModels);
+                }
+            });
         });
-        categoryRepository.fetchRemoteCategoriesByType("income");
     }
 
     private void setupGrid() {
@@ -201,9 +207,7 @@ public class CategoryIncomeActivity extends AppCompatActivity {
                 R.drawable.ic_default_category
         );
 
-        if (categoryRepository != null) {
-            categoryRepository.insert(entity);
-        }
+        repo.insert(entity);
 
         Toast.makeText(this, "Đã thêm danh mục!", Toast.LENGTH_SHORT).show();
         loadCategoriesFromDB();

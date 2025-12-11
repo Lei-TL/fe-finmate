@@ -3,10 +3,7 @@ package com.finmate.data.repository;
 import android.content.Context;
 import androidx.lifecycle.LiveData;
 
-import androidx.annotation.Nullable;
-import com.finmate.data.remote.api.ApiCallback;
-import com.finmate.core.offline.PendingAction;
-import com.finmate.core.offline.SyncStatus;
+import com.finmate.core.network.ApiCallback;
 import com.finmate.data.dto.CategoryRequest;
 import com.finmate.data.dto.CategoryResponse;
 import com.finmate.data.local.database.AppDatabase;
@@ -24,7 +21,7 @@ import javax.inject.Singleton;
 import dagger.hilt.android.qualifiers.ApplicationContext;
 
 @Singleton
-public class CategoryLocalRepository {
+public class CategoryRepository {
 
     private static final Executor EXECUTOR = Executors.newSingleThreadExecutor();
 
@@ -33,7 +30,7 @@ public class CategoryLocalRepository {
     private final Context context;
 
     @Inject
-    public CategoryLocalRepository(@ApplicationContext Context ctx,
+    public CategoryRepository(@ApplicationContext Context ctx,
                               CategoryRemoteRepository remoteRepo) {
         this.context = ctx;
         this.dao = AppDatabase.getDatabase(ctx).categoryDao();
@@ -43,65 +40,20 @@ public class CategoryLocalRepository {
     // ===== LOCAL CRUD =====
 
     public void insert(CategoryEntity e) {
-        e.setPendingAction(PendingAction.CREATE);
-        e.setSyncStatus(SyncStatus.PENDING_CREATE);
-        e.setUpdatedAt(System.currentTimeMillis());
         EXECUTOR.execute(() -> dao.insert(e));
     }
 
     public void update(CategoryEntity e) {
-        e.setPendingAction(PendingAction.UPDATE);
-        e.setSyncStatus(SyncStatus.PENDING_UPDATE);
-        e.setUpdatedAt(System.currentTimeMillis());
         EXECUTOR.execute(() -> dao.update(e));
     }
 
     public void delete(CategoryEntity e) {
-        e.setPendingAction(PendingAction.DELETE);
-        e.setSyncStatus(SyncStatus.PENDING_DELETE);
-        e.setUpdatedAt(System.currentTimeMillis());
-        EXECUTOR.execute(() -> dao.update(e));
-    }
-
-    public void updateAsSynced(CategoryEntity e) {
-        e.setPendingAction(PendingAction.NONE);
-        e.setSyncStatus(SyncStatus.SYNCED);
-        e.setUpdatedAt(System.currentTimeMillis());
-        EXECUTOR.execute(() -> dao.update(e));
-    }
-
-    public void saveStatusOnly(CategoryEntity e) {
-        e.setUpdatedAt(System.currentTimeMillis());
-        EXECUTOR.execute(() -> dao.update(e));
-    }
-
-    public void getPendingForSync(OnResultCallback<List<CategoryEntity>> callback) {
-        EXECUTOR.execute(() -> callback.onResult(dao.getPendingForSync()));
-    }
-
-    public void getPendingCategories(OnResultCallback<List<CategoryEntity>> callback) {
-        getPendingForSync(callback);
-    }
-
-    public void markAsSyncedAfterCreate(CategoryEntity pending, CategoryEntity synced) {
-        EXECUTOR.execute(() -> {
-            dao.delete(pending);
-            dao.insert(synced);
-        });
-    }
-
-    public void deleteImmediate(CategoryEntity e) {
         EXECUTOR.execute(() -> dao.delete(e));
     }
 
     // Sửa lại: Trả về LiveData để ViewModel có thể observe sự thay đổi dữ liệu một cách an toàn
     public LiveData<List<CategoryEntity>> getByType(String type) {
         return dao.getByType(type);
-    }
-
-    // Synchronous method for lookups
-    public void getByTypeSync(String type, OnResultCallback<List<CategoryEntity>> callback) {
-        EXECUTOR.execute(() -> callback.onResult(dao.getByTypeSync(type)));
     }
 
     // Sửa lại: Dùng transaction để đảm bảo tính toàn vẹn khi thay thế dữ liệu.
@@ -132,23 +84,17 @@ public class CategoryLocalRepository {
                     int iconResId = context.getResources().getIdentifier(r.getIcon(), "drawable", context.getPackageName());
                     if (iconResId == 0) continue; // Bỏ qua nếu không tìm thấy icon
 
-                    CategoryEntity entity = new CategoryEntity(
+                    mapped.add(new CategoryEntity(
                             r.getName(),
                             r.getType(),
                             iconResId
-                    );
-                    entity.setIcon(r.getIcon());
-                    entity.setRemoteId(r.getId());
-                    entity.setSyncStatus(SyncStatus.SYNCED);
-                    entity.setPendingAction(PendingAction.NONE);
-                    entity.setUpdatedAt(System.currentTimeMillis());
-                    mapped.add(entity);
+                    ));
                 }
                 replaceByType(type, mapped);
             }
 
             @Override
-            public void onError(String msg, @Nullable Integer code) {
+            public void onError(String msg) {
                 // Có thể log lỗi hoặc hiển thị thông báo cho người dùng nếu cần
             }
         });
@@ -177,17 +123,12 @@ public class CategoryLocalRepository {
                         res.getType(),
                         iconResId
                 );
-                e.setIcon(res.getIcon());
-                e.setRemoteId(res.getId());
-                e.setSyncStatus(SyncStatus.SYNCED);
-                e.setPendingAction(PendingAction.NONE);
-                e.setUpdatedAt(System.currentTimeMillis());
                 insert(e);
                 cb.onSuccess();
             }
 
             @Override
-            public void onError(String msg, @Nullable Integer code) {
+            public void onError(String msg) {
                 cb.onError(msg);
             }
         });
@@ -217,17 +158,12 @@ public class CategoryLocalRepository {
                         iconResId
                 );
                 updated.setId(edit.getId());
-                updated.setIcon(res.getIcon());
-                updated.setRemoteId(res.getId());
-                updated.setSyncStatus(SyncStatus.SYNCED);
-                updated.setPendingAction(PendingAction.NONE);
-                updated.setUpdatedAt(System.currentTimeMillis());
                 update(updated);
                 cb.onSuccess();
             }
 
             @Override
-            public void onError(String msg, @Nullable Integer code) {
+            public void onError(String msg) {
                 cb.onError(msg);
             }
         });
@@ -239,12 +175,12 @@ public class CategoryLocalRepository {
         remoteRepo.deleteCategory(id, new ApiCallback<Void>() {
             @Override
             public void onSuccess(Void unused) {
-                dao.delete(e);
+                delete(e);
                 cb.onSuccess();
             }
 
             @Override
-            public void onError(String msg, @Nullable Integer code) {
+            public void onError(String msg) {
                 cb.onError(msg);
             }
         });
@@ -254,9 +190,5 @@ public class CategoryLocalRepository {
     public interface OperationCallback {
         void onSuccess();
         void onError(String msg);
-    }
-
-    public interface OnResultCallback<T> {
-        void onResult(T data);
     }
 }
