@@ -4,13 +4,13 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="20dp"
-    android:background="#1A1E2E">
+    android:background="?attr/backgroundColor">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Chọn ngày đến hạn"
-        android:textColor="#FFFFFF"
+        android:text="@string/select_due_date_title"
+        android:textColor="?attr/textColorPrimary"
         android:textSize="18sp"
         android:textStyle="bold"
         android:layout_marginBottom="15dp"/>
@@ -19,38 +19,38 @@
         android:id="@+id/tvDueToday"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Trong ngày"
+        android:text="@string/today"
         android:textSize="16sp"
-        android:textColor="#FFFFFF"
+        android:textColor="?attr/textColorPrimary"
         android:padding="15dp"
-        android:background="@android:drawable/list_selector_background"/>
+        android:background="?attr/selectableItemBackground"/>
 
     <TextView
         android:id="@+id/tvDueSingle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Chọn 1 ngày"
+        android:text="@string/single_day"
         android:textSize="16sp"
-        android:textColor="#FFFFFF"
+        android:textColor="?attr/textColorPrimary"
         android:padding="15dp"
-        android:background="@android:drawable/list_selector_background"/>
+        android:background="?attr/selectableItemBackground"/>
 
     <TextView
         android:id="@+id/tvDueRange"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Chọn khoảng ngày (từ → đến)"
+        android:text="@string/date_range"
         android:textSize="16sp"
-        android:textColor="#FFFFFF"
+        android:textColor="?attr/textColorPrimary"
         android:padding="15dp"
-        android:background="@android:drawable/list_selector_background"/>
+        android:background="?attr/selectableItemBackground"/>
 
     <TextView
         android:id="@+id/tvDueClear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Xóa ngày"
+        android:text="@string/clear"
         android:textSize="16sp"
-        android:textColor="#FF5252"
+        android:textColor="?attr/textColorNegative"
         android:padding="15dp"/>
 </LinearLayout>

@@ -15,6 +15,11 @@
     <string name="description">Mô tả bản thân</string>
     <string name="friends">Bạn bè</string>
     <string name="feature_in_development">Tính năng đang phát triển</string>
+    <string name="connect">Connect</string>
+    <string name="delete">Xóa</string>
+    <string name="edit">Chỉnh sửa</string>
+    <string name="confirm_delete_friend_title">Xóa bạn bè</string>
+    <string name="confirm_delete_friend_message">Bạn chắc chắn muốn xóa người bạn này khỏi danh sách connect?</string>
 
     <!-- Login Screen -->
     <string name="welcome_back">Chào mừng quay trở lại !</string>
@@ -29,6 +34,26 @@
     <!-- Home Screen -->
     <string name="greeting">Chào,</string>
     <string name="chart_title">Thống kê thu nhập - chi tiêu</string>
+
+    <!-- Add Transaction Screen -->
+    <string name="add_transaction_title">Thêm giao dịch</string>
+    <string name="select_group_first">Vui lòng chọn nhóm giao dịch trước!</string>
+    <string name="select_date">Chọn ngày</string>
+    <string name="select_start_date">Chọn ngày bắt đầu</string>
+    <string name="select_end_date">Chọn ngày kết thúc</string>
+    <string name="due_date">Đến hạn</string>
+    <string name="today">Hôm nay</string>
+    <string name="single_day">Một ngày</string>
+    <string name="date_range">Khoảng ngày (từ → đến)</string>
+    <string name="clear">Xóa ngày</string>
+    <string name="transaction_saved">Đã lưu giao dịch!</string>
+    <string name="fill_all_info">Vui lòng nhập đầy đủ thông tin!</string>
+    <string name="category_hint">Phân loại</string>
+    <string name="title_hint">Tiêu đề</string>
+    <string name="amount_hint">Số tiền</string>
+    <string name="friend_hint">Bạn bè</string>
+    <string name="note_hint">Ghi chú</string>
+    <string name="select_due_date_title">Chọn ngày đến hạn</string>
 
     <!-- Account Screen -->
     <string name="income">Thu nhập</string>
@@ -54,9 +79,20 @@
     <string name="compare_income_types">So sánh các loại thu nhập</string>
 
     <!-- Category Screens -->
+    <string name="select_transaction_group">Chọn nhóm giao dịch</string>
     <string name="select_income_group">Chọn nhóm giao dịch thu nhập</string>
     <string name="select_expense_group">Chọn nhóm giao dịch chi tiêu</string>
     <string name="add_new_category_group">Thêm mới nhóm phân loại</string>
+
+    <!-- Friend Screen -->
+    <string name="active">Đang hoạt động</string>
+    <string name="paused">Tạm dừng hoạt động</string>
+    <string name="connect_new_friend">Connect bạn mới</string>
+    <string name="email_or_friend_name">Email/Tên bạn mới</string>
+    <string name="show_as_list">Hiển thị dưới dạng danh sách</string>
+    <string name="show_as_grid">Hiển thị dưới dạng lưới</string>
+    <string name="share">Chia sẻ</string>
+    <string name="help_and_feedback">Trợ giúp &amp; Phản hồi</string>
 
     <!-- Settings Screen -->
     <string name="manage_categories">Quản lý thể loại</string>
@@ -79,15 +115,5 @@
     <string name="dark_theme">Tối</string>
     <string name="system_theme">Theo hệ thống</string>
     <string name="cancel">Hủy</string>
-
-    <string-array name="language_options">
-        <item>English</item>
-        <item>Tiếng Việt</item>
-    </string-array>
-    <string-array name="theme_options">
-        <item>@string/light_theme</item>
-        <item>@string/dark_theme</item>
-        <item>@string/system_theme</item>
-    </string-array>
 
 </resources>

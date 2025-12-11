@@ -4,48 +4,59 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0F1624"
-    tools:context=".UI.activities.LanguageActivity"> <!-- Giả sử tên Activity là LanguageActivity -->
+    android:background="?attr/backgroundColor">
 
-    <!-- Scrollable Content -->
+    <!-- ===== MAIN CONTENT ===== -->
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/bottomNavigation">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_back"
+            android:padding="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="?attr/iconTint" />
+
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="vertical">
 
             <!-- ===== HEADER ===== -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                tools:ignore="ChildInNonViewGroup">
 
                 <!-- BACK BUTTON -->
                 <ImageView
                     android:id="@+id/btnBack"
                     android:layout_width="28dp"
                     android:layout_height="28dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:padding="4dp"
                     android:src="@drawable/ic_back"
-                    app:tint="#FFFFFF" />
+                    android:padding="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:tint="#FFFFFF"
+                    tools:ignore="DuplicateIds" />
 
                 <!-- TITLE -->
                 <TextView
                     android:id="@+id/tvTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
                     android:text="@string/title_language"
                     android:textColor="#FFFFFF"
+                    android:textStyle="bold"
                     android:textSize="20sp"
-                    android:textStyle="bold" />
+                    android:layout_marginStart="16dp" />
             </LinearLayout>
 
             <!-- ====== LANGUAGE: TIẾNG VIỆT ====== -->
@@ -53,25 +64,26 @@
                 android:id="@+id/btnVietnamese"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:layout_marginTop="24dp"
-                android:background="@drawable/bg_card"
-                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingHorizontal="16dp">
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_card"
+                android:paddingHorizontal="16dp"
+                android:layout_marginTop="24dp"
+                tools:ignore="ChildInNonViewGroup">
 
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:contentDescription="@string/language_vietnamese"
-                    android:src="@drawable/ic_flag_vn" />
+                    android:src="@drawable/ic_flag_vn"
+                    android:contentDescription="@string/language_vietnamese" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
                     android:text="@string/language_vietnamese"
                     android:textColor="#FFFFFF"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:layout_marginStart="12dp" />
             </LinearLayout>
 
             <!-- ====== LANGUAGE: ENGLISH ====== -->
@@ -79,28 +91,27 @@
                 android:id="@+id/btnEnglish"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:layout_marginTop="12dp"
-                android:background="@drawable/bg_card"
-                android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:paddingHorizontal="16dp">
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_card"
+                android:paddingHorizontal="16dp"
+                android:layout_marginTop="12dp">
 
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:contentDescription="@string/language_english"
-                    android:src="@drawable/ic_flag_us" />
+                    android:src="@drawable/ic_flag_us"
+                    android:contentDescription="@string/language_english" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
                     android:text="@string/language_english"
                     android:textColor="#FFFFFF"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:layout_marginStart="12dp" />
             </LinearLayout>
-
-        </LinearLayout>
+        </TextView>
     </ScrollView>
 
     <!-- ===== BOTTOM NAV ===== -->
@@ -109,9 +120,9 @@
         android:layout_width="match_parent"
         android:layout_height="65dp"
         android:layout_alignParentBottom="true"
-        android:background="#1A2232" 
-        app:itemIconTint="@drawable/bottom_nav_color_selector" 
-        app:itemTextColor="@drawable/bottom_nav_color_selector" 
+        android:background="@drawable/bg_bottom_nav"
+        app:itemIconTint="@color/selector_nav_color"
+        app:itemTextColor="@color/selector_nav_color"
         app:menu="@menu/menu_bottom" />
 
 </RelativeLayout>

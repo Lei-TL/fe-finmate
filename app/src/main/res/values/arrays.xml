@@ -18,6 +18,8 @@
         <item>@drawable/ngonngu</item>
         <item>@drawable/theloai</item>
         <item>@drawable/giaodien</item>
+        <item>@drawable/thongbao</item>
+        <item>@drawable/thongke</item>
     </array>
 
     <array name="predefined_colors">
