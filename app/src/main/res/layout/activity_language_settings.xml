@@ -1,99 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/backgroundColor">
 
     <!-- ===== MAIN CONTENT ===== -->
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:padding="16dp">
 
-        <!-- ===== HEADER ===== -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_back"
+            android:padding="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="?attr/iconTint" />
+
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
-            <!-- BACK BUTTON -->
-            <ImageView
-                android:id="@+id/btnBack"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:src="@drawable/ic_back"
-                android:padding="4dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                app:tint="#FFFFFF" />
-
-            <!-- TITLE -->
-            <TextView
-                android:id="@+id/tvTitle"
-                android:layout_width="wrap_content"
+            <!-- ===== HEADER ===== -->
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/title_language"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold"
-                android:textSize="20sp"
-                android:layout_marginStart="16dp" />
-        </LinearLayout>
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                tools:ignore="ChildInNonViewGroup">
 
-        <!-- ====== LANGUAGE: TIẾNG VIỆT ====== -->
-        <LinearLayout
-            android:id="@+id/btnVietnamese"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="@drawable/bg_card"
-            android:paddingHorizontal="16dp"
-            android:layout_marginTop="24dp">
+                <!-- BACK BUTTON -->
+                <ImageView
+                    android:id="@+id/btnBack"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_back"
+                    android:padding="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:tint="#FFFFFF"
+                    tools:ignore="DuplicateIds" />
 
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/ic_flag_vn"
-                android:contentDescription="@string/language_vietnamese" />
+                <!-- TITLE -->
+                <TextView
+                    android:id="@+id/tvTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title_language"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:layout_marginStart="16dp" />
+            </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/language_vietnamese"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:layout_marginStart="12dp" />
-        </LinearLayout>
+            <!-- ====== LANGUAGE: TIẾNG VIỆT ====== -->
+            <LinearLayout
+                android:id="@+id/btnVietnamese"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_card"
+                android:paddingHorizontal="16dp"
+                android:layout_marginTop="24dp"
+                tools:ignore="ChildInNonViewGroup">
 
-        <!-- ====== LANGUAGE: ENGLISH ====== -->
-        <LinearLayout
-            android:id="@+id/btnEnglish"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="@drawable/bg_card"
-            android:paddingHorizontal="16dp"
-            android:layout_marginTop="12dp">
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_flag_vn"
+                    android:contentDescription="@string/language_vietnamese" />
 
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/ic_flag_us"
-                android.contentDescription="@string/language_english" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/language_vietnamese"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:layout_marginStart="12dp" />
+            </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/language_english"
-                android:textColor="#FFFFFF"
-                android:textSize="16sp"
-                android:layout_marginStart="12dp" />
-        </LinearLayout>
+            <!-- ====== LANGUAGE: ENGLISH ====== -->
+            <LinearLayout
+                android:id="@+id/btnEnglish"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_card"
+                android:paddingHorizontal="16dp"
+                android:layout_marginTop="12dp">
 
-    </LinearLayout>
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_flag_us"
+                    android:contentDescription="@string/language_english" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/language_english"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:layout_marginStart="12dp" />
+            </LinearLayout>
+        </TextView>
+    </ScrollView>
 
     <!-- ===== BOTTOM NAV ===== -->
     <com.google.android.material.bottomnavigation.BottomNavigationView

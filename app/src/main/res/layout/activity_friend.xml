@@ -4,76 +4,88 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/backgroundColor">
+    android:background="?attr/backgroundColor"
+    tools:context=".ui.activities.FriendActivity">
 
-    <!-- Main content -->
+    <!-- Header -->
     <LinearLayout
+        android:id="@+id/headerLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/bottomNavigation"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
 
-        <!-- ===== HEADER: BACK - TITLE - MORE ===== -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_back"
+            app:tint="?attr/iconTint" />
+
+        <TextView
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <!-- BACK -->
-            <ImageView
-                android:id="@+id/btnBack"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:src="@drawable/ic_back"
-                app:tint="?attr/iconTint"
-                android:padding="4dp"
-                android:background="?attr/selectableItemBackgroundBorderless" />
-
-            <!-- TITLE -->
-            <TextView
-                android:id="@+id/tvTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Bạn bè đang hoạt động"
-                android:textColor="?attr/textColorPrimary"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:gravity="center" />
-
-            <!-- MORE (3 DOTS) -->
-            <ImageView
-                android:id="@+id/btnMore"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:src="@drawable/ic_more"
-                app:tint="?attr/iconTint"
-                android:padding="4dp"
-                android:background="?attr/selectableItemBackgroundBorderless" />
-        </LinearLayout>
-
-        <!-- Friend List -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvFriends"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
             android:layout_weight="1"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/item_friend"
-            tools:itemCount="6" />
+            android:gravity="center"
+            android:text="@string/friends"
+            android:textColor="?attr/textColorPrimary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
+        <ImageView
+            android:id="@+id/btnMore"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_more"
+            app:tint="?attr/iconTint" />
     </LinearLayout>
 
-    <!-- BOTTOM NAV -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
+    <!-- Tabs -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
         android:layout_width="match_parent"
-        android:layout_height="65dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/headerLayout"
+        android:background="?attr/backgroundColor"
+        app:tabTextColor="?attr/textColorSecondary"
+        app:tabSelectedTextColor="?attr/textColorPrimary"
+        app:tabIndicatorColor="?attr/colorPrimary"
+        app:tabGravity="fill"
+        app:tabMode="fixed">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/active" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/paused" />
+
+    </com.google.android.material.tabs.TabLayout>
+
+    <!-- RecyclerView for Friends List -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvFriends"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_below="@id/tabLayout"
+        android:layout_above="@+id/btnConnectNewFriend"
+        android:padding="16dp"
+        tools:listitem="@layout/item_friend"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+    <!-- Connect New Friend Button -->
+    <Button
+        android:id="@+id/btnConnectNewFriend"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
         android:layout_alignParentBottom="true"
-        android:background="?attr/bottomNavBackgroundColor"
-        app:itemTextColor="@color/selector_nav_color"
-        app:menu="@menu/menu_bottom" />
+        android:layout_margin="16dp"
+        android:text="@string/connect_new_friend"
+        android:background="@drawable/btn_primary"
+        android:textColor="?attr/colorOnPrimary" />
 
 </RelativeLayout>

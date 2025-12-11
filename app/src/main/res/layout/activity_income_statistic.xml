@@ -120,7 +120,7 @@
                 android:id="@+id/tvAddTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Thống kê thu nhập theo tháng"
+                android:text="@string/statistic_monthly_income"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="?attr/textColorPrimary"
@@ -133,7 +133,7 @@
                 android:layout_height="40dp"
                 android:gravity="center_vertical"
                 android:paddingHorizontal="12dp"
-                android:text="Theo thể loại"
+                android:text="@string/filter_by_category"
                 android:background="?attr/editTextBackground"
                 android:textColor="?attr/editTextColor"
                 android:textSize="14sp" />
@@ -149,7 +149,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="So sánh các loại thu nhập"
+                android:text="@string/compare_income_types"
                 android:textStyle="bold"
                 android:textColor="?attr/textColorPrimary"
                 android:layout_marginTop="24dp" />
