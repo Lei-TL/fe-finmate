@@ -63,7 +63,11 @@ public class SignUpActivity extends AppCompatActivity {
                 return;
             }
             
-            signUpViewModel.register(email, pass);
+            // Avatar mặc định - sử dụng tên resource hoặc URL mặc định
+            // Có thể thay đổi thành URL thực tế nếu có server lưu avatar
+            String defaultAvatarUrl = "ic_avatar"; // Tên resource mặc định
+            
+            signUpViewModel.register(email, pass, name, defaultAvatarUrl);
         });
 
         // Quay lại Login

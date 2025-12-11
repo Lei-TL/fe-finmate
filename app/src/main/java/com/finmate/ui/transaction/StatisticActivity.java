@@ -1,14 +1,20 @@
 package com.finmate.ui.transaction;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.finmate.R;
+import com.finmate.core.util.TransactionFormatter;
+import com.finmate.data.local.database.entity.WalletEntity;
+import com.finmate.data.repository.model.StatisticFilter;
 import com.finmate.ui.activities.AddTransactionActivity;
 import com.finmate.ui.activities.IncomeStatisticActivity;
 import com.finmate.ui.home.HomeActivity;
@@ -24,69 +30,103 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class StatisticActivity extends AppCompatActivity {
 
-    ImageView btnBack;
-    TextView tvExpenseTab, tvIncomeTab, tvTotalExpense;
+    private static final String TYPE_EXPENSE = "EXPENSE";
 
+    ImageView btnBack;
+    TextView tvExpenseTab, tvIncomeTab, tvTotalExpense, tvDateFilter, tvWalletFilter;
     BarChart barChartExpense;
     PieChart pieChartExpense;
-
     BottomNavigationView bottomNavigation;
+
+    StatisticViewModel viewModel;
+    List<WalletEntity> walletOptions = new ArrayList<>();
+    String currentWalletLabel = "Tất cả ví";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistic);
 
-        // ÁNH XẠ
+        viewModel = new ViewModelProvider(this).get(StatisticViewModel.class);
+
         btnBack = findViewById(R.id.btnBack);
         tvExpenseTab = findViewById(R.id.tvExpenseTab);
         tvIncomeTab = findViewById(R.id.tvIncomeTab);
         tvTotalExpense = findViewById(R.id.tvTotalExpense);
+        tvDateFilter = findViewById(R.id.tvDateFilter);
+        tvWalletFilter = findViewById(R.id.tvWalletFilter);
 
         barChartExpense = findViewById(R.id.barChartExpense);
         pieChartExpense = findViewById(R.id.pieChartExpense);
 
         bottomNavigation = findViewById(R.id.bottomNavigation);
 
-        // BACK
+        highlightTabs();
+        setupBottomNav();
+        setupEvents();
+        setupObservers();
+
+        updateFilterLabels(viewModel.getCurrentFilter());
+        viewModel.loadWallets();
+        viewModel.loadStatistics(TYPE_EXPENSE);
+    }
+
+    private void setupEvents() {
         btnBack.setOnClickListener(v -> finish());
 
-        // TAB CHI TIÊU (hiện tại)
-        tvExpenseTab.setOnClickListener(v -> {});
+        tvExpenseTab.setOnClickListener(v -> { /* already on expense */ });
 
-        // CHUYỂN QUA THU NHẬP
         tvIncomeTab.setOnClickListener(v -> {
             startActivity(new Intent(this, IncomeStatisticActivity.class));
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         });
 
-        // HIGHLIGHT TAB
-        highlightTabs();
-
-        // NẠP DỮ LIỆU CHART
-        loadBarChartData();
-        loadPieChartData();
-
-        // BOTTOM NAV
-        setupBottomNav();
+        tvDateFilter.setOnClickListener(v -> showDateFilterDialog());
+        tvWalletFilter.setOnClickListener(v -> showWalletFilterDialog());
     }
 
-    // ===================== BAR CHART =====================
-    private void loadBarChartData() {
+    private void setupObservers() {
+        viewModel.statistic.observe(this, this::renderStatistic);
+        viewModel.wallets.observe(this, wallets -> {
+            walletOptions = wallets != null ? wallets : new ArrayList<>();
+        });
+    }
+
+    private void renderStatistic(StatisticResult result) {
+        String formatted = TransactionFormatter.formatAmount(result.getTotalAmount());
+        tvTotalExpense.setText("-" + formatted + " VND");
+
+        renderBarChart(result.getTimeline());
+        renderPieChart(result.getByCategory());
+    }
+
+    private void renderBarChart(List<ChartPoint> data) {
+        barChartExpense.clear();
+
+        if (data == null || data.isEmpty()) {
+            barChartExpense.setNoDataText("Không có dữ liệu");
+            barChartExpense.invalidate();
+            return;
+        }
 
         List<BarEntry> entries = new ArrayList<>();
-        entries.add(new BarEntry(1, 5000000)); // Tháng 1
-        entries.add(new BarEntry(2, 3500000)); // Tháng 2
-        entries.add(new BarEntry(3, 4200000)); // Tháng 3
-        entries.add(new BarEntry(4, 6100000)); // Tháng 4
-        entries.add(new BarEntry(5, 4800000)); // Tháng 5
+        List<String> labels = new ArrayList<>();
+        for (int i = 0; i < data.size(); i++) {
+            entries.add(new BarEntry(i, data.get(i).getValue()));
+            labels.add(data.get(i).getLabel());
+        }
 
         BarDataSet dataSet = new BarDataSet(entries, "Chi tiêu");
         dataSet.setColor(Color.parseColor("#FF5252"));
@@ -98,7 +138,6 @@ public class StatisticActivity extends AppCompatActivity {
 
         barChartExpense.setData(barData);
         barChartExpense.setFitBars(true);
-        barChartExpense.setNoDataText("Không có dữ liệu");
         barChartExpense.getDescription().setEnabled(false);
         barChartExpense.getLegend().setEnabled(false);
 
@@ -106,26 +145,35 @@ public class StatisticActivity extends AppCompatActivity {
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setTextColor(Color.WHITE);
         xAxis.setDrawGridLines(false);
+        xAxis.setGranularity(1f);
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
+        xAxis.setLabelCount(labels.size());
 
-        barChartExpense.animateY(800);
+        barChartExpense.animateY(500);
         barChartExpense.invalidate();
     }
 
-    // ===================== PIE CHART =====================
-    private void loadPieChartData() {
+    private void renderPieChart(List<ChartPoint> data) {
+        pieChartExpense.clear();
+
+        if (data == null || data.isEmpty()) {
+            pieChartExpense.setNoDataText("Không có dữ liệu");
+            pieChartExpense.invalidate();
+            return;
+        }
 
         List<PieEntry> entries = new ArrayList<>();
-        entries.add(new PieEntry(40f, "Ăn uống"));
-        entries.add(new PieEntry(25f, "Đi lại"));
-        entries.add(new PieEntry(20f, "Giải trí"));
-        entries.add(new PieEntry(15f, "Mua sắm"));
+        for (ChartPoint point : data) {
+            entries.add(new PieEntry(point.getValue(), point.getLabel()));
+        }
 
         PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setColors(
                 Color.parseColor("#FF5252"),
                 Color.parseColor("#FF8A65"),
                 Color.parseColor("#FF7043"),
-                Color.parseColor("#FFB74D")
+                Color.parseColor("#FFB74D"),
+                Color.parseColor("#FFCC80")
         );
 
         dataSet.setValueTextSize(12f);
@@ -135,33 +183,127 @@ public class StatisticActivity extends AppCompatActivity {
 
         pieChartExpense.setData(pieData);
         pieChartExpense.setUsePercentValues(true);
-
         pieChartExpense.setTransparentCircleRadius(50f);
         pieChartExpense.setHoleRadius(45f);
-
         pieChartExpense.getDescription().setEnabled(false);
 
         Legend legend = pieChartExpense.getLegend();
         legend.setTextColor(Color.WHITE);
         legend.setTextSize(12f);
 
-        pieChartExpense.animateY(800);
+        pieChartExpense.animateY(500);
         pieChartExpense.invalidate();
     }
 
-    // ===================== HIGHLIGHT TAB =====================
+    private void showDateFilterDialog() {
+        String[] options = new String[]{
+                "7 ngày gần nhất",
+                "30 ngày gần nhất",
+                "Tháng này",
+                "Năm nay",
+                "Chọn ngày tùy chỉnh"
+        };
+
+        new AlertDialog.Builder(this)
+                .setTitle("Khoảng thời gian")
+                .setItems(options, (dialog, which) -> {
+                    switch (which) {
+                        case 0:
+                            applyFilter(StatisticFilter.lastDays(7));
+                            break;
+                        case 1:
+                            applyFilter(StatisticFilter.lastDays(30));
+                            break;
+                        case 2:
+                            applyFilter(StatisticFilter.currentMonth());
+                            break;
+                        case 3:
+                            applyFilter(StatisticFilter.yearToDate());
+                            break;
+                        case 4:
+                            showCustomRangePicker();
+                            break;
+                    }
+                })
+                .show();
+    }
+
+    private void showCustomRangePicker() {
+        Calendar now = Calendar.getInstance();
+        DatePickerDialog startPicker = new DatePickerDialog(
+                this,
+                (view, y, m, d) -> {
+                    Calendar start = Calendar.getInstance();
+                    start.set(y, m, d);
+                    showEndDatePicker(start);
+                },
+                now.get(Calendar.YEAR),
+                now.get(Calendar.MONTH),
+                now.get(Calendar.DAY_OF_MONTH)
+        );
+        startPicker.setTitle("Chọn ngày bắt đầu");
+        startPicker.show();
+    }
+
+    private void showEndDatePicker(Calendar start) {
+        Calendar now = Calendar.getInstance();
+        DatePickerDialog endPicker = new DatePickerDialog(
+                this,
+                (view, y, m, d) -> {
+                    Calendar end = Calendar.getInstance();
+                    end.set(y, m, d);
+                    applyFilter(StatisticFilter.custom(start, end, "Tùy chỉnh"));
+                },
+                now.get(Calendar.YEAR),
+                now.get(Calendar.MONTH),
+                now.get(Calendar.DAY_OF_MONTH)
+        );
+        endPicker.setTitle("Chọn ngày kết thúc");
+        endPicker.show();
+    }
+
+    private void showWalletFilterDialog() {
+        List<String> names = new ArrayList<>();
+        names.add("Tất cả ví");
+        for (WalletEntity wallet : walletOptions) {
+            names.add(wallet.name);
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("Chọn ví")
+                .setItems(names.toArray(new String[0]), (dialog, which) -> {
+                    if (which == 0) {
+                        currentWalletLabel = "Tất cả ví";
+                        viewModel.applyWallet(TYPE_EXPENSE, null);
+                    } else {
+                        String selected = names.get(which);
+                        currentWalletLabel = selected;
+                        viewModel.applyWallet(TYPE_EXPENSE, selected);
+                    }
+                    tvWalletFilter.setText(currentWalletLabel);
+                })
+                .show();
+    }
+
+    private void applyFilter(StatisticFilter filter) {
+        updateFilterLabels(filter);
+        viewModel.applyFilter(TYPE_EXPENSE, filter);
+    }
+
+    private void updateFilterLabels(StatisticFilter filter) {
+        tvDateFilter.setText(filter.getDisplayLabel());
+        tvWalletFilter.setText(currentWalletLabel);
+    }
+
     private void highlightTabs() {
-        // Chi tiêu ACTIVE
         tvExpenseTab.setTextColor(Color.WHITE);
         tvExpenseTab.setTextSize(18f);
         tvExpenseTab.setTypeface(tvExpenseTab.getTypeface(), android.graphics.Typeface.BOLD);
 
-        // Thu nhập INACTIVE
         tvIncomeTab.setTextColor(Color.parseColor("#777777"));
         tvIncomeTab.setTypeface(tvIncomeTab.getTypeface(), android.graphics.Typeface.NORMAL);
     }
 
-    // ===================== BOTTOM NAV =====================
     private void setupBottomNav() {
         bottomNavigation.setSelectedItemId(R.id.nav_statistic);
 

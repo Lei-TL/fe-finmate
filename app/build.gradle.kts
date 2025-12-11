@@ -55,6 +55,7 @@ dependencies {
 
     // RxJava
     implementation(libs.rxjava)
+    implementation(libs.rxandroid)
 
     // Lifecycle
     implementation(libs.lifecycle.viewmodel)

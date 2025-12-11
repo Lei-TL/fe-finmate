@@ -130,11 +130,11 @@ public class WalletActivity extends BaseActivity {
         for (TransactionEntity entity : transactionEntities) {
             // Format amount và date cho UI tại đây
             uiModels.add(new TransactionUIModel(
-                    entity.name,
-                    entity.category,
-                    TransactionFormatter.formatAmount(entity.amount),
-                    entity.wallet,
-                    TransactionFormatter.formatDate(entity.occurredAt)
+                    entity.getName(),
+                    entity.getCategoryName(),
+                    TransactionFormatter.formatAmount(entity.getAmount()),
+                    entity.getWalletName(),
+                    TransactionFormatter.formatDate(entity.getOccurredAt())
             ));
         }
 

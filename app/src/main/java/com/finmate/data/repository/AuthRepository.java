@@ -36,8 +36,8 @@ public class AuthRepository {
                 .flatMapCompletable(this::handleTokenResponse);
     }
 
-    public Completable register(String email, String password) {
-        return authService.register(new RegisterRequest(email, password))
+    public Completable register(String email, String password, String fullName, String avatarUrl) {
+        return authService.register(new RegisterRequest(email, password, fullName, avatarUrl))
                 .flatMapCompletable(this::handleTokenResponse);
     }
 

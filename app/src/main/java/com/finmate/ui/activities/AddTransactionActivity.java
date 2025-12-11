@@ -20,11 +20,8 @@ import com.finmate.R;
 import com.finmate.core.util.NetworkUtils;
 import com.finmate.core.util.TransactionFormatter;
 import com.finmate.data.local.database.entity.TransactionEntity;
-import com.finmate.data.remote.api.ApiCallback;
-import com.finmate.data.dto.TransactionResponse;
 import com.finmate.data.repository.TransactionLocalRepository;
-import com.finmate.data.repository.TransactionRemoteRepository;
-import com.finmate.ui.base.BaseActivity;
+import com.finmate.data.repository.TransactionSyncManager;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.text.ParseException;
@@ -40,7 +37,7 @@ public class AddTransactionActivity extends BaseActivity {
     @Inject
     TransactionLocalRepository localRepository;
     @Inject
-    TransactionRemoteRepository remoteRepository;
+    TransactionSyncManager syncManager;
 
     EditText etCategory, etTitle, etAmount, tvFriend, etNote;
     TextView tvDate;
@@ -103,46 +100,15 @@ public class AddTransactionActivity extends BaseActivity {
         }
 
         TransactionEntity transaction = new TransactionEntity(title, group, amount, wallet, occurredAt);
+        localRepository.insert(transaction);
 
         if (NetworkUtils.isOnline(this)) {
-            // Online: Try to create on backend
-            remoteRepository.createFromLocal(transaction, new ApiCallback<TransactionResponse>() {
-                @Override
-                public void onSuccess(TransactionResponse data) {
-                    // BE success: save the synced version locally
-                    String titleFromBE = (data.getNote() != null && !data.getNote().isEmpty()) ? data.getNote() : data.getCategoryName();
-                    TransactionEntity syncedEntity = new TransactionEntity(
-                            data.getId(),
-                            titleFromBE,
-                            data.getCategoryName(),
-                            data.getAmount(),  // amount đã là double
-                            data.getWalletName(),
-                            data.getOccurredAt()  // occurredAt là ISO string
-                    );
-                    localRepository.insert(syncedEntity);
-                    Toast.makeText(AddTransactionActivity.this, "Đã lưu và đồng bộ!", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-
-                @Override
-                public void onError(String message, @Nullable Integer code) {
-                    if (code != null && code >= 400 && code < 500) {
-                        // Business error (4xx): Show error, do not save locally
-                        Toast.makeText(AddTransactionActivity.this, "Lỗi: " + message, Toast.LENGTH_LONG).show();
-                    } else {
-                        // Network/Server error (5xx, IOException): Save locally as pending
-                        localRepository.insert(transaction);
-                        Toast.makeText(AddTransactionActivity.this, "Lưu tạm (offline)!", Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-                }
-            });
+            syncManager.syncPendingTransactions();
+            Toast.makeText(this, "Đã lưu, đang đồng bộ…", Toast.LENGTH_SHORT).show();
         } else {
-            // Offline: Save locally as pending
-            localRepository.insert(transaction);
             Toast.makeText(this, "Lưu tạm (offline)!", Toast.LENGTH_SHORT).show();
-            finish();
         }
+        finish();
     }
 
     // ... (the rest of the methods are unchanged)

@@ -24,12 +24,21 @@ public class LanguageUIModel {
         return name;
     }
 
+    // Legacy adapter helpers
+    public String getLanguageName() {
+        return name;
+    }
+
     public String getCode() {
         return code;
     }
 
     public boolean isSelected() {
         return selected;
+    }
+
+    public int getFlagRes() {
+        return flagResId;
     }
 
     public void setSelected(boolean selected) {

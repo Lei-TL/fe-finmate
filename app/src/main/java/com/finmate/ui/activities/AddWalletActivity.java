@@ -61,7 +61,15 @@ public class AddWalletActivity extends AppCompatActivity {
             return;
         }
 
-        WalletEntity wallet = new WalletEntity(name, balance, R.drawable.ic_wallet);
+        double balanceValue;
+        try {
+            balanceValue = Double.parseDouble(balance.replace(",", ""));
+        } catch (NumberFormatException e) {
+            edtWalletBalance.setError("Số dư không hợp lệ");
+            return;
+        }
+
+        WalletEntity wallet = new WalletEntity(name, "VND", balanceValue, R.drawable.ic_wallet);
 
         repo.insert(wallet);
 

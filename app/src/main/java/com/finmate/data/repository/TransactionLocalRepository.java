@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.finmate.data.local.database.AppDatabase;
 import com.finmate.data.local.database.dao.TransactionDao;
-import com.finmate.data.local.database.entity.SyncStatus;
+import com.finmate.core.offline.SyncStatus;
 import com.finmate.data.local.database.entity.TransactionEntity;
 
 import java.util.List;
@@ -36,11 +36,12 @@ public class TransactionLocalRepository {
         EXECUTOR.execute(() -> callback.onResult(dao.getAll()));
     }
 
-    public void getPendingTransactions(OnResultCallback<List<TransactionEntity>> callback) {
-        EXECUTOR.execute(() -> callback.onResult(dao.getPendingTransactions()));
+    public void getPendingForSync(OnResultCallback<List<TransactionEntity>> callback) {
+        EXECUTOR.execute(() -> callback.onResult(dao.getPendingForSync()));
     }
 
     public void update(TransactionEntity entity) {
+        entity.updatedAt = System.currentTimeMillis();
         EXECUTOR.execute(() -> dao.update(entity));
     }
 

@@ -12,18 +12,30 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface TransactionService {
 
-    @GET("transaction/byWallet/{walletId}")
-    Call<TransactionPageResponse> getTransactions(@Path("walletId") String walletId);
+    @GET("transactions")
+    Call<TransactionPageResponse> getTransactions(
+            @Query("from") String from,
+            @Query("to") String to,
+            @Query("walletId") String walletId,
+            @Query("categoryId") String categoryId,
+            @Query("type") String type,
+            @Query("page") int page,
+            @Query("size") int size
+    );
 
-    @POST("transaction")
+    @GET("transactions/{id}")
+    Call<TransactionResponse> getTransactionById(@Path("id") String id);
+
+    @POST("transactions")
     Call<TransactionResponse> createTransaction(@Body CreateTransactionRequest request);
 
-    @PUT("transaction/{id}")
+    @PUT("transactions/{id}")
     Call<TransactionResponse> updateTransaction(@Path("id") String id, @Body UpdateTransactionRequest request);
 
-    @DELETE("transaction/{id}")
+    @DELETE("transactions/{id}")
     Call<Void> deleteTransaction(@Path("id") String id);
 }

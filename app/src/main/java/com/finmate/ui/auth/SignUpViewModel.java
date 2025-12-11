@@ -32,14 +32,14 @@ public class SignUpViewModel extends ViewModel {
         this.authRepository = authRepository;
     }
 
-    public void register(String email, String password) {
+    public void register(String email, String password, String fullName, String avatarUrl) {
         if (email.isEmpty() || password.isEmpty()) {
             _errorMessage.setValue("Email and password cannot be empty");
             return;
         }
 
         _isLoading.setValue(true);
-        disposables.add(authRepository.register(email, password)
+        disposables.add(authRepository.register(email, password, fullName, avatarUrl)
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         () -> {

@@ -3,6 +3,7 @@ package com.finmate.core.di;
 import com.finmate.core.network.interceptor.AuthInterceptor;
 import com.finmate.core.session.SessionManager;
 import com.finmate.data.remote.api.AuthService;
+import com.finmate.data.remote.api.CategoryService;
 import com.finmate.data.remote.api.FriendService;
 import com.finmate.data.remote.api.TransactionService;
 import com.finmate.data.remote.api.WalletService;
@@ -17,6 +18,7 @@ import dagger.hilt.components.SingletonComponent;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
@@ -46,6 +48,7 @@ public class NetworkModule {
         return new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .client(okHttpClient)
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }
@@ -57,6 +60,7 @@ public class NetworkModule {
         return new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .client(okHttpClient)
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
     }
@@ -78,6 +82,12 @@ public class NetworkModule {
     @Singleton
     public FriendService provideFriendService(Retrofit retrofit) {
         return retrofit.create(FriendService.class);
+    }
+
+    @Provides
+    @Singleton
+    public CategoryService provideCategoryService(Retrofit retrofit) {
+        return retrofit.create(CategoryService.class);
     }
 
     @Provides

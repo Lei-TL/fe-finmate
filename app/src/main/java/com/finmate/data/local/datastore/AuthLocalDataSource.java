@@ -7,6 +7,7 @@ import androidx.datastore.rxjava3.RxDataStore;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.inject.Named;
 
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Flowable;
@@ -23,7 +24,7 @@ public class AuthLocalDataSource {
             PreferencesKeys.stringKey("refresh_token");
 
     @Inject
-    public AuthLocalDataSource(RxDataStore<Preferences> dataStore) {
+    public AuthLocalDataSource(@Named("authDataStore") RxDataStore<Preferences> dataStore) {
         this.dataStore = dataStore;
     }
 

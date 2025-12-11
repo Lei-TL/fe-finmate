@@ -7,10 +7,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
-import com.finmate.ui.models.FriendUIModel;
-import com.finmate.adapters.FriendAdapter;
+import com.finmate.ui.friend.FriendUIModel;
+import com.finmate.ui.friend.FriendAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.finmate.ui.base.BaseActivity;
+import com.finmate.ui.home.WalletActivity;
+import com.finmate.ui.transaction.StatisticActivity;
+import com.finmate.ui.settings.SettingsActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,13 +34,13 @@ public class FriendActivity extends BaseActivity {
 
         // Sample data
         List<FriendUIModel> friendList = new ArrayList<>();
-        friendList.add(new FriendUIModel(R.drawable.ic_friend, "Bạn còn thiếu một chút tiền từ Nguyễn An"));
-        friendList.add(new FriendUIModel(R.drawable.ic_friend, "Nguyễn Văn B đã trả lại bạn 50,000 VND"));
-        friendList.add(new FriendUIModel(R.drawable.ic_friend, "Bạn đã nhắc nhở Trần Thị C trả tiền"));
-        friendList.add(new FriendUIModel(R.drawable.ic_friend, "Lê Văn D vừa gửi bạn một yêu cầu chia tiền"));
-        friendList.add(new FriendUIModel(R.drawable.ic_friend, "Bạn và Phạm Thị E đã hòa tiền"));
+        friendList.add(new FriendUIModel("1", "u1", "Nguyễn An", "an@example.com", "PENDING", true));
+        friendList.add(new FriendUIModel("2", "u2", "Nguyễn Văn B", "b@example.com", "ACCEPTED", false));
+        friendList.add(new FriendUIModel("3", "u3", "Trần Thị C", "c@example.com", "PENDING", true));
+        friendList.add(new FriendUIModel("4", "u4", "Lê Văn D", "d@example.com", "PENDING", true));
+        friendList.add(new FriendUIModel("5", "u5", "Phạm Thị E", "e@example.com", "ACCEPTED", false));
 
-        FriendAdapter adapter = new FriendAdapter(this, friendList);
+        FriendAdapter adapter = new FriendAdapter(friendList);
         rvFriends.setAdapter(adapter);
 
         // Bottom Navigation

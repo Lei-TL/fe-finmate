@@ -7,6 +7,7 @@ import androidx.datastore.preferences.rxjava3.RxPreferenceDataStoreBuilder;
 import androidx.datastore.rxjava3.RxDataStore;
 
 import javax.inject.Singleton;
+import javax.inject.Named;
 
 import dagger.Module;
 import dagger.Provides;
@@ -20,12 +21,25 @@ public class DataStoreModule {
 
     @Provides
     @Singleton
-    public RxDataStore<Preferences> provideDataStore(
+    @Named("authDataStore")
+    public RxDataStore<Preferences> provideAuthDataStore(
             @ApplicationContext Context context
     ) {
         return new RxPreferenceDataStoreBuilder(
                 context,
-                "auth_prefs"   // tên file DataStore
+                "auth_prefs"   // file lưu token
+        ).build();
+    }
+
+    @Provides
+    @Singleton
+    @Named("settingsDataStore")
+    public RxDataStore<Preferences> provideSettingsDataStore(
+            @ApplicationContext Context context
+    ) {
+        return new RxPreferenceDataStoreBuilder(
+                context,
+                "user_settings"   // file lưu ngôn ngữ/theme/khác
         ).build();
     }
 }

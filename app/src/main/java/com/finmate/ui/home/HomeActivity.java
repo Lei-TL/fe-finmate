@@ -112,11 +112,11 @@ public class HomeActivity extends AppCompatActivity {
         for (TransactionEntity entity : transactionEntities) {
             // Format amount và date cho UI tại đây, không lưu format trong Entity
             uiModels.add(new TransactionUIModel(
-                    entity.name,
-                    entity.category,
-                    TransactionFormatter.formatAmount(entity.amount),  // Format amount
-                    entity.wallet,
-                    TransactionFormatter.formatDate(entity.occurredAt)  // Format date
+                    entity.getName(),
+                    entity.getCategoryName(),
+                    TransactionFormatter.formatAmount(entity.getAmount()),  // Format amount
+                    entity.getWalletName(),
+                    TransactionFormatter.formatDate(entity.getOccurredAt())  // Format date
             ));
         }
 
