@@ -107,6 +107,9 @@ public class TransactionRepository {
     /**
      * Ghi đè toàn bộ transaction local = data mới từ server.
      * ✅ Tối ưu: Không load tất cả existing vào memory, dùng bulk delete
+     * ⚠️ CẢNH BÁO: Method này sẽ XÓA TẤT CẢ transactions cũ, chỉ giữ lại danh sách mới.
+     * Nếu API chỉ trả về một phần dữ liệu (phân trang), sẽ mất dữ liệu cũ.
+     * Nên dùng upsertAll() thay vì method này.
      */
     public void replaceAll(List<TransactionEntity> transactions) {
         EXECUTOR.execute(() -> {
@@ -115,6 +118,36 @@ public class TransactionRepository {
             // ✅ Insert batch
             for (TransactionEntity t : transactions) {
                 dao.insert(t);
+            }
+        });
+    }
+
+    /**
+     * Upsert transactions: Insert nếu mới, Update nếu đã tồn tại (dựa trên remoteId).
+     * ✅ An toàn hơn replaceAll: Không xóa transactions cũ, chỉ cập nhật/thêm mới.
+     * ✅ Giữ nguyên các transactions tạo local (không có remoteId) và các transactions không có trong danh sách mới.
+     * 
+     * @param transactions Danh sách transactions từ backend (phải có remoteId)
+     */
+    public void upsertAll(List<TransactionEntity> transactions) {
+        EXECUTOR.execute(() -> {
+            for (TransactionEntity newTransaction : transactions) {
+                // Chỉ upsert những transactions có remoteId (từ backend)
+                if (newTransaction.remoteId == null || newTransaction.remoteId.isEmpty()) {
+                    continue; // Bỏ qua transactions không có remoteId
+                }
+                
+                // Tìm transaction đã tồn tại theo remoteId
+                TransactionEntity existing = dao.getByRemoteId(newTransaction.remoteId);
+                
+                if (existing != null) {
+                    // Đã tồn tại → Update (giữ nguyên local id)
+                    newTransaction.id = existing.id;
+                    dao.update(newTransaction);
+                } else {
+                    // Chưa tồn tại → Insert mới
+                    dao.insert(newTransaction);
+                }
             }
         });
     }

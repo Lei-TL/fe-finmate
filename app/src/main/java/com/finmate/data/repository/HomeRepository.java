@@ -72,6 +72,12 @@ public class HomeRepository {
                             continue; // Bỏ qua wallets đã bị xóa
                         }
                         
+                        // ✅ Chỉ lưu wallets có id (UUID từ backend)
+                        // Bỏ qua nếu không có ID (không nên xảy ra, nhưng để an toàn)
+                        if (w.getId() == null || w.getId().isEmpty()) {
+                            continue;
+                        }
+                        
                         // ✅ Nếu backend chưa trả về currentBalance, dùng initialBalance làm fallback
                         double currentBalance = w.getCurrentBalance() != 0.0 ? w.getCurrentBalance() : w.getInitialBalance();
                         double initialBalance = w.getInitialBalance();
@@ -94,11 +100,18 @@ public class HomeRepository {
                     }
                 }
 
-                // 2.1) Ghi đè vào local cache
-                walletLocalRepository.replaceAll(mapped);
+                // 2.1) ✅ Upsert vào local cache (insert nếu mới, update nếu đã có)
+                // ✅ An toàn: Không xóa wallets cũ, chỉ cập nhật/thêm mới
+                // ✅ Giữ nguyên wallets tạo local (nếu có id khác với danh sách từ server)
+                walletLocalRepository.upsertAll(mapped);
 
-                // 2.2) Đẩy list mới lên UI
-                callback.onDataLoaded(mapped);
+                // 2.2) Load lại từ local để đảm bảo có đầy đủ dữ liệu (bao gồm cả wallets tạo local)
+                walletLocalRepository.getAll(new WalletRepository.Callback() {
+                    @Override
+                    public void onResult(List<WalletEntity> list) {
+                        callback.onDataLoaded(list);
+                    }
+                });
             }
 
             @Override
@@ -143,15 +156,10 @@ public class HomeRepository {
             return;
         }
 
-        // ✅ Chỉ sync từ backend khi chọn "Tất cả ví" (walletId == null)
-        // Khi chọn ví cụ thể, chỉ filter ở local để không mất transactions của ví khác
-        if (walletId != null) {
-            // Chọn ví cụ thể → chỉ dùng data local đã filter ở bước 1, không sync từ backend
-            return;
-        }
-
-        // ✅ Chỉ khi chọn "Tất cả ví" mới sync từ backend
-        transactionRemoteRepository.fetchTransactions(null, new ApiCallback<TransactionPageResponse>() {
+        // ✅ Sync từ backend cho cả "Tất cả ví" và ví cụ thể
+        // Khi chọn ví cụ thể, vẫn sync để cập nhật dữ liệu mới nhất của ví đó
+        // (API sẽ filter theo walletId, và upsertAll sẽ chỉ cập nhật transactions có remoteId, không xóa transactions của ví khác)
+        transactionRemoteRepository.fetchTransactions(walletId, new ApiCallback<TransactionPageResponse>() {
             @Override
             public void onSuccess(TransactionPageResponse page) {
                 if (page == null || page.getContent() == null) {
@@ -164,6 +172,12 @@ public class HomeRepository {
                     public void onResult(List<WalletEntity> wallets) {
                         List<TransactionEntity> mapped = new java.util.ArrayList<>();
                         for (TransactionResponse t : page.getContent()) {
+                            // ✅ Chỉ lưu transactions có remoteId (từ backend)
+                            // Bỏ qua nếu không có ID (không nên xảy ra, nhưng để an toàn)
+                            if (t.getId() == null || t.getId().isEmpty()) {
+                                continue;
+                            }
+                            
                             // ✅ Tìm walletName từ walletId
                             String walletNameForTransaction = null;
                             if (t.getWalletId() != null && wallets != null) {
@@ -178,54 +192,62 @@ public class HomeRepository {
                             // ✅ Backend đã trả về categoryName trong TransactionResponse
                             String categoryName = t.getCategoryName() != null ? t.getCategoryName() : "";
 
-                                // Format số tiền + thời gian → map vào TransactionEntity hiện tại
-                                double amountValue = t.getAmount() != null ? t.getAmount().doubleValue() : 0.0;
-                                String amountFormatted = String.format(
-                                        "%,.0f",
-                                        amountValue
-                                );
+                            // Format số tiền + thời gian → map vào TransactionEntity hiện tại
+                            double amountValue = t.getAmount() != null ? t.getAmount().doubleValue() : 0.0;
+                            String amountFormatted = String.format(
+                                    "%,.0f",
+                                    amountValue
+                            );
 
-                                // ✅ Format occurredAt từ Instant (backend) hoặc String
-                                String dateDisplay = "";
-                                if (t.getOccurredAt() != null) {
-                                    dateDisplay = t.getOccurredAt(); // Gson sẽ parse Instant thành String ISO format
-                                }
-
-                                // Ở HomeRepository cũ anh đang dùng ctor:
-                                // new TransactionEntity(title, category, amountText, walletName, dateText)
-                                String title = (t.getNote() != null && !t.getNote().isEmpty())
-                                        ? t.getNote()
-                                        : (categoryName.isEmpty() ? "" : categoryName);
-
-                                // ✅ Lưu type và amountDouble để tính toán
-                                TransactionEntity entity = new TransactionEntity(
-                                        title,
-                                        categoryName, // ✅ Dùng category name thực tế, không dùng "Unknown"
-                                        amountFormatted,
-                                        walletNameForTransaction != null ? walletNameForTransaction : "",
-                                        dateDisplay,
-                                        t.getType(), // ✅ Lưu type từ backend
-                                        amountValue  // ✅ Lưu amount (double) để tính toán
-                                );
-
-                                mapped.add(entity);
+                            // ✅ Format occurredAt từ Instant (backend) hoặc String
+                            String dateDisplay = "";
+                            if (t.getOccurredAt() != null) {
+                                dateDisplay = t.getOccurredAt(); // Gson sẽ parse Instant thành String ISO format
                             }
 
-                            // 2.1) Ghi đè vào local cache (chỉ khi sync tất cả ví)
-                            transactionLocalRepository.replaceAll(mapped);
+                            // Ở HomeRepository cũ anh đang dùng ctor:
+                            // new TransactionEntity(title, category, amountText, walletName, dateText)
+                            String title = (t.getNote() != null && !t.getNote().isEmpty())
+                                    ? t.getNote()
+                                    : (categoryName.isEmpty() ? "" : categoryName);
 
-                            // 2.2) Đẩy list mới lên UI (filter theo walletName nếu cần)
+                            // ✅ Lưu type và amountDouble để tính toán
+                            // ✅ Lưu remoteId từ backend để identify transaction khi upsert
+                            TransactionEntity entity = new TransactionEntity(
+                                    t.getId(), // ✅ remoteId từ backend
+                                    title,
+                                    categoryName, // ✅ Dùng category name thực tế, không dùng "Unknown"
+                                    amountFormatted,
+                                    walletNameForTransaction != null ? walletNameForTransaction : "",
+                                    dateDisplay,
+                                    t.getType(), // ✅ Lưu type từ backend
+                                    amountValue  // ✅ Lưu amount (double) để tính toán
+                            );
+
+                            mapped.add(entity);
+                        }
+
+                            // 2.1) ✅ Upsert vào local cache (insert nếu mới, update nếu đã có)
+                            // ✅ An toàn: Không xóa transactions cũ, chỉ cập nhật/thêm mới
+                            // ✅ Giữ nguyên transactions tạo local (không có remoteId) và transactions của ví khác
+                            transactionLocalRepository.upsertAll(mapped);
+
+                            // 2.2) Load lại từ local để đảm bảo có đầy đủ dữ liệu (bao gồm cả transactions local)
+                            // và filter theo walletName/dateRange nếu cần
                             if (finalWalletName != null) {
-                                // Filter lại theo walletName
-                                List<TransactionEntity> filtered = new java.util.ArrayList<>();
-                                for (TransactionEntity e : mapped) {
-                                    if (e.wallet != null && e.wallet.equals(finalWalletName)) {
-                                        filtered.add(e);
+                                transactionLocalRepository.getByWalletNameAndDateRange(finalWalletName, finalStartDate, finalEndDate, new TransactionRepository.OnResultCallback<List<TransactionEntity>>() {
+                                    @Override
+                                    public void onResult(List<TransactionEntity> data) {
+                                        callback.onDataLoaded(data);
                                     }
-                                }
-                                callback.onDataLoaded(filtered);
+                                });
                             } else {
-                                callback.onDataLoaded(mapped);
+                                transactionLocalRepository.getByDateRange(finalStartDate, finalEndDate, new TransactionRepository.OnResultCallback<List<TransactionEntity>>() {
+                                    @Override
+                                    public void onResult(List<TransactionEntity> data) {
+                                        callback.onDataLoaded(data);
+                                    }
+                                });
                             }
                         }
                     });

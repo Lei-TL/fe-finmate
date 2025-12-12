@@ -87,17 +87,28 @@ public class HomeViewModel extends ViewModel {
         loadTransactions(walletId, walletName, timeFilterStartDate, timeFilterEndDate);
     }
 
+    // ✅ Flag để tránh gọi API nhiều lần cùng lúc
+    private boolean isLoadingTransactions = false;
+    
     private void loadTransactions(String walletId, String walletName, Long startDate, Long endDate) {
+        // ✅ Tránh gọi API nếu đang loading
+        if (isLoadingTransactions) {
+            return;
+        }
+        
+        isLoadingTransactions = true;
         _isLoading.postValue(true); // Dùng postValue để an toàn
         homeRepository.fetchTransactions(walletId, walletName, startDate, endDate, new HomeRepository.DataCallback<List<TransactionEntity>>() {
             @Override
             public void onDataLoaded(List<TransactionEntity> data) {
+                isLoadingTransactions = false;
                 _transactions.postValue(data);
                 _isLoading.postValue(false);
             }
 
             @Override
             public void onError(String message) {
+                isLoadingTransactions = false;
                 _isLoading.postValue(false);
                 // Xử lý lỗi
             }

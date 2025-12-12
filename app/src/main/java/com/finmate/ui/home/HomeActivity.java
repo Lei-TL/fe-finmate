@@ -116,11 +116,24 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // ✅ Reload transactions khi quay lại từ AddTransactionActivity
-        // Đảm bảo transaction mới được hiển thị ngay
-        viewModel.loadHomeData();
+        // ✅ Chỉ reload transactions nếu đang loading hoặc chưa có data
+        // Tránh gọi API liên tục khi activity resume
+        Boolean isLoading = viewModel.isLoading.getValue();
+        List<TransactionEntity> currentTransactions = viewModel.transactions.getValue();
         
-        // ✅ Sync pending transactions khi có mạng
+        // Chỉ reload nếu chưa có data hoặc đang không loading (tránh duplicate calls)
+        if ((currentTransactions == null || currentTransactions.isEmpty()) && (isLoading == null || !isLoading)) {
+            // Chỉ reload transactions, không reload wallets (tránh trigger lại selectWallet)
+            String walletId = viewModel.selectedWalletId.getValue();
+            String walletName = viewModel.selectedWalletName.getValue();
+            if (walletId != null || walletName != null) {
+                viewModel.selectWallet(walletId, walletName);
+            } else {
+                viewModel.selectWallet(null, null);
+            }
+        }
+        
+        // ✅ Sync pending transactions khi có mạng (chỉ sync, không reload)
         if (transactionSyncManager != null) {
             transactionSyncManager.syncPendingTransactions();
         }
@@ -143,9 +156,7 @@ public class HomeActivity extends AppCompatActivity {
             viewModel.wallets.removeObservers(this);
             viewModel.transactions.removeObservers(this);
         }
-        if (categoryRepository != null && categoriesObserver != null) {
-            categoryRepository.getAll().removeObserver(categoriesObserver);
-        }
+        // ✅ CategoryRepository sử dụng LiveData, observers sẽ tự động được clear khi Activity destroy
     }
     
     // ✅ Load categories và tạo map categoryName -> iconName
@@ -172,10 +183,9 @@ public class HomeActivity extends AppCompatActivity {
             } else {
                 // ✅ Nếu chưa có categories, sync từ backend
                 categoryRepository.fetchRemoteCategoriesByType("INCOME");
-                    categoryRepository.fetchRemoteCategoriesByType("EXPENSE");
-                }
-            };
-        categoryRepository.getAll().observe(this, categoriesObserver);
+                categoryRepository.fetchRemoteCategoriesByType("EXPENSE");
+            }
+        });
     }
 
     private void mapViews() {

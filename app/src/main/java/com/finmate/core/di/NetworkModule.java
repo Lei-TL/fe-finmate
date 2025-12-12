@@ -1,5 +1,7 @@
 package com.finmate.core.di;
 
+import android.content.Context;
+
 import com.finmate.core.network.interceptor.AuthInterceptor;
 import com.finmate.core.session.SessionManager;
 import com.finmate.data.remote.api.AuthService;
@@ -13,7 +15,10 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 import dagger.hilt.InstallIn;
+import dagger.hilt.android.qualifiers.ApplicationContext;
 import dagger.hilt.components.SingletonComponent;
+import androidx.work.WorkManager;
+
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -90,5 +95,12 @@ public class NetworkModule {
     @Singleton
     public AuthInterceptor provideAuthInterceptor(SessionManager sessionManager) {
         return new AuthInterceptor(sessionManager);
+    }
+
+    // Provide WorkManager for sync operations
+    @Provides
+    @Singleton
+    public WorkManager provideWorkManager(@ApplicationContext Context context) {
+        return WorkManager.getInstance(context);
     }
 }

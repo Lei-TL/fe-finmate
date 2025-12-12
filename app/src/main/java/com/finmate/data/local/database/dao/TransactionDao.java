@@ -49,6 +49,10 @@ public interface TransactionDao {
 
     @Query("SELECT * FROM transactions WHERE id = :id")
     TransactionEntity getById(int id);
+    
+    // ✅ Query transaction theo remoteId để check xem đã tồn tại chưa
+    @Query("SELECT * FROM transactions WHERE remoteId = :remoteId LIMIT 1")
+    TransactionEntity getByRemoteId(String remoteId);
 
     @Update
     void update(TransactionEntity transaction);
@@ -62,4 +66,7 @@ public interface TransactionDao {
     // ✅ Bulk delete để tối ưu memory
     @Query("DELETE FROM transactions")
     void deleteAll();
+    
+    // ✅ Upsert: Insert nếu chưa có (dựa trên remoteId), Update nếu đã có
+    // Room không có upsert built-in, nên sẽ implement trong Repository
 }
