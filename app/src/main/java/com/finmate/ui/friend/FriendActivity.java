@@ -1,6 +1,7 @@
 package com.finmate.ui.friend;
 
 
+import android.content.Context;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,12 +13,19 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.finmate.core.ui.LocaleHelper;
+
 import java.util.ArrayList;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class FriendActivity extends AppCompatActivity {
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.applyLocale(newBase));
+    }
 
     private RecyclerView recyclerView;
     private FriendAdapter adapter;

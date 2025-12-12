@@ -1,5 +1,6 @@
 package com.finmate.ui.auth;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
@@ -11,12 +12,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.finmate.R;
+import com.finmate.core.ui.LocaleHelper;
 import com.finmate.ui.home.HomeActivity;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class LoginActivity extends AppCompatActivity {
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.applyLocale(newBase));
+    }
 
     EditText etUsername, etPassword;
     Button btnLogin;
@@ -44,6 +51,12 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(v -> {
             String email = etUsername.getText().toString().trim();
             String pass = etPassword.getText().toString().trim();
+            
+            // Validation
+            if (!validateInputs(email, pass)) {
+                return;
+            }
+            
             loginViewModel.login(email, pass);
         });
 
@@ -59,10 +72,42 @@ public class LoginActivity extends AppCompatActivity {
         );
     }
     
+    private boolean validateInputs(String email, String password) {
+        boolean isValid = true;
+        
+        // Validate email
+        if (email.isEmpty()) {
+            etUsername.setError(getString(R.string.required_field));
+            isValid = false;
+        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            etUsername.setError(getString(R.string.invalid_email));
+            isValid = false;
+        } else {
+            etUsername.setError(null);
+        }
+        
+        // Validate password
+        if (password.isEmpty()) {
+            etPassword.setError(getString(R.string.required_field));
+            isValid = false;
+        } else if (password.length() < 6) {
+            etPassword.setError(getString(R.string.password_too_short));
+            isValid = false;
+        } else {
+            etPassword.setError(null);
+        }
+        
+        return isValid;
+    }
+    
     private void observeViewModel() {
         loginViewModel.isLoading.observe(this, isLoading -> {
             btnLogin.setEnabled(!isLoading);
-            btnLogin.setText(isLoading ? "Đang xử lý..." : "Login");
+            btnLogin.setText(isLoading ? getString(R.string.syncing) : getString(R.string.login));
+            // Show progress indicator
+            if (isLoading) {
+                // TODO: Show progress bar/dialog if needed
+            }
         });
         
         loginViewModel.loginSuccess.observe(this, success -> {

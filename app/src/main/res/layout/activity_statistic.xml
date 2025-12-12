@@ -52,6 +52,35 @@
             android:gravity="center" />
     </LinearLayout>
 
+    <!-- FILTER BAR -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="8dp"
+        android:gravity="center_vertical">
+
+        <!-- Wallet Filter Chip -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipWalletFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/all_wallets"
+            android:clickable="true"
+            android:focusable="true"
+            style="@style/Widget.MaterialComponents.Chip.Choice" />
+
+        <!-- Time Filter Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTimeFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/this_month"
+            android:layout_marginStart="8dp"
+            style="@style/Widget.MaterialComponents.Button.TextButton" />
+    </LinearLayout>
+
     <!-- TOTAL EXPENSE -->
     <TextView
         android:id="@+id/tvTotalExpense"

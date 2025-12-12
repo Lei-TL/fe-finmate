@@ -11,7 +11,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 import com.finmate.ui.base.BaseActivity;
 import com.finmate.R;
-import com.finmate.adapters.ThemeHelper;
+import com.finmate.core.ui.ThemeHelper;
 
 public class AccountActivity extends BaseActivity {
 
@@ -101,7 +101,7 @@ public class AccountActivity extends BaseActivity {
 
     private void loadLanguageSelection() {
         SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
-        String currentLanguage = prefs.getString("language", "en");
+        String currentLanguage = prefs.getString("language", "vi"); // Default là tiếng Việt
 
         if (currentLanguage.equals("vi")) {
             spnLanguage.setSelection(1);

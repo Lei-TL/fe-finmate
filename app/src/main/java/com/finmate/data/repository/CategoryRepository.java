@@ -4,6 +4,7 @@ import android.content.Context;
 import androidx.lifecycle.LiveData;
 
 import com.finmate.core.network.ApiCallback;
+import com.finmate.core.network.NetworkChecker;
 import com.finmate.data.dto.CategoryRequest;
 import com.finmate.data.dto.CategoryResponse;
 import com.finmate.data.local.database.AppDatabase;
@@ -28,13 +29,16 @@ public class CategoryRepository {
     private final CategoryDao dao;
     private final CategoryRemoteRepository remoteRepo;
     private final Context context;
+    private final NetworkChecker networkChecker;
 
     @Inject
     public CategoryRepository(@ApplicationContext Context ctx,
-                              CategoryRemoteRepository remoteRepo) {
+                              CategoryRemoteRepository remoteRepo,
+                              NetworkChecker networkChecker) {
         this.context = ctx;
         this.dao = AppDatabase.getDatabase(ctx).categoryDao();
         this.remoteRepo = remoteRepo;
+        this.networkChecker = networkChecker;
     }
 
     // ===== LOCAL CRUD =====
@@ -56,6 +60,19 @@ public class CategoryRepository {
         return dao.getByType(type);
     }
 
+    public LiveData<List<CategoryEntity>> getAll() {
+        return dao.getAll();
+    }
+
+    // ✅ Lấy category theo name (async)
+    public void getByName(String name, OnResultCallback<CategoryEntity> callback) {
+        EXECUTOR.execute(() -> callback.onResult(dao.getByName(name)));
+    }
+
+    public interface OnResultCallback<T> {
+        void onResult(T result);
+    }
+
     // Sửa lại: Dùng transaction để đảm bảo tính toàn vẹn khi thay thế dữ liệu.
     private void replaceByType(String type, List<CategoryEntity> list) {
         EXECUTOR.execute(() -> {
@@ -70,9 +87,15 @@ public class CategoryRepository {
 
     // ===== REMOTE OPERATIONS =====
 
-    // Sửa lại: Phương thức này chỉ trigger việc fetch dữ liệu từ server.
-    // ViewModel sẽ nhận dữ liệu mới thông qua LiveData từ getByType.
+    // Offline-first: Chỉ sync từ server nếu có mạng
+    // ViewModel sẽ nhận dữ liệu mới thông qua LiveData từ getByType (đã load local trước).
     public void fetchRemoteCategoriesByType(String type) {
+        // Chỉ gọi BE nếu có mạng
+        if (!networkChecker.isNetworkAvailable()) {
+            // Không có mạng → chỉ dùng data local (đã load qua LiveData)
+            return;
+        }
+
         remoteRepo.fetchCategoriesByType(type, new ApiCallback<List<CategoryResponse>>() {
             @Override
             public void onSuccess(List<CategoryResponse> body) {
@@ -80,14 +103,11 @@ public class CategoryRepository {
 
                 List<CategoryEntity> mapped = new ArrayList<>();
                 for (CategoryResponse r : body) {
-                    // Sửa lại: Chuyển đổi tên icon (String) từ server thành resource ID (int) để lưu trữ
-                    int iconResId = context.getResources().getIdentifier(r.getIcon(), "drawable", context.getPackageName());
-                    if (iconResId == 0) continue; // Bỏ qua nếu không tìm thấy icon
-
+                    // Lưu icon name (String) trực tiếp từ server
                     mapped.add(new CategoryEntity(
                             r.getName(),
                             r.getType(),
-                            iconResId
+                            r.getIcon() != null ? r.getIcon() : ""
                     ));
                 }
                 replaceByType(type, mapped);
@@ -101,27 +121,29 @@ public class CategoryRepository {
     }
 
     public void createCategory(CategoryEntity localDraft, OperationCallback cb) {
-        // Sửa lại: Chuyển resource ID (int) thành tên (String) để gửi lên server
-        String iconName = context.getResources().getResourceEntryName(localDraft.getIconRes());
+        // Chỉ sync lên BE nếu có mạng
+        if (!networkChecker.isNetworkAvailable()) {
+            // Không có mạng → lưu local trước (offline-first)
+            insert(localDraft);
+            cb.onSuccess();
+            return;
+        }
 
+        // Có mạng → gọi BE trước, sau đó lưu local với dữ liệu từ server
         CategoryRequest req = new CategoryRequest(
                 localDraft.getName(),
                 localDraft.getType(),
-                iconName
+                localDraft.getIcon() != null ? localDraft.getIcon() : ""
         );
 
         remoteRepo.createCategory(req, new ApiCallback<CategoryResponse>() {
             @Override
             public void onSuccess(CategoryResponse res) {
-                int iconResId = context.getResources().getIdentifier(res.getIcon(), "drawable", context.getPackageName());
-                if (iconResId == 0) {
-                    cb.onError("Icon not found: " + res.getIcon());
-                    return;
-                }
+                // Lưu local với dữ liệu từ server
                 CategoryEntity e = new CategoryEntity(
                         res.getName(),
                         res.getType(),
-                        iconResId
+                        res.getIcon() != null ? res.getIcon() : ""
                 );
                 insert(e);
                 cb.onSuccess();
@@ -135,27 +157,31 @@ public class CategoryRepository {
     }
 
     public void updateCategory(CategoryEntity edit, OperationCallback cb) {
-        String id = String.valueOf(edit.getId());
-        String iconName = context.getResources().getResourceEntryName(edit.getIconRes());
+        // Update local trước (offline-first)
+        update(edit);
+        
+        // Chỉ sync lên BE nếu có mạng
+        if (!networkChecker.isNetworkAvailable()) {
+            // Không có mạng → đã update local, callback success
+            cb.onSuccess();
+            return;
+        }
 
+        String id = String.valueOf(edit.getId());
+        // Sử dụng icon name (String) trực tiếp từ CategoryEntity
         CategoryRequest req = new CategoryRequest(
                 edit.getName(),
                 edit.getType(),
-                iconName
+                edit.getIcon() != null ? edit.getIcon() : ""
         );
 
         remoteRepo.updateCategory(id, req, new ApiCallback<CategoryResponse>() {
             @Override
             public void onSuccess(CategoryResponse res) {
-                int iconResId = context.getResources().getIdentifier(res.getIcon(), "drawable", context.getPackageName());
-                if (iconResId == 0) {
-                    cb.onError("Icon not found: " + res.getIcon());
-                    return;
-                }
                 CategoryEntity updated = new CategoryEntity(
                         res.getName(),
                         res.getType(),
-                        iconResId
+                        res.getIcon() != null ? res.getIcon() : ""
                 );
                 updated.setId(edit.getId());
                 update(updated);
@@ -170,12 +196,22 @@ public class CategoryRepository {
     }
 
     public void deleteCategory(CategoryEntity e, OperationCallback cb) {
+        // Xóa local trước (offline-first)
+        delete(e);
+        
+        // Chỉ sync lên BE nếu có mạng
+        if (!networkChecker.isNetworkAvailable()) {
+            // Không có mạng → đã xóa local, callback success
+            cb.onSuccess();
+            return;
+        }
+
         String id = String.valueOf(e.getId());
 
         remoteRepo.deleteCategory(id, new ApiCallback<Void>() {
             @Override
             public void onSuccess(Void unused) {
-                delete(e);
+                // Đã xóa local ở trên, chỉ cần callback success
                 cb.onSuccess();
             }
 

@@ -14,9 +14,12 @@ import dagger.Module;
 import dagger.Provides;
 import dagger.hilt.InstallIn;
 import dagger.hilt.components.SingletonComponent;
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
@@ -62,6 +65,7 @@ public class NetworkModule {
                 .baseUrl(BASE_URL)
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .build();
     }
 
@@ -72,8 +76,12 @@ public class NetworkModule {
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         return new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS) // Tăng timeout kết nối lên 30s
+                .readTimeout(30, TimeUnit.SECONDS)    // Tăng timeout đọc lên 30s
+                .writeTimeout(30, TimeUnit.SECONDS)   // Tăng timeout ghi lên 30s
                 .addInterceptor(authInterceptor)
                 .addInterceptor(logging)
+                .retryOnConnectionFailure(true)        // Tự động retry khi mất kết nối
                 .build();
     }
 

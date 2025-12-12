@@ -1,5 +1,6 @@
 package com.finmate.ui.activities;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -9,10 +10,16 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.finmate.R;
+import com.finmate.core.ui.LocaleHelper;
 import com.finmate.data.local.database.entity.WalletEntity;
 import com.finmate.data.repository.WalletRepository;
 
 public class AddWalletActivity extends AppCompatActivity {
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.applyLocale(newBase));
+    }
 
     private EditText edtWalletName, edtWalletBalance;
     private Button btnSave, btnCancel;
@@ -61,7 +68,27 @@ public class AddWalletActivity extends AppCompatActivity {
             return;
         }
 
-        WalletEntity wallet = new WalletEntity(name, balance, R.drawable.ic_wallet);
+        // Tạo UUID tạm thời cho wallet mới (sẽ được thay thế bằng ID từ backend khi sync)
+        String tempId = java.util.UUID.randomUUID().toString();
+        
+        // ✅ Parse balance từ string sang double
+        double balanceValue = 0.0;
+        try {
+            String balanceStr = balance.replaceAll("[^0-9.]", "");
+            balanceValue = Double.parseDouble(balanceStr);
+        } catch (Exception e) {
+            balanceValue = 0.0;
+        }
+        
+        // ✅ Tạo WalletEntity với currentBalance và initialBalance bằng nhau (ví mới)
+        WalletEntity wallet = new WalletEntity(
+                tempId, 
+                name, 
+                balance, // Formatted string
+                balanceValue, // currentBalance
+                balanceValue, // initialBalance (bằng currentBalance cho ví mới)
+                R.drawable.ic_wallet
+        );
 
         repo.insert(wallet);
 

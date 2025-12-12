@@ -24,5 +24,5 @@ public interface WalletDao {
     List<WalletEntity> getAll();
 
     @Query("SELECT * FROM wallets WHERE id = :id LIMIT 1")
-    WalletEntity getById(int id);
+    WalletEntity getById(String id); // ✅ Đổi từ int sang String
 }

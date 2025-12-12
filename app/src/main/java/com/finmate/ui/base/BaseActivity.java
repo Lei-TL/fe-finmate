@@ -6,22 +6,26 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.finmate.adapters.LocaleHelper;   // đúng package
-import com.finmate.adapters.ThemeHelper;   // đúng package
+import com.finmate.core.ui.LocaleHelper;
+import com.finmate.core.ui.ThemeHelper;
 
 public class BaseActivity extends AppCompatActivity {
 
+    /**
+     * attachBaseContext được gọi TRƯỚC onCreate
+     * => Locale được apply TRƯỚC setContentView
+     * => Tất cả string resources sẽ hiển thị đúng ngôn ngữ
+     */
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.applyLocale(newBase));
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-
         // Áp dụng theme
         ThemeHelper.applyCurrentTheme(this);
 
         super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(LocaleHelper.applyLocale(newBase));
     }
 }

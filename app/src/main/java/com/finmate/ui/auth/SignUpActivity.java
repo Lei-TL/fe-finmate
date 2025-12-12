@@ -1,5 +1,6 @@
 package com.finmate.ui.auth;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
@@ -11,12 +12,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.finmate.R;
+import com.finmate.core.ui.LocaleHelper;
 import com.finmate.ui.home.HomeActivity;
 
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class SignUpActivity extends AppCompatActivity {
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.applyLocale(newBase));
+    }
 
     EditText etName, etEmail, etPassword;
     Button btnSignup;
@@ -48,22 +55,13 @@ public class SignUpActivity extends AppCompatActivity {
             String pass = etPassword.getText().toString().trim();
 
             // VALIDATE
-            if (name.isEmpty() || email.isEmpty() || pass.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (!email.contains("@")) {
-                Toast.makeText(this, "Email không hợp lệ!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (pass.length() < 6) {
-                Toast.makeText(this, "Mật khẩu phải ≥ 6 ký tự!", Toast.LENGTH_SHORT).show();
+            if (!validateInputs(name, email, pass)) {
                 return;
             }
             
-            signUpViewModel.register(email, pass);
+            String fullName = etName.getText().toString().trim();
+            String defaultAvatarUrl = "ic_avatar"; // Default avatar resource name
+            signUpViewModel.register(email, pass, fullName, defaultAvatarUrl);
         });
 
         // Quay lại Login
@@ -75,10 +73,54 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
     
+    private boolean validateInputs(String name, String email, String password) {
+        boolean isValid = true;
+        
+        // Validate name
+        if (name.isEmpty()) {
+            etName.setError(getString(R.string.required_field));
+            isValid = false;
+        } else {
+            etName.setError(null);
+        }
+        
+        // Validate email
+        if (email.isEmpty()) {
+            etEmail.setError(getString(R.string.required_field));
+            isValid = false;
+        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            etEmail.setError(getString(R.string.invalid_email));
+            isValid = false;
+        } else {
+            etEmail.setError(null);
+        }
+        
+        // Validate password
+        if (password.isEmpty()) {
+            etPassword.setError(getString(R.string.required_field));
+            isValid = false;
+        } else if (password.length() < 6) {
+            etPassword.setError(getString(R.string.password_too_short));
+            isValid = false;
+        } else {
+            etPassword.setError(null);
+        }
+        
+        if (!isValid) {
+            Toast.makeText(this, R.string.fill_all_info, Toast.LENGTH_SHORT).show();
+        }
+        
+        return isValid;
+    }
+    
     private void observeViewModel() {
         signUpViewModel.isLoading.observe(this, isLoading -> {
             btnSignup.setEnabled(!isLoading);
-            btnSignup.setText(isLoading ? "Đang xử lý..." : "Signup");
+            btnSignup.setText(isLoading ? getString(R.string.syncing) : getString(R.string.signup_button));
+            // Show progress indicator
+            if (isLoading) {
+                // TODO: Show progress bar/dialog if needed
+            }
         });
         
         signUpViewModel.registerSuccess.observe(this, success -> {

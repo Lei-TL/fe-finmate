@@ -8,13 +8,15 @@ public class TransactionUIModel {
     private final String amount;
     private final String wallet;
     private final String date;
+    private final String type; // "INCOME" / "EXPENSE" / "TRANSFER"
 
-    public TransactionUIModel(String name, String category, String amount, String wallet, String date) {
+    public TransactionUIModel(String name, String category, String amount, String wallet, String date, String type) {
         this.name = name;
         this.category = category;
         this.amount = amount;
         this.wallet = wallet;
         this.date = date;
+        this.type = type != null ? type : "EXPENSE";
     }
 
     // Getters
@@ -36,5 +38,9 @@ public class TransactionUIModel {
 
     public String getDate() {
         return date;
+    }
+
+    public String getType() {
+        return type;
     }
 }

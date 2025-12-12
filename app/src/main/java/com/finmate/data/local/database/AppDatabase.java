@@ -20,7 +20,7 @@ import com.finmate.data.local.database.entity.WalletEntity;
         CategoryEntity.class,
         WalletEntity.class,
         TransactionEntity.class
-}, version = 2, exportSchema = false)
+}, version = 5, exportSchema = false) // ✅ Tăng version vì WalletEntity thêm field currentBalance và initialBalance
 public abstract class AppDatabase extends RoomDatabase {
 
     public abstract TokenDao tokenDao();

@@ -1,14 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="48dp"
-    android:height="48dp"
-    android:viewportWidth="512"
-    android:viewportHeight="512">
-
-    <!-- Biểu đồ đầu tư -->
-    <path android:fillColor="#81C784"
-        android:pathData="M80,400h40v-120h-40zM160,400h40v-200h-40zM240,400h40v-260h-40zM320,400h40v-180h-40zM400,400h40v-300h-40z" />
-
-    <!-- Mũi tên đi lên -->
-    <path android:fillColor="#388E3C"
-        android:pathData="M60,300l120,-120 100,80 120,-140 20,20 -140,160 -100,-80 -100,100z" />
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#8BC34A"
+        android:pathData="M16,6l2.29,2.29 -4.88,4.88 -4,-4L2,16.59 3.41,18l6,-6 4,4 6.3,-6.29L22,12V6z"/>
 </vector>
