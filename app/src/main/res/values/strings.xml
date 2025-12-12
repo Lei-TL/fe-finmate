@@ -24,7 +24,7 @@
     <!-- Login Screen -->
     <string name="welcome_back">Welcome Back!</string>
     <string name="forgot_password">Forgot Password</string>
-    <string name="no_account">Don&apos;t have an account? Sign up</string>
+    <string name="no_account">Don\'t have an account? Sign up</string>
 
     <!-- Signup Screen -->
     <string name="create_account">Create Account</string>
@@ -88,7 +88,7 @@
     <string name="active">Active</string>
     <string name="paused">Paused</string>
     <string name="connect_new_friend">Connect new friend</string>
-    <string name="email_or_friend_name">Email/Friend&apos;s Name</string>
+    <string name="email_or_friend_name">Email/Friend\'s Name</string>
     <string name="show_as_list">Show as list</string>
     <string name="show_as_grid">Show as grid</string>
     <string name="share">Share</string>
@@ -115,5 +115,10 @@
     <string name="dark_theme">Dark</string>
     <string name="system_theme">System</string>
     <string name="cancel">Cancel</string>
+
+    <!-- Language Settings -->
+    <string name="title_language">Choose Language</string>
+    <string name="language_vietnamese">Tiếng Việt</string>
+    <string name="language_english">English</string>
 
 </resources>

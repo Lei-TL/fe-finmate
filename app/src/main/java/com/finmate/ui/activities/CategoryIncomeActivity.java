@@ -73,23 +73,33 @@ public class CategoryIncomeActivity extends AppCompatActivity {
     }
 
     private void loadCategoriesFromDB() {
-        repo.getByType("income", entities -> {
+        if (repo == null) repo = categoryRepository;
+        // ✅ getByType trả về LiveData, cần observe
+        repo.getByType("INCOME").observe(this, entities -> {
+            if (entities == null) return;
 
             List<CategoryUIModel> uiModels = new ArrayList<>();
 
             for (CategoryEntity entity : entities) {
-                uiModels.add(new CategoryUIModel(entity.iconRes, entity.name));
+                // ✅ Convert icon name (String) thành resource ID (int)
+                String iconName = entity.getIcon();
+                int iconResId = 0;
+                if (iconName != null && !iconName.isEmpty()) {
+                    iconResId = getResources().getIdentifier(iconName, "drawable", getPackageName());
+                }
+                if (iconResId == 0) {
+                    iconResId = R.drawable.ic_default_category; // Fallback
+                }
+                uiModels.add(new CategoryUIModel(iconResId, entity.getName()));
             }
 
-            runOnUiThread(() -> {
-                incomeList = uiModels;
+            incomeList = uiModels;
 
-                if (isGrid && gridAdapter != null) {
-                    gridAdapter.updateList(uiModels);
-                } else if (!isGrid && listAdapter != null) {
-                    listAdapter.updateList(uiModels);
-                }
-            });
+            if (isGrid && gridAdapter != null) {
+                gridAdapter.updateList(uiModels);
+            } else if (!isGrid && listAdapter != null) {
+                listAdapter.updateList(uiModels);
+            }
         });
     }
 
@@ -200,11 +210,11 @@ public class CategoryIncomeActivity extends AppCompatActivity {
     }
 
     private void saveCategory(String name, String type) {
-
+        // ✅ Dùng icon name (String) thay vì resource ID (int)
         CategoryEntity entity = new CategoryEntity(
                 name,
                 type,
-                R.drawable.ic_default_category
+                "ic_default_category" // Icon name as String
         );
 
         repo.insert(entity);

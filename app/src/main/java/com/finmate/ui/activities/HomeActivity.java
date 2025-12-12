@@ -13,9 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
-import com.finmate.adapters.TransactionAdapter;
-import com.finmate.ui.models.TransactionUIModel;
-import com.finmate.entities.TransactionEntity;
+import com.finmate.ui.transaction.TransactionAdapter;
+import com.finmate.ui.transaction.TransactionUIModel;
+import com.finmate.data.local.database.entity.TransactionEntity;
 import com.finmate.data.repository.TransactionRepository;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
@@ -206,7 +206,7 @@ public class HomeActivity extends BaseActivity {
             if (item.getItemId() == R.id.nav_home) {
                 return true;
             } else if (item.getItemId() == R.id.nav_wallet) {
-                intent = new Intent(this, WalletActivity.class);
+                intent = new Intent(this, com.finmate.ui.home.WalletActivity.class);
             } else if (item.getItemId() == R.id.nav_add) {
                 intent = new Intent(this, AddTransactionActivity.class);
             } else if (item.getItemId() == R.id.nav_statistic) {

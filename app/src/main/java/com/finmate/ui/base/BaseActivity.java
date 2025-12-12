@@ -6,8 +6,8 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.finmate.adapters.LocaleHelper;   // đúng package
-import com.finmate.adapters.ThemeHelper;   // đúng package
+import com.finmate.core.ui.LocaleHelper;
+import com.finmate.core.ui.ThemeHelper;
 
 public class BaseActivity extends AppCompatActivity {
 

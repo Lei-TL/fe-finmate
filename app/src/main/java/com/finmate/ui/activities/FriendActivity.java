@@ -7,8 +7,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
-import com.finmate.ui.models.FriendUIModel;
-import com.finmate.adapters.FriendAdapter;
+import com.finmate.ui.friend.FriendUIModel;
+import com.finmate.ui.friend.FriendAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.finmate.ui.base.BaseActivity;
 
@@ -29,15 +29,12 @@ public class FriendActivity extends BaseActivity {
         RecyclerView rvFriends = findViewById(R.id.rvFriends);
         rvFriends.setLayoutManager(new LinearLayoutManager(this));
 
-        // Sample data
+        // Sample data - TODO: Load from database/API
         List<FriendUIModel> friendList = new ArrayList<>();
-        friendList.add(new FriendUIModel(R.drawable.ic_friend, "Bạn còn thiếu một chút tiền từ Nguyễn An"));
-        friendList.add(new FriendUIModel(R.drawable.ic_friend, "Nguyễn Văn B đã trả lại bạn 50,000 VND"));
-        friendList.add(new FriendUIModel(R.drawable.ic_friend, "Bạn đã nhắc nhở Trần Thị C trả tiền"));
-        friendList.add(new FriendUIModel(R.drawable.ic_friend, "Lê Văn D vừa gửi bạn một yêu cầu chia tiền"));
-        friendList.add(new FriendUIModel(R.drawable.ic_friend, "Bạn và Phạm Thị E đã hòa tiền"));
+        // FriendUIModel constructor: (friendshipId, friendUserId, name, email, status, incoming)
+        // Tạm thời để trống vì constructor không khớp với sample data cũ
 
-        FriendAdapter adapter = new FriendAdapter(this, friendList);
+        FriendAdapter adapter = new FriendAdapter(friendList);
         rvFriends.setAdapter(adapter);
 
         // Bottom Navigation
@@ -49,7 +46,7 @@ public class FriendActivity extends BaseActivity {
             if (id == R.id.nav_home) {
                 startActivity(new Intent(this, HomeActivity.class));
             } else if (id == R.id.nav_wallet) {
-                startActivity(new Intent(this, WalletActivity.class));
+                startActivity(new Intent(this, com.finmate.ui.home.WalletActivity.class));
             } else if (id == R.id.nav_add) {
                 startActivity(new Intent(this, AddTransactionActivity.class));
             } else if (id == R.id.nav_statistic) {

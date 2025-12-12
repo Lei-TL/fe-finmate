@@ -11,6 +11,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.finmate.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,22 +40,30 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
         FriendUIModel friend = friendList.get(position);
 
         // Avatar tạm thời dùng icon chung
-        holder.ivAvatar.setImageResource(R.drawable.ic_person); // đổi icon nếu anh có
+        if (holder.ivAvatar != null) {
+            holder.ivAvatar.setImageResource(R.drawable.ic_avatar); // Dùng ic_avatar từ layout
+        }
 
-        holder.tvStatus.setText(friend.getStatus());
+        // Hiển thị tên hoặc status
+        if (holder.tvName != null) {
+            String displayText = friend.getName() != null ? friend.getName() : friend.getStatus();
+            holder.tvName.setText(displayText);
+        }
 
-        holder.ivMoreOptions.setOnClickListener(v -> {
-            if (actionListener != null) {
-                // Ví dụ: mặc định là remove, hoặc show bottom sheet rồi gọi actionListener
-                actionListener.onRemove(friend);
-            } else {
-                Toast.makeText(
-                        holder.itemView.getContext(),
-                        "Tùy chọn cho: " + friend.getStatus(),
-                        Toast.LENGTH_SHORT
-                ).show();
-            }
-        });
+        // More options - nếu có trong layout
+        if (holder.ivMoreOptions != null) {
+            holder.ivMoreOptions.setOnClickListener(v -> {
+                if (actionListener != null) {
+                    actionListener.onRemove(friend);
+                } else {
+                    Toast.makeText(
+                            holder.itemView.getContext(),
+                            "Tùy chọn cho: " + friend.getStatus(),
+                            Toast.LENGTH_SHORT
+                    ).show();
+                }
+            });
+        }
     }
 
     @Override
@@ -64,13 +74,15 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     static class FriendViewHolder extends RecyclerView.ViewHolder {
 
         ImageView ivAvatar, ivMoreOptions;
-        TextView tvStatus;
+        TextView tvName, tvStatus;
 
         public FriendViewHolder(@NonNull View itemView) {
             super(itemView);
             ivAvatar = itemView.findViewById(R.id.ivFriendAvatar);
-            tvStatus = itemView.findViewById(R.id.tvFriendStatus);
-            ivMoreOptions = itemView.findViewById(R.id.ivMoreOptions);
+            tvName = itemView.findViewById(R.id.tvFriendName);
+            // Các ID này không tồn tại trong layout, để null
+            tvStatus = null;
+            ivMoreOptions = null;
         }
     }
 

@@ -80,14 +80,11 @@ public class CategoryRepository {
 
                 List<CategoryEntity> mapped = new ArrayList<>();
                 for (CategoryResponse r : body) {
-                    // Sửa lại: Chuyển đổi tên icon (String) từ server thành resource ID (int) để lưu trữ
-                    int iconResId = context.getResources().getIdentifier(r.getIcon(), "drawable", context.getPackageName());
-                    if (iconResId == 0) continue; // Bỏ qua nếu không tìm thấy icon
-
+                    // ✅ Lưu icon name (String) trực tiếp từ server
                     mapped.add(new CategoryEntity(
                             r.getName(),
                             r.getType(),
-                            iconResId
+                            r.getIcon() != null ? r.getIcon() : ""
                     ));
                 }
                 replaceByType(type, mapped);
@@ -101,27 +98,21 @@ public class CategoryRepository {
     }
 
     public void createCategory(CategoryEntity localDraft, OperationCallback cb) {
-        // Sửa lại: Chuyển resource ID (int) thành tên (String) để gửi lên server
-        String iconName = context.getResources().getResourceEntryName(localDraft.getIconRes());
-
+        // ✅ Dùng icon name (String) trực tiếp
         CategoryRequest req = new CategoryRequest(
                 localDraft.getName(),
                 localDraft.getType(),
-                iconName
+                localDraft.getIcon() != null ? localDraft.getIcon() : ""
         );
 
         remoteRepo.createCategory(req, new ApiCallback<CategoryResponse>() {
             @Override
             public void onSuccess(CategoryResponse res) {
-                int iconResId = context.getResources().getIdentifier(res.getIcon(), "drawable", context.getPackageName());
-                if (iconResId == 0) {
-                    cb.onError("Icon not found: " + res.getIcon());
-                    return;
-                }
+                // ✅ Lưu icon name (String) trực tiếp
                 CategoryEntity e = new CategoryEntity(
                         res.getName(),
                         res.getType(),
-                        iconResId
+                        res.getIcon() != null ? res.getIcon() : ""
                 );
                 insert(e);
                 cb.onSuccess();
@@ -136,26 +127,21 @@ public class CategoryRepository {
 
     public void updateCategory(CategoryEntity edit, OperationCallback cb) {
         String id = String.valueOf(edit.getId());
-        String iconName = context.getResources().getResourceEntryName(edit.getIconRes());
-
+        // ✅ Dùng icon name (String) trực tiếp
         CategoryRequest req = new CategoryRequest(
                 edit.getName(),
                 edit.getType(),
-                iconName
+                edit.getIcon() != null ? edit.getIcon() : ""
         );
 
         remoteRepo.updateCategory(id, req, new ApiCallback<CategoryResponse>() {
             @Override
             public void onSuccess(CategoryResponse res) {
-                int iconResId = context.getResources().getIdentifier(res.getIcon(), "drawable", context.getPackageName());
-                if (iconResId == 0) {
-                    cb.onError("Icon not found: " + res.getIcon());
-                    return;
-                }
+                // ✅ Lưu icon name (String) trực tiếp
                 CategoryEntity updated = new CategoryEntity(
                         res.getName(),
                         res.getType(),
-                        iconResId
+                        res.getIcon() != null ? res.getIcon() : ""
                 );
                 updated.setId(edit.getId());
                 update(updated);

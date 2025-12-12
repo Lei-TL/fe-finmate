@@ -39,4 +39,15 @@
         <item>#2980B9</item>
         <item>#8E44AD</item>
     </array>
+
+    <array name="language_options">
+        <item>English</item>
+        <item>Tiếng Việt</item>
+    </array>
+
+    <array name="theme_options">
+        <item>Light</item>
+        <item>Dark</item>
+        <item>System</item>
+    </array>
 </resources>
