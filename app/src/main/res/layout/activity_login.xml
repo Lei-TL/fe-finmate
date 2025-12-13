@@ -18,16 +18,16 @@
             android:id="@+id/iv_language_setting"
             android:layout_width="28dp"
             android:layout_height="28dp"
-            android:src="@drawable/ic_language"
+            android:src="@drawable/ngonngu"
             android:layout_marginEnd="16dp"
-            app:tint="?attr/iconTint" />
+            app:tint="@null" />
 
         <ImageView
             android:id="@+id/iv_theme_setting"
             android:layout_width="28dp"
             android:layout_height="28dp"
-            android:src="@drawable/ic_theme"
-            app:tint="?attr/iconTint" />
+            android:src="@drawable/giaodien"
+            app:tint="@null" />
 
     </LinearLayout>
 

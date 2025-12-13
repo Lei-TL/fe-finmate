@@ -123,13 +123,13 @@ public class AccountActivity extends BaseActivity {
         String selectedTheme;
         switch (selectedPosition) {
             case 0:
-                selectedTheme = ThemeHelper.LIGHT_MODE;
+                selectedTheme = ThemeHelper.THEME_LIGHT;
                 break;
             case 1:
-                selectedTheme = ThemeHelper.DARK_MODE;
+                selectedTheme = ThemeHelper.THEME_DARK;
                 break;
             default:
-                selectedTheme = ThemeHelper.SYSTEM_DEFAULT;
+                selectedTheme = ThemeHelper.THEME_SYSTEM;
                 break;
         }
         SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
@@ -139,12 +139,12 @@ public class AccountActivity extends BaseActivity {
 
     private void loadThemeSelection() {
         SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
-        String currentTheme = prefs.getString("theme", ThemeHelper.SYSTEM_DEFAULT);
+        String currentTheme = prefs.getString("theme", ThemeHelper.THEME_SYSTEM);
         switch (currentTheme) {
-            case ThemeHelper.LIGHT_MODE:
+            case ThemeHelper.THEME_LIGHT:
                 spnTheme.setSelection(0);
                 break;
-            case ThemeHelper.DARK_MODE:
+            case ThemeHelper.THEME_DARK:
                 spnTheme.setSelection(1);
                 break;
             default:

@@ -15,11 +15,11 @@
     <string name="description">Mô tả bản thân</string>
     <string name="friends">Bạn bè</string>
     <string name="feature_in_development">Tính năng đang phát triển</string>
-    <string name="connect">Connect</string>
+    <string name="connect">Kết nối</string>
     <string name="delete">Xóa</string>
     <string name="edit">Chỉnh sửa</string>
     <string name="confirm_delete_friend_title">Xóa bạn bè</string>
-    <string name="confirm_delete_friend_message">Bạn chắc chắn muốn xóa người bạn này khỏi danh sách connect?</string>
+    <string name="confirm_delete_friend_message">Bạn chắc chắn muốn xóa người bạn này khỏi danh sách kết nối?</string>
 
     <!-- Login Screen -->
     <string name="welcome_back">Chào mừng quay trở lại !</string>
@@ -36,7 +36,6 @@
     <string name="chart_title">Thống kê thu nhập - chi tiêu</string>
 
     <!-- Add Transaction Screen -->
-    <string name="add_transaction">Thêm giao dịch</string>
     <string name="add_transaction_title">Thêm giao dịch</string>
     <string name="select_group_first">Vui lòng chọn nhóm giao dịch trước!</string>
     <string name="select_date">Chọn ngày</string>
@@ -46,8 +45,8 @@
     <string name="today">Hôm nay</string>
     <string name="yesterday">Hôm qua</string>
     <string name="single_day">Một ngày</string>
-    <string name="date_range">Khoảng ngày (từ → đến)</string>
-    <string name="clear">Xóa ngày</string>
+    <string name="date_range">Khoảng ngày</string>
+    <string name="clear">Xóa</string>
     <string name="transaction_saved">Đã lưu giao dịch!</string>
     <string name="fill_all_info">Vui lòng nhập đầy đủ thông tin!</string>
     <string name="category_hint">Phân loại</string>
@@ -56,6 +55,7 @@
     <string name="friend_hint">Bạn bè</string>
     <string name="note_hint">Ghi chú</string>
     <string name="select_due_date_title">Chọn ngày đến hạn</string>
+    <string name="add_transaction">Thêm giao dịch</string>
 
     <!-- Account Screen -->
     <string name="income">Thu nhập</string>
@@ -71,7 +71,7 @@
     <!-- Wallet Screen -->
     <string name="my_account">Tài khoản của tôi</string>
     <string name="my_wallet">Ví của tôi</string>
-    <string name="personal">Riêng tôi</string>
+    <string name="personal">Cá nhân</string>
 
     <!-- Statistic Screen -->
     <string name="statistic_monthly_expense">Thống kê chi tiêu theo tháng</string>
@@ -88,11 +88,11 @@
 
     <!-- Friend Screen -->
     <string name="active">Đang hoạt động</string>
-    <string name="paused">Tạm dừng hoạt động</string>
-    <string name="connect_new_friend">Connect bạn mới</string>
-    <string name="email_or_friend_name">Email/Tên bạn mới</string>
-    <string name="show_as_list">Hiển thị dưới dạng danh sách</string>
-    <string name="show_as_grid">Hiển thị dưới dạng lưới</string>
+    <string name="paused">Tạm dừng</string>
+    <string name="connect_new_friend">Kết nối bạn mới</string>
+    <string name="email_or_friend_name">Email/Tên bạn bè</string>
+    <string name="show_as_list">Hiển thị dạng danh sách</string>
+    <string name="show_as_grid">Hiển thị dạng lưới</string>
     <string name="share">Chia sẻ</string>
     <string name="help_and_feedback">Trợ giúp &amp; Phản hồi</string>
 
@@ -102,7 +102,7 @@
     <string name="notifications">Thông báo</string>
 
     <!-- Bottom Navigation -->
-    <string name="nav_home">Home</string>
+    <string name="nav_home">Trang chủ</string>
     <string name="nav_wallet">Ví tiền</string>
     <string name="nav_add">Thêm</string>
     <string name="nav_statistic">Thống kê</string>
@@ -133,7 +133,7 @@
     <string name="no_wallets">Chưa có ví nào</string>
     <string name="no_wallets_hint">Bấm + để thêm ví mới</string>
     <string name="no_friends">Chưa có bạn bè nào</string>
-    <string name="no_friends_hint">Bấm Connect để thêm bạn bè</string>
+    <string name="no_friends_hint">Bấm Kết nối để thêm bạn bè</string>
     <string name="no_statistics">Chưa có dữ liệu thống kê</string>
     <string name="no_statistics_hint">Thêm giao dịch để xem thống kê</string>
 
@@ -183,5 +183,14 @@
     <string name="last_updated_at">Cập nhật lúc %1$s</string>
     <string name="income_label">Thu nhập</string>
     <string name="expense_label">Chi tiêu</string>
+
+    <!-- Weekdays -->
+    <string name="monday">Thứ 2</string>
+    <string name="tuesday">Thứ 3</string>
+    <string name="wednesday">Thứ 4</string>
+    <string name="thursday">Thứ 5</string>
+    <string name="friday">Thứ 6</string>
+    <string name="saturday">Thứ 7</string>
+    <string name="sunday">Chủ nhật</string>
 
 </resources>

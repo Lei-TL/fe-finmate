@@ -13,6 +13,8 @@ import java.util.List;
 import javax.inject.Inject;
 
 import dagger.hilt.android.lifecycle.HiltViewModel;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 @HiltViewModel
 public class HomeViewModel extends ViewModel {
@@ -113,5 +115,17 @@ public class HomeViewModel extends ViewModel {
                 // Xử lý lỗi
             }
         });
+    }
+
+    public void deleteTransaction(long localId) {
+        homeRepository.deleteTransaction(localId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                    // Reload transactions after deletion
+                    loadTransactions(_selectedWalletId.getValue(), _selectedWalletName.getValue());
+                }, throwable -> {
+                    // Handle error
+                });
     }
 }

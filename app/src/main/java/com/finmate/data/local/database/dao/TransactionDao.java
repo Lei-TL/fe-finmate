@@ -61,7 +61,7 @@ public interface TransactionDao {
     void delete(TransactionEntity transaction);
 
     @Query("DELETE FROM transactions WHERE id = :id")
-    void deleteById(int id);
+    void deleteById(long id);
     
     // ✅ Bulk delete để tối ưu memory
     @Query("DELETE FROM transactions")

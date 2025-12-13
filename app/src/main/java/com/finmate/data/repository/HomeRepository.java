@@ -13,6 +13,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.reactivex.rxjava3.core.Completable;
+
 @Singleton
 public class HomeRepository {
 
@@ -260,6 +262,10 @@ public class HomeRepository {
                 // optional: callback.onError(message);
             }
         });
+    }
+
+    public Completable deleteTransaction(long localId) {
+        return Completable.fromAction(() -> transactionLocalRepository.deleteByLocalId(localId));
     }
 
 }

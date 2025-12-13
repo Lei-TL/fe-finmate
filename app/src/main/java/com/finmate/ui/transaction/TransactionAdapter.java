@@ -46,6 +46,10 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         notifyDataSetChanged(); // Báo cho RecyclerView cập nhật lại
     }
 
+    public TransactionGroupedItem getItem(int position) {
+        return groupedItems.get(position);
+    }
+
     @Override
     public int getItemViewType(int position) {
         return groupedItems.get(position).getType() == TransactionGroupedItem.ItemType.HEADER 
@@ -78,9 +82,9 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             TransactionUIModel transaction = item.getTransaction();
             Context context = holder.itemView.getContext();
             
-            transactionHolder.tvName.setText(transaction.getName());
+            transactionHolder.tvName.setText(transaction.name);
             // ✅ Hiển thị category name (không hiển thị "Unknown" nữa)
-            String categoryName = transaction.getCategory();
+            String categoryName = transaction.category;
             if (categoryName == null || categoryName.isEmpty()) {
                 transactionHolder.tvGroup.setText("");
             } else {
@@ -119,8 +123,8 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
             }
             
             // ✅ Format amount với dấu + hoặc - và màu sắc dựa trên type
-            String type = transaction.getType();
-            String amountText = transaction.getAmount();
+            String type = transaction.type;
+            String amountText = transaction.amount;
             
             if ("INCOME".equals(type)) {
                 // Thu nhập: màu xanh + dấu +
@@ -153,7 +157,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 transactionHolder.tvMoney.setTextColor(transactionHolder.tvName.getCurrentTextColor());
             }
             
-            transactionHolder.tvWallet.setText(transaction.getWallet());
+            transactionHolder.tvWallet.setText(transaction.wallet);
         }
     }
 
