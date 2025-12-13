@@ -103,6 +103,10 @@ public class TransactionRepository {
     public void delete(TransactionEntity entity) {
         EXECUTOR.execute(() -> dao.delete(entity));
     }
+    
+    public void deleteByLocalId(long localId) {
+        EXECUTOR.execute(() -> dao.deleteById(localId));
+    }
 
     /**
      * Ghi đè toàn bộ transaction local = data mới từ server.

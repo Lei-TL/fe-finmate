@@ -3,11 +3,13 @@ package com.finmate.ui.home;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,12 +20,9 @@ import com.finmate.data.local.database.entity.WalletEntity;
 import com.finmate.ui.activities.AddTransactionActivity;
 import com.finmate.ui.activities.SettingsActivity;
 import com.finmate.ui.activities.StatisticActivity;
-import com.finmate.ui.base.BaseActivity;
 import com.finmate.ui.transaction.TransactionAdapter;
 import com.finmate.ui.transaction.TransactionGroupedItem;
 import com.finmate.ui.transaction.TransactionUIModel;
-import com.finmate.data.repository.CategoryRepository;
-import com.finmate.data.local.database.entity.CategoryEntity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.chip.Chip;
 
@@ -36,29 +35,20 @@ import java.util.Locale;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
-public class WalletActivity extends BaseActivity {
+public class WalletActivity extends AppCompatActivity {
 
     private WalletViewModel viewModel;
-    
-    // ✅ CategoryRepository để load categories và lấy icon
-    @javax.inject.Inject
-    CategoryRepository categoryRepository;
-    
-    private Chip chipWalletFilter, chipTimeFilter;
-    private TextView tvBalance, tvIncomeValue, tvExpenseValue, tvWalletName;
-    private ProgressBar progIncome, progExpense;
-    private BottomNavigationView bottomNavigation;
     private RecyclerView rvTransactions;
     private TransactionAdapter transactionAdapter;
     private View layoutEmptyState;
-    private android.widget.ImageView btnAddTransaction;
-    
+    private Chip chipWalletFilter;
     private String selectedWalletId = null;
     private String selectedWalletName = "";
-    
-    // ✅ Time filter state
-    private Long timeFilterStartDate = null;
-    private Long timeFilterEndDate = null;
+    private TextView tvBalance, tvIncomeValue, tvExpenseValue, tvWalletName;
+    private ProgressBar progIncome, progExpense;
+    private ImageView btnBack;
+    private BottomNavigationView bottomNavigation;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,206 +57,43 @@ public class WalletActivity extends BaseActivity {
 
         viewModel = new ViewModelProvider(this).get(WalletViewModel.class);
 
-        // ÁNH XẠ VIEW
-        chipWalletFilter = findViewById(R.id.chipWalletFilter);
-        chipTimeFilter = findViewById(R.id.chipTimeFilter);
-        tvBalance = findViewById(R.id.tv_balance);
-        tvWalletName = findViewById(R.id.tv_wallet_name);
-        tvIncomeValue = findViewById(R.id.tv_income_value);
-        tvExpenseValue = findViewById(R.id.tv_expense_value);
-        btnAddTransaction = findViewById(R.id.btnAddTransaction);
-
-        progIncome = findViewById(R.id.prog_income);
-        progExpense = findViewById(R.id.prog_expense);
-
-        bottomNavigation = findViewById(R.id.bottomNavigation);
-        rvTransactions = findViewById(R.id.rvTransactions);
-        layoutEmptyState = findViewById(R.id.layoutEmptyState);
-
-        // Chọn đúng tab hiện tại
-        bottomNavigation.setSelectedItemId(R.id.nav_wallet);
-
+        mapViews();
         setupRecyclerView();
-        setupWalletFilter();
-        setupTimeFilter();
-        setupAddTransactionButton();
+        setupClickListeners();
         observeViewModel();
-        setupBottomNavigation();
-        loadCategories(); // ✅ Load categories để lấy icon
-        
+
         viewModel.loadWalletData();
     }
-    
-    // ✅ Load categories và tạo map categoryName -> iconName
-    private void loadCategories() {
-        categoryRepository.getAll().observe(this, categories -> {
-            if (categories != null && !categories.isEmpty()) {
-                java.util.Map<String, String> categoryIconMap = new java.util.HashMap<>();
-                for (CategoryEntity category : categories) {
-                    if (category.getName() != null && category.getIcon() != null) {
-                        String categoryName = category.getName().trim();
-                        String iconName = category.getIcon().trim();
-                        if (!categoryName.isEmpty() && !iconName.isEmpty()) {
-                            categoryIconMap.put(categoryName, iconName);
-                            // ✅ Thêm cả lowercase version để match case-insensitive
-                            categoryIconMap.put(categoryName.toLowerCase(), iconName);
-                        }
-                    }
-                }
-                // ✅ Truyền map vào adapter và notify để refresh
-                if (transactionAdapter != null) {
-                    transactionAdapter.setCategoryIconMap(categoryIconMap);
-                }
-            } else {
-                // ✅ Nếu chưa có categories, sync từ backend
-                categoryRepository.fetchRemoteCategoriesByType("INCOME");
-                categoryRepository.fetchRemoteCategoriesByType("EXPENSE");
-            }
-        });
+
+    private void mapViews() {
+        rvTransactions = findViewById(R.id.rvTransactions);
+        layoutEmptyState = findViewById(R.id.layoutEmptyState);
+        chipWalletFilter = findViewById(R.id.chipWalletFilter);
+        tvBalance = findViewById(R.id.tvBalance);
+        tvIncomeValue = findViewById(R.id.tvIncomeValue);
+        tvExpenseValue = findViewById(R.id.tvExpenseValue);
+        progIncome = findViewById(R.id.progIncome);
+        progExpense = findViewById(R.id.progExpense);
+        tvWalletName = findViewById(R.id.tvWalletName);
+        btnBack = findViewById(R.id.btnBack);
+        bottomNavigation = findViewById(R.id.bottomNavigation);
+        
+        bottomNavigation.setSelectedItemId(R.id.nav_wallet);
     }
-    
+
     private void setupRecyclerView() {
         rvTransactions.setLayoutManager(new LinearLayoutManager(this));
         transactionAdapter = new TransactionAdapter(new ArrayList<>());
         rvTransactions.setAdapter(transactionAdapter);
-        rvTransactions.setNestedScrollingEnabled(false);
-        rvTransactions.setHasFixedSize(false);
     }
 
-    private void setupWalletFilter() {
-        chipWalletFilter.setOnClickListener(v -> showWalletMenu());
+    private void setupClickListeners() {
+        chipWalletFilter.setOnClickListener(v -> showWalletSelectionMenu());
+        btnBack.setOnClickListener(v -> finish());
+        setupBottomNavigation();
     }
-    
-    private void setupTimeFilter() {
-        // ✅ Mặc định: Tháng này
-        Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.DAY_OF_MONTH, 1);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        timeFilterStartDate = cal.getTimeInMillis();
-        
-        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-        cal.set(Calendar.HOUR_OF_DAY, 23);
-        cal.set(Calendar.MINUTE, 59);
-        cal.set(Calendar.SECOND, 59);
-        cal.set(Calendar.MILLISECOND, 999);
-        timeFilterEndDate = cal.getTimeInMillis();
-        
-        chipTimeFilter.setText(getString(R.string.this_month));
-        
-        chipTimeFilter.setOnClickListener(v -> {
-            com.finmate.ui.dialogs.TimeFilterBottomSheet bottomSheet = 
-                com.finmate.ui.dialogs.TimeFilterBottomSheet.newInstance();
-            bottomSheet.setListener(new com.finmate.ui.dialogs.TimeFilterBottomSheet.TimeFilterListener() {
-                @Override
-                public void onTodaySelected() {
-                    chipTimeFilter.setText(getString(R.string.today));
-                    
-                    Calendar cal = Calendar.getInstance();
-                    cal.set(Calendar.HOUR_OF_DAY, 0);
-                    cal.set(Calendar.MINUTE, 0);
-                    cal.set(Calendar.SECOND, 0);
-                    cal.set(Calendar.MILLISECOND, 0);
-                    timeFilterStartDate = cal.getTimeInMillis();
-                    
-                    cal.set(Calendar.HOUR_OF_DAY, 23);
-                    cal.set(Calendar.MINUTE, 59);
-                    cal.set(Calendar.SECOND, 59);
-                    cal.set(Calendar.MILLISECOND, 999);
-                    timeFilterEndDate = cal.getTimeInMillis();
-                    
-                    viewModel.selectTimeFilter(timeFilterStartDate, timeFilterEndDate);
-                }
 
-                @Override
-                public void onSingleDaySelected(java.util.Date date) {
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                    String dateText = sdf.format(date);
-                    chipTimeFilter.setText(dateText);
-                    
-                    Calendar cal = Calendar.getInstance();
-                    cal.setTime(date);
-                    cal.set(Calendar.HOUR_OF_DAY, 0);
-                    cal.set(Calendar.MINUTE, 0);
-                    cal.set(Calendar.SECOND, 0);
-                    cal.set(Calendar.MILLISECOND, 0);
-                    timeFilterStartDate = cal.getTimeInMillis();
-                    
-                    cal.set(Calendar.HOUR_OF_DAY, 23);
-                    cal.set(Calendar.MINUTE, 59);
-                    cal.set(Calendar.SECOND, 59);
-                    cal.set(Calendar.MILLISECOND, 999);
-                    timeFilterEndDate = cal.getTimeInMillis();
-                    
-                    viewModel.selectTimeFilter(timeFilterStartDate, timeFilterEndDate);
-                }
-
-                @Override
-                public void onDateRangeSelected(java.util.Date startDate, java.util.Date endDate) {
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-                    String dateText = sdf.format(startDate) + " - " + sdf.format(endDate);
-                    chipTimeFilter.setText(dateText);
-                    
-                    Calendar calStart = Calendar.getInstance();
-                    calStart.setTime(startDate);
-                    calStart.set(Calendar.HOUR_OF_DAY, 0);
-                    calStart.set(Calendar.MINUTE, 0);
-                    calStart.set(Calendar.SECOND, 0);
-                    calStart.set(Calendar.MILLISECOND, 0);
-                    timeFilterStartDate = calStart.getTimeInMillis();
-                    
-                    Calendar calEnd = Calendar.getInstance();
-                    calEnd.setTime(endDate);
-                    calEnd.set(Calendar.HOUR_OF_DAY, 23);
-                    calEnd.set(Calendar.MINUTE, 59);
-                    calEnd.set(Calendar.SECOND, 59);
-                    calEnd.set(Calendar.MILLISECOND, 999);
-                    timeFilterEndDate = calEnd.getTimeInMillis();
-                    
-                    viewModel.selectTimeFilter(timeFilterStartDate, timeFilterEndDate);
-                }
-
-                @Override
-                public void onClear() {
-                    chipTimeFilter.setText(getString(R.string.this_month));
-                    
-                    // Reset về tháng này
-                    Calendar cal = Calendar.getInstance();
-                    cal.set(Calendar.DAY_OF_MONTH, 1);
-                    cal.set(Calendar.HOUR_OF_DAY, 0);
-                    cal.set(Calendar.MINUTE, 0);
-                    cal.set(Calendar.SECOND, 0);
-                    cal.set(Calendar.MILLISECOND, 0);
-                    timeFilterStartDate = cal.getTimeInMillis();
-                    
-                    cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-                    cal.set(Calendar.HOUR_OF_DAY, 23);
-                    cal.set(Calendar.MINUTE, 59);
-                    cal.set(Calendar.SECOND, 59);
-                    cal.set(Calendar.MILLISECOND, 999);
-                    timeFilterEndDate = cal.getTimeInMillis();
-                    
-                    viewModel.selectTimeFilter(timeFilterStartDate, timeFilterEndDate);
-                }
-            });
-            bottomSheet.show(getSupportFragmentManager(), "TimeFilterBottomSheet");
-        });
-    }
-    
-    private void setupAddTransactionButton() {
-        btnAddTransaction.setOnClickListener(v -> {
-            Intent intent = new Intent(this, AddTransactionActivity.class);
-            // ✅ Nếu đã chọn ví cụ thể, có thể truyền walletId để pre-select
-            if (selectedWalletId != null) {
-                intent.putExtra("walletId", selectedWalletId);
-            }
-            startActivity(intent);
-        });
-    }
-    
-    private void showWalletMenu() {
+    private void showWalletSelectionMenu() {
         List<WalletEntity> wallets = viewModel.wallets.getValue();
         
         if (wallets == null || wallets.isEmpty()) {
@@ -472,6 +299,7 @@ public class WalletActivity extends BaseActivity {
                 
                 for (TransactionEntity entity : dayTransactions) {
                     TransactionUIModel uiModel = new TransactionUIModel(
+                            entity.id,
                             entity.name,
                             entity.category,
                             entity.amount,
@@ -497,13 +325,13 @@ public class WalletActivity extends BaseActivity {
     
     private String formatDayOfWeek(String dayOfWeek) {
         java.util.Map<String, String> dayMap = new java.util.HashMap<>();
-        dayMap.put("Monday", "Thứ 2");
-        dayMap.put("Tuesday", "Thứ 3");
-        dayMap.put("Wednesday", "Thứ 4");
-        dayMap.put("Thursday", "Thứ 5");
-        dayMap.put("Friday", "Thứ 6");
-        dayMap.put("Saturday", "Thứ 7");
-        dayMap.put("Sunday", "Chủ nhật");
+        dayMap.put("Monday", getString(R.string.monday));
+        dayMap.put("Tuesday", getString(R.string.tuesday));
+        dayMap.put("Wednesday", getString(R.string.wednesday));
+        dayMap.put("Thursday", getString(R.string.thursday));
+        dayMap.put("Friday", getString(R.string.friday));
+        dayMap.put("Saturday", getString(R.string.saturday));
+        dayMap.put("Sunday", getString(R.string.sunday));
         
         return dayMap.getOrDefault(dayOfWeek, dayOfWeek);
     }

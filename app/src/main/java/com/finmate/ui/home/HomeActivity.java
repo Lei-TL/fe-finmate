@@ -10,9 +10,11 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -75,7 +77,6 @@ public class HomeActivity extends AppCompatActivity {
     
     // Filter views
     private com.google.android.material.button.MaterialButton btnTimeFilter;
-    private TextView tvCurrentFilter, tvSyncStatus;
     private ImageView imgAvatar;
     private TextView tvName;
     
@@ -102,6 +103,7 @@ public class HomeActivity extends AppCompatActivity {
         setupMenuMore();
         setupRecyclerView();
         setupBottomNavigation();
+        setupSwipeToDelete();
         
         observeViewModel();
         loadCategories(); // ✅ Load categories để lấy icon
@@ -201,8 +203,6 @@ public class HomeActivity extends AppCompatActivity {
         
         // Filter views
         btnTimeFilter = findViewById(R.id.btnTimeFilter);
-        tvCurrentFilter = findViewById(R.id.tvCurrentFilter);
-        tvSyncStatus = findViewById(R.id.tvSyncStatus);
         
         // Summary cards
         cardBalance = findViewById(R.id.cardBalance);
@@ -263,7 +263,6 @@ public class HomeActivity extends AppCompatActivity {
                 @Override
                 public void onTodaySelected() {
                     btnTimeFilter.setText(getString(R.string.today));
-                    updateFilterSubtitle(getString(R.string.today));
                     
                     // ✅ Filter transactions for today
                     Calendar cal = Calendar.getInstance();
@@ -291,7 +290,6 @@ public class HomeActivity extends AppCompatActivity {
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                     String dateText = sdf.format(date);
                     btnTimeFilter.setText(dateText);
-                    updateFilterSubtitle(dateText);
                     
                     // ✅ Filter transactions for selected day
                     Calendar cal = Calendar.getInstance();
@@ -320,7 +318,6 @@ public class HomeActivity extends AppCompatActivity {
                     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
                     String dateText = sdf.format(startDate) + " - " + sdf.format(endDate);
                     btnTimeFilter.setText(dateText);
-                    updateFilterSubtitle(dateText);
                     
                     // ✅ Filter transactions for date range
                     Calendar calStart = Calendar.getInstance();
@@ -349,7 +346,6 @@ public class HomeActivity extends AppCompatActivity {
                 @Override
                 public void onClear() {
                     btnTimeFilter.setText(getString(R.string.today));
-                    updateFilterSubtitle(getString(R.string.today));
                     
                     // ✅ Clear filter (set to null = no filter)
                     timeFilterStartDate = null;
@@ -359,22 +355,12 @@ public class HomeActivity extends AppCompatActivity {
             });
             bottomSheet.show(getSupportFragmentManager(), "TimeFilterBottomSheet");
         });
-        
-        // ✅ Initialize filter subtitle
-        updateFilterSubtitle(getString(R.string.today));
-    }
-    
-    // ✅ Cập nhật filter subtitle (chỉ hiển thị time filter)
-    private void updateFilterSubtitle(String timeFilter) {
-        if (tvCurrentFilter != null) {
-            tvCurrentFilter.setText(timeFilter);
-        }
     }
     
     private void setupCardClicks() {
         // Balance card -> WalletActivity
         cardBalance.setOnClickListener(v -> {
-            startActivity(new Intent(this, WalletActivity.class));
+            startActivity(new Intent(this, com.finmate.ui.home.WalletActivity.class));
         });
         
         // Income card -> IncomeStatisticActivity
@@ -389,10 +375,10 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void observeViewModel() {
-        // ✅ Calculate total balance từ tất cả ví
+        // ✅ Calculate total balance from all wallets
         viewModel.wallets.observe(this, wallets -> {
             if (wallets != null && !wallets.isEmpty()) {
-                // ✅ Tất cả ví: tính tổng currentBalance
+                // ✅ All wallets: calculate total currentBalance
                 double totalBalance = 0;
                 for (com.finmate.data.local.database.entity.WalletEntity w : wallets) {
                     totalBalance += w.currentBalance;
@@ -418,23 +404,14 @@ public class HomeActivity extends AppCompatActivity {
                 }
             }
             
-            // ✅ Update summary cards và chart từ transactions đã filter
+            // ✅ Update summary cards and chart from filtered transactions
             updateSummaryCards(transactionEntities);
             setupChart(transactionEntities);
         });
     }
     
-    // ✅ Cập nhật sync status (hiển thị thời gian cập nhật cuối)
-    private void updateSyncStatus() {
-        if (tvSyncStatus != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
-            String time = sdf.format(Calendar.getInstance().getTime());
-            tvSyncStatus.setText(getString(R.string.last_updated_at, time));
-        }
-    }
-    
-    // ✅ Tính toán và update summary cards (income, expense)
-    // ✅ Transactions đã được filter từ ViewModel theo wallet và time filter
+    // ✅ Calculate and update summary cards (income, expense)
+    // ✅ Transactions are already filtered by ViewModel by wallet and time filter
     private void updateSummaryCards(List<TransactionEntity> transactions) {
         if (transactions == null || transactions.isEmpty()) {
             if (tvIncome != null) tvIncome.setText("0 VND");
@@ -448,7 +425,7 @@ public class HomeActivity extends AppCompatActivity {
         double totalIncome = 0;
         double totalExpense = 0;
         
-        // ✅ Tính toán từ transactions đã được filter (theo wallet và time)
+        // ✅ Calculate from filtered transactions (by wallet and time)
         for (TransactionEntity t : transactions) {
             if (t.type != null && t.type.equals("INCOME")) {
                 totalIncome += t.amountDouble;
@@ -464,7 +441,7 @@ public class HomeActivity extends AppCompatActivity {
             tvExpense.setText(formatAmount(totalExpense));
         }
         
-        // ✅ Update subtitle theo time filter đã chọn
+        // ✅ Update subtitle based on selected time filter
         String subtitle = getTimeFilterSubtitle();
         if (tvIncomeSubtitle != null) {
             tvIncomeSubtitle.setText(subtitle);
@@ -474,14 +451,11 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
     
-    // ✅ Format subtitle dựa trên time filter đã chọn
+    // ✅ Format subtitle based on selected time filter
     private String getTimeFilterSubtitle() {
         if (timeFilterStartDate == null && timeFilterEndDate == null) {
-            // Không có filter → hiển thị "Tháng này"
-            Calendar cal = Calendar.getInstance();
-            int nowMonth = cal.get(Calendar.MONTH) + 1;
-            int nowYear = cal.get(Calendar.YEAR);
-            return String.format(Locale.getDefault(), "Tháng %d/%d", nowMonth, nowYear);
+            // No filter → show "This month"
+            return getString(R.string.this_month);
         }
         
         Calendar calStart = Calendar.getInstance();
@@ -491,10 +465,10 @@ public class HomeActivity extends AppCompatActivity {
         
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         
-        // Nếu cùng một ngày → "Hôm nay" hoặc "dd/MM/yyyy"
+        // If same day → "Today" or "dd/MM/yyyy"
         if (calStart.get(Calendar.YEAR) == calEnd.get(Calendar.YEAR) &&
             calStart.get(Calendar.DAY_OF_YEAR) == calEnd.get(Calendar.DAY_OF_YEAR)) {
-            // Kiểm tra xem có phải hôm nay không
+            // Check if it's today
             Calendar today = Calendar.getInstance();
             if (calStart.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
                 calStart.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)) {
@@ -503,7 +477,7 @@ public class HomeActivity extends AppCompatActivity {
             return sdf.format(calStart.getTime());
         }
         
-        // Nếu cùng một tháng → "Tháng MM/yyyy"
+        // If same month → "Tháng MM/yyyy"
         if (calStart.get(Calendar.YEAR) == calEnd.get(Calendar.YEAR) &&
             calStart.get(Calendar.MONTH) == calEnd.get(Calendar.MONTH)) {
             int month = calStart.get(Calendar.MONTH) + 1;
@@ -523,25 +497,43 @@ public class HomeActivity extends AppCompatActivity {
             return;
         }
 
-        // ✅ Group transactions theo ngày
+        // ✅ Group transactions by date
         List<TransactionGroupedItem> groupedItems = groupTransactionsByDate(transactionEntities);
         if (transactionAdapter != null) {
             transactionAdapter.updateList(groupedItems);
         }
     }
     
-    // ✅ Group transactions theo ngày và tạo header cho mỗi ngày
+    private void setupSwipeToDelete() {
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getAdapterPosition();
+                TransactionGroupedItem item = transactionAdapter.getItem(position);
+                if (item != null && item.isTransaction()) {
+                    viewModel.deleteTransaction(item.getTransaction().localId);
+                }
+            }
+        }).attachToRecyclerView(rvTransactions);
+    }
+    
+    // ✅ Group transactions by date and create headers for each day
     private List<TransactionGroupedItem> groupTransactionsByDate(List<TransactionEntity> transactions) {
         List<TransactionGroupedItem> groupedItems = new ArrayList<>();
         
-        // Parse và group transactions theo ngày
+        // Parse and group transactions by date
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
         SimpleDateFormat displayDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        // Sử dụng locale tiếng Việt để format thứ
+        // Use Vietnamese locale to format day of week
         SimpleDateFormat dayOfWeekFormat = new SimpleDateFormat("EEEE", new Locale("vi", "VN"));
         
-        // Map để lưu transactions theo ngày
+        // Map to store transactions by date
         java.util.Map<String, List<TransactionEntity>> transactionsByDate = new java.util.LinkedHashMap<>();
         
         for (TransactionEntity entity : transactions) {
@@ -568,7 +560,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
         
-        // Tạo grouped items với header cho mỗi ngày
+        // Create grouped items with headers for each day
         for (java.util.Map.Entry<String, List<TransactionEntity>> entry : transactionsByDate.entrySet()) {
             String dateKey = entry.getKey();
             List<TransactionEntity> dayTransactions = entry.getValue();
@@ -576,24 +568,25 @@ public class HomeActivity extends AppCompatActivity {
             try {
                 java.util.Date date = dateFormat.parse(dateKey);
                 
-                // Format ngày: "dd/MM/yyyy"
+                // Format date: "dd/MM/yyyy"
                 String dateHeader = displayDateFormat.format(date);
                 
-                // Format thứ: "Thứ 2", "Thứ 3", ...
+                // Format day of week: "Thứ 2", "Thứ 3", ...
                 String dayOfWeek = formatDayOfWeek(dayOfWeekFormat.format(date));
                 
-                // Thêm header
+                // Add header
                 groupedItems.add(new TransactionGroupedItem(dateHeader, dayOfWeek));
                 
-                // Thêm transactions của ngày đó
+                // Add transactions for that day
                 for (TransactionEntity entity : dayTransactions) {
                     TransactionUIModel uiModel = new TransactionUIModel(
+                            entity.id,
                             entity.name,
                             entity.category,
                             entity.amount,
                             entity.wallet,
                             entity.date,
-                            entity.type // ✅ Truyền type để adapter có thể format màu và dấu
+                            entity.type // ✅ Pass type so adapter can format color and sign
                     );
                     groupedItems.add(new TransactionGroupedItem(uiModel));
                 }
@@ -609,22 +602,22 @@ public class HomeActivity extends AppCompatActivity {
     private String formatDayOfWeek(String dayOfWeek) {
         // Convert to Vietnamese day of week
         java.util.Map<String, String> dayMap = new java.util.HashMap<>();
-        dayMap.put("Monday", "Thứ 2");
-        dayMap.put("Tuesday", "Thứ 3");
-        dayMap.put("Wednesday", "Thứ 4");
-        dayMap.put("Thursday", "Thứ 5");
-        dayMap.put("Friday", "Thứ 6");
-        dayMap.put("Saturday", "Thứ 7");
-        dayMap.put("Sunday", "Chủ nhật");
+        dayMap.put("Monday", getString(R.string.monday));
+        dayMap.put("Tuesday", getString(R.string.tuesday));
+        dayMap.put("Wednesday", getString(R.string.wednesday));
+        dayMap.put("Thursday", getString(R.string.thursday));
+        dayMap.put("Friday", getString(R.string.friday));
+        dayMap.put("Saturday", getString(R.string.saturday));
+        dayMap.put("Sunday", getString(R.string.sunday));
         
         // Vietnamese locale (full name)
-        dayMap.put("Thứ Hai", "Thứ 2");
-        dayMap.put("Thứ Ba", "Thứ 3");
-        dayMap.put("Thứ Tư", "Thứ 4");
-        dayMap.put("Thứ Năm", "Thứ 5");
-        dayMap.put("Thứ Sáu", "Thứ 6");
-        dayMap.put("Thứ Bảy", "Thứ 7");
-        dayMap.put("Chủ Nhật", "Chủ nhật");
+        dayMap.put("Thứ Hai", getString(R.string.monday));
+        dayMap.put("Thứ Ba", getString(R.string.tuesday));
+        dayMap.put("Thứ Tư", getString(R.string.wednesday));
+        dayMap.put("Thứ Năm", getString(R.string.thursday));
+        dayMap.put("Thứ Sáu", getString(R.string.friday));
+        dayMap.put("Thứ Bảy", getString(R.string.saturday));
+        dayMap.put("Chủ Nhật", getString(R.string.sunday));
         
         // Check if already formatted
         if (dayMap.containsKey(dayOfWeek)) {
@@ -666,40 +659,40 @@ public class HomeActivity extends AppCompatActivity {
         transactionAdapter = new TransactionAdapter(new ArrayList<>()); 
         rvTransactions.setAdapter(transactionAdapter);
         
-        // ✅ Disable nested scrolling của RecyclerView vì đã có NestedScrollView bên ngoài
-        // NestedScrollView sẽ handle scroll, RecyclerView chỉ hiển thị content
+        // ✅ Disable nested scrolling of RecyclerView because there is a NestedScrollView outside
+        // NestedScrollView will handle scroll, RecyclerView just displays content
         rvTransactions.setNestedScrollingEnabled(false);
         rvTransactions.setHasFixedSize(false);
     }
 
     private void setupChart(List<TransactionEntity> transactions) {
         if (transactions == null || transactions.isEmpty()) {
-            // ✅ Ẩn chart nếu không có data
+            // ✅ Hide chart if no data
             if (chartContainer != null) {
                 chartContainer.setVisibility(View.GONE);
             }
             return;
         }
         
-        // ✅ Hiển thị chart
+        // ✅ Show chart
         if (chartContainer != null) {
             chartContainer.setVisibility(View.VISIBLE);
         }
         
-        // ✅ Tính toán income và expense từ transactions (6 tháng gần nhất)
+        // ✅ Calculate income and expense from transactions (last 6 months)
         Calendar now = Calendar.getInstance();
         String[] months = new String[6];
         double[] monthlyIncome = new double[6];
         double[] monthlyExpense = new double[6];
         
-        // ✅ Tạo labels cho 6 tháng gần nhất (bao gồm tháng hiện tại)
+        // ✅ Create labels for last 6 months (including current month)
         Calendar cal = Calendar.getInstance();
         for (int i = 5; i >= 0; i--) {
             months[i] = String.format(Locale.getDefault(), "T%d", cal.get(Calendar.MONTH) + 1);
             cal.add(Calendar.MONTH, -1);
         }
         
-        // ✅ Group transactions by month thực tế
+        // ✅ Group transactions by actual month
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         // Try ISO format first, then other formats
         SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
@@ -726,7 +719,7 @@ public class HomeActivity extends AppCompatActivity {
                 
                 // Only include transactions from last 6 months (0 to 5)
                 if (diffMonths >= 0 && diffMonths < 6) {
-                    int index = 5 - diffMonths; // 0 = 6 tháng trước, 5 = tháng này
+                    int index = 5 - diffMonths; // 0 = 6 months ago, 5 = this month
                     if ("INCOME".equals(t.type)) {
                         monthlyIncome[index] += t.amountDouble;
                     } else if ("EXPENSE".equals(t.type)) {
@@ -738,7 +731,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
         
-        // ✅ Tạo chart data
+        // ✅ Create chart data
         ArrayList<Entry> income = new ArrayList<>();
         ArrayList<Entry> expense = new ArrayList<>();
 
@@ -764,13 +757,13 @@ public class HomeActivity extends AppCompatActivity {
         LineData data = new LineData(incomeSet, expenseSet);
         lineChart.setData(data);
         
-        // ✅ Cải thiện UI chart
+        // ✅ Improve chart UI
         lineChart.setDrawGridBackground(false);
         lineChart.getDescription().setEnabled(false);
         lineChart.getLegend().setEnabled(true);
         lineChart.getAxisRight().setEnabled(false);
         
-        // ✅ X-axis với labels tháng
+        // ✅ X-axis with month labels
         XAxis xAxis = lineChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setGranularity(1f);
@@ -799,7 +792,7 @@ public class HomeActivity extends AppCompatActivity {
             if (id == R.id.nav_home) {
                 return true; // Đang ở Home, không cần navigate
             } else if (id == R.id.nav_wallet) {
-                intent = new Intent(this, WalletActivity.class);
+                intent = new Intent(this, com.finmate.ui.home.WalletActivity.class);
             } else if (id == R.id.nav_add) {
                 intent = new Intent(this, AddTransactionActivity.class);
             } else if (id == R.id.nav_statistic) {
@@ -811,24 +804,25 @@ public class HomeActivity extends AppCompatActivity {
             if (intent != null) {
                 startActivity(intent);
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish(); // Close current activity when navigating
             }
             return true;
         });
     }
     
-    // ✅ Format số tiền ngắn gọn để không làm vỡ layout
+    // ✅ Format amount concisely to avoid breaking the layout
     private String formatAmount(double amount) {
         if (amount >= 1_000_000_000) {
-            // >= 1 tỷ: hiển thị dạng 1.2B
+            // >= 1 billion: show as 1.2B
             return String.format(Locale.getDefault(), "%.1fB VND", amount / 1_000_000_000);
         } else if (amount >= 1_000_000) {
-            // >= 1 triệu: hiển thị dạng 1.2M
+            // >= 1 million: show as 1.2M
             return String.format(Locale.getDefault(), "%.1fM VND", amount / 1_000_000);
         } else if (amount >= 1_000) {
-            // >= 1 nghìn: hiển thị dạng 1.2K
+            // >= 1 thousand: show as 1.2K
             return String.format(Locale.getDefault(), "%.1fK VND", amount / 1_000);
         } else {
-            // < 1 nghìn: hiển thị đầy đủ
+            // < 1 thousand: show full amount
             return String.format(Locale.getDefault(), "%,.0f VND", amount);
         }
     }

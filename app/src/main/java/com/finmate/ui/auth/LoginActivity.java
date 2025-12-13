@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,6 +14,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.finmate.R;
 import com.finmate.core.ui.LocaleHelper;
+import com.finmate.core.ui.ThemeHelper;
+import com.finmate.ui.activities.LanguageSettingActivity;
+import com.finmate.ui.dialogs.ThemeDialog;
 import com.finmate.ui.home.HomeActivity;
 
 import dagger.hilt.android.AndroidEntryPoint;
@@ -28,11 +32,13 @@ public class LoginActivity extends AppCompatActivity {
     EditText etUsername, etPassword;
     Button btnLogin;
     TextView tvSignup, tvForgot;
+    ImageView ivLanguageSetting, ivThemeSetting;
     
     private LoginViewModel loginViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ThemeHelper.applyCurrentTheme(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
@@ -44,6 +50,8 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         tvSignup = findViewById(R.id.tvSignup);
         tvForgot = findViewById(R.id.tvForgot);
+        ivLanguageSetting = findViewById(R.id.iv_language_setting);
+        ivThemeSetting = findViewById(R.id.iv_theme_setting);
         
         observeViewModel();
 
@@ -70,8 +78,23 @@ public class LoginActivity extends AppCompatActivity {
         tvForgot.setOnClickListener(v ->
                 Toast.makeText(this, "Tính năng đang phát triển", Toast.LENGTH_SHORT).show()
         );
+
+        ivLanguageSetting.setOnClickListener(v -> {
+            startActivity(new Intent(this, LanguageSettingActivity.class));
+        });
+
+        ivThemeSetting.setOnClickListener(v -> {
+            ThemeDialog dialog = new ThemeDialog();
+            dialog.show(getSupportFragmentManager(), "theme_dialog");
+        });
     }
-    
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        recreate();
+    }
+
     private boolean validateInputs(String email, String password) {
         boolean isValid = true;
         

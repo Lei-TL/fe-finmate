@@ -44,6 +44,10 @@ public class TransactionGroupedItem {
     public TransactionUIModel getTransaction() {
         return transaction;
     }
+
+    public boolean isTransaction() {
+        return type == ItemType.TRANSACTION;
+    }
 }
 
 

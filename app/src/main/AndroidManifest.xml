@@ -37,6 +37,7 @@
 
         <!-- ======= CÁC MÀN HÌNH KHÁC (Vẫn ở package cũ chưa move) ======= -->
         <activity android:name=".ui.activities.SettingsActivity" android:exported="false" />
+        <activity android:name=".ui.activities.ThemeSettingActivity" android:exported="false" />
         <activity android:name=".ui.friend.FriendActivity" android:exported="false" />
         <activity android:name=".ui.home.WalletActivity" android:exported="false" />
         <activity android:name=".ui.activities.AccountActivity" android:exported="false" />

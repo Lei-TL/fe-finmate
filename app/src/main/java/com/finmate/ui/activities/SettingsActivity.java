@@ -13,7 +13,6 @@ import com.finmate.data.repository.AuthRepository;
 import com.finmate.data.repository.HomeRepository;
 import com.finmate.ui.auth.LoginActivity;
 import com.finmate.ui.base.BaseActivity;
-import com.finmate.ui.dialogs.ThemeDialog;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import javax.inject.Inject;
@@ -71,10 +70,9 @@ public class SettingsActivity extends BaseActivity {
         );
 
         // Giao diện (Theme)
-        btnTheme.setOnClickListener(v -> {
-            ThemeDialog dialog = new ThemeDialog();
-            dialog.show(getSupportFragmentManager(), "theme_dialog");
-        });
+        btnTheme.setOnClickListener(v ->
+                startActivity(new Intent(this, ThemeSettingActivity.class))
+        );
 
         // Bạn bè
         btnFriend.setOnClickListener(v ->
