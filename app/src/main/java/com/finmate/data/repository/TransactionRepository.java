@@ -31,8 +31,69 @@ public class TransactionRepository {
         EXECUTOR.execute(() -> dao.insert(entity));
     }
 
+    // ✅ Default limit cho UI (500 items đủ cho hầu hết trường hợp)
+    private static final int DEFAULT_LIMIT = 500;
+    
     public void getAll(OnResultCallback<List<TransactionEntity>> callback) {
-        EXECUTOR.execute(() -> callback.onResult(dao.getAll()));
+        getAll(DEFAULT_LIMIT, callback);
+    }
+    
+    public void getAll(int limit, OnResultCallback<List<TransactionEntity>> callback) {
+        EXECUTOR.execute(() -> callback.onResult(dao.getAll(limit)));
+    }
+
+    public void getByWalletName(String walletName, OnResultCallback<List<TransactionEntity>> callback) {
+        getByWalletName(walletName, DEFAULT_LIMIT, callback);
+    }
+    
+    public void getByWalletName(String walletName, int limit, OnResultCallback<List<TransactionEntity>> callback) {
+        EXECUTOR.execute(() -> callback.onResult(dao.getByWalletName(walletName, limit)));
+    }
+
+    // ✅ Filter by date range - dùng SQL thay vì filter in memory
+    public void getByDateRange(Long startDate, Long endDate, OnResultCallback<List<TransactionEntity>> callback) {
+        getByDateRange(startDate, endDate, DEFAULT_LIMIT, callback);
+    }
+    
+    public void getByDateRange(Long startDate, Long endDate, int limit, OnResultCallback<List<TransactionEntity>> callback) {
+        EXECUTOR.execute(() -> {
+            String startDateStr = startDate != null ? formatDateForQuery(startDate) : null;
+            String endDateStr = endDate != null ? formatDateForQuery(endDate) : null;
+            // ✅ Dùng SQL query thay vì load tất cả rồi filter
+            callback.onResult(dao.getByDateRange(startDateStr, endDateStr, limit));
+        });
+    }
+
+    // ✅ Filter by wallet and date range - dùng SQL thay vì filter in memory
+    public void getByWalletNameAndDateRange(String walletName, Long startDate, Long endDate, OnResultCallback<List<TransactionEntity>> callback) {
+        getByWalletNameAndDateRange(walletName, startDate, endDate, DEFAULT_LIMIT, callback);
+    }
+    
+    public void getByWalletNameAndDateRange(String walletName, Long startDate, Long endDate, int limit, OnResultCallback<List<TransactionEntity>> callback) {
+        EXECUTOR.execute(() -> {
+            String startDateStr = startDate != null ? formatDateForQuery(startDate) : null;
+            String endDateStr = endDate != null ? formatDateForQuery(endDate) : null;
+            // ✅ Dùng SQL query thay vì load tất cả rồi filter
+            callback.onResult(dao.getByWalletNameAndDateRange(walletName, startDateStr, endDateStr, limit));
+        });
+    }
+    
+    // ✅ Method tối ưu cho sync manager - chỉ lấy transactions chưa sync
+    public void getUnsyncedTransactions(List<Integer> syncedIds, int limit, OnResultCallback<List<TransactionEntity>> callback) {
+        EXECUTOR.execute(() -> {
+            if (syncedIds == null || syncedIds.isEmpty()) {
+                // Nếu không có synced IDs, lấy tất cả (giới hạn)
+                callback.onResult(dao.getAll(limit));
+            } else {
+                callback.onResult(dao.getUnsyncedTransactions(syncedIds, limit));
+            }
+        });
+    }
+
+    // ✅ Convert timestamp (milliseconds) to ISO date string for comparison
+    private String formatDateForQuery(Long timestamp) {
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault());
+        return sdf.format(new java.util.Date(timestamp));
     }
 
     public void update(TransactionEntity entity) {
@@ -45,16 +106,48 @@ public class TransactionRepository {
 
     /**
      * Ghi đè toàn bộ transaction local = data mới từ server.
-     * Anh có thể sau này đổi thành sync thông minh hơn.
+     * ✅ Tối ưu: Không load tất cả existing vào memory, dùng bulk delete
+     * ⚠️ CẢNH BÁO: Method này sẽ XÓA TẤT CẢ transactions cũ, chỉ giữ lại danh sách mới.
+     * Nếu API chỉ trả về một phần dữ liệu (phân trang), sẽ mất dữ liệu cũ.
+     * Nên dùng upsertAll() thay vì method này.
      */
     public void replaceAll(List<TransactionEntity> transactions) {
         EXECUTOR.execute(() -> {
-            List<TransactionEntity> existing = dao.getAll();
-            for (TransactionEntity t : existing) {
-                dao.delete(t);
-            }
+            // ✅ Xóa tất cả bằng SQL query thay vì load vào memory
+            dao.deleteAll();
+            // ✅ Insert batch
             for (TransactionEntity t : transactions) {
                 dao.insert(t);
+            }
+        });
+    }
+
+    /**
+     * Upsert transactions: Insert nếu mới, Update nếu đã tồn tại (dựa trên remoteId).
+     * ✅ An toàn hơn replaceAll: Không xóa transactions cũ, chỉ cập nhật/thêm mới.
+     * ✅ Giữ nguyên các transactions tạo local (không có remoteId) và các transactions không có trong danh sách mới.
+     * 
+     * @param transactions Danh sách transactions từ backend (phải có remoteId)
+     */
+    public void upsertAll(List<TransactionEntity> transactions) {
+        EXECUTOR.execute(() -> {
+            for (TransactionEntity newTransaction : transactions) {
+                // Chỉ upsert những transactions có remoteId (từ backend)
+                if (newTransaction.remoteId == null || newTransaction.remoteId.isEmpty()) {
+                    continue; // Bỏ qua transactions không có remoteId
+                }
+                
+                // Tìm transaction đã tồn tại theo remoteId
+                TransactionEntity existing = dao.getByRemoteId(newTransaction.remoteId);
+                
+                if (existing != null) {
+                    // Đã tồn tại → Update (giữ nguyên local id)
+                    newTransaction.id = existing.id;
+                    dao.update(newTransaction);
+                } else {
+                    // Chưa tồn tại → Insert mới
+                    dao.insert(newTransaction);
+                }
             }
         });
     }

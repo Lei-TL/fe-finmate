@@ -33,7 +33,7 @@
             android:id="@+id/tvGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/personal"
+            android:text=""
             android:textColor="?attr/textColorSecondary"
             android:textSize="13sp" />
     </LinearLayout>

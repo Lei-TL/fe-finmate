@@ -33,15 +33,32 @@
 
             <!-- Chọn nhóm giao dịch -->
             <EditText
+                android:id="@+id/etGroup"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:hint="Nhóm giao dịch *"
+                android:background="?attr/editTextBackground"
+                android:padding="14dp"
+                android:textColor="?attr/editTextColor"
+                android:textColorHint="?attr/editTextColorHint"
+                android:drawableEnd="@drawable/ic_arrow_drop_down"
+                android:focusable="false"
+                android:clickable="true"
+                android:layout_marginTop="16dp" />
+
+            <!-- Chọn danh mục -->
+            <EditText
                 android:id="@+id/etCategory"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
-                android:hint="Chọn nhóm giao dịch *"
+                android:hint="Danh mục *"
                 android:background="?attr/editTextBackground"
                 android:padding="14dp"
-                android:textColor="@color/edittext_text_color"
-                android:textColorHint="@color/edittext_hint_color"
+                android:textColor="?attr/editTextColor"
+                android:textColorHint="?attr/editTextColorHint"
                 android:drawableEnd="@drawable/ic_arrow_drop_down"
+                android:focusable="false"
+                android:clickable="true"
                 android:layout_marginTop="16dp" />
 
             <!-- Tên giao dịch -->
@@ -49,11 +66,12 @@
                 android:id="@+id/etTitle"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
-                android:hint="Tên giao dịch *"
+                android:hint="Tên giao dịch"
                 android:background="?attr/editTextBackground"
                 android:padding="14dp"
                 android:textColor="?attr/editTextColor"
                 android:textColorHint="?attr/editTextColorHint"
+                android:inputType="text"
                 android:layout_marginTop="16dp"/>
 
             <!-- Số tiền -->
@@ -69,21 +87,23 @@
                 android:textColorHint="?attr/editTextColorHint"
                 android:layout_marginTop="16dp"/>
 
-            <!-- Thêm bạn -->
+            <!-- Chọn ví -->
             <EditText
-                android:id="@+id/tvFriend"
+                android:id="@+id/etWallet"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
-                android:hint="Thêm bạn"
+                android:hint="Chọn ví *"
                 android:background="?attr/editTextBackground"
                 android:padding="14dp"
-                android:textColor="?attr/editTextColor"
-                android:textColorHint="?attr/editTextColorHint"
+                android:textColor="@color/edittext_text_color"
+                android:textColorHint="@color/edittext_hint_color"
                 android:drawableEnd="@drawable/ic_arrow_drop_down"
                 android:drawableTint="?attr/iconTint"
+                android:focusable="false"
+                android:clickable="true"
                 android:layout_marginTop="16dp"/>
 
-            <!-- Đến hạn -->
+            <!-- Ngày giao dịch -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
@@ -91,15 +111,17 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingHorizontal="14dp"
-                android:layout_marginTop="16dp">
+                android:layout_marginTop="16dp"
+                android:clickable="true"
+                android:focusable="true">
 
                 <TextView
                     android:id="@+id/tvDate"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Đến hạn"
-                    android:textColor="#7A7F8C"
+                    android:text="Ngày giao dịch"
+                    android:textColor="?attr/textColorSecondary"
                     android:textSize="16sp" />
 
                 <ImageView

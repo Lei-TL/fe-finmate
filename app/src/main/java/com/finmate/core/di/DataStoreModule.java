@@ -28,4 +28,16 @@ public class DataStoreModule {
                 "auth_prefs"   // tên file DataStore
         ).build();
     }
+
+    @Provides
+    @Singleton
+    @javax.inject.Named("user_prefs")
+    public RxDataStore<Preferences> provideUserPreferencesDataStore(
+            @ApplicationContext Context context
+    ) {
+        return new RxPreferenceDataStoreBuilder(
+                context,
+                "user_prefs"   // tên file DataStore cho user preferences
+        ).build();
+    }
 }

@@ -100,7 +100,7 @@
     <string name="notifications">Thông báo</string>
 
     <!-- Bottom Navigation -->
-    <string name="nav_home">Giao dịch</string>
+    <string name="nav_home">Home</string>
     <string name="nav_wallet">Ví tiền</string>
     <string name="nav_add">Thêm</string>
     <string name="nav_statistic">Thống kê</string>

@@ -27,9 +27,14 @@ public class AuthInterceptor implements Interceptor {
 
         String token = sessionManager.getAccessToken();
         Request request = chain.request();
+        String path = request.url().encodedPath();
 
-        // Không add token cho các API auth
-        if (token != null && !request.url().encodedPath().startsWith("/auth")) {
+        // ✅ Không add token cho các API auth (login, register, refresh)
+        // ✅ Nhưng /auth/me cần token
+        boolean isAuthEndpoint = path.startsWith("/auth");
+        boolean isAuthMe = path.equals("/auth/me");
+        
+        if (token != null && !token.isEmpty() && (!isAuthEndpoint || isAuthMe)) {
             request = request.newBuilder()
                     .addHeader("Authorization", "Bearer " + token)
                     .build();

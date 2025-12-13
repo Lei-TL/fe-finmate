@@ -1,5 +1,6 @@
 package com.finmate.ui.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -8,6 +9,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.finmate.R;
+import com.finmate.core.ui.LocaleHelper;
 import com.finmate.ui.home.WalletActivity;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
@@ -27,6 +29,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class IncomeStatisticActivity extends AppCompatActivity {
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.applyLocale(newBase));
+    }
 
     ImageView btnBack;
     TextView tvExpenseTab, tvIncomeTab;
@@ -146,29 +153,27 @@ public class IncomeStatisticActivity extends AppCompatActivity {
     private void setupBottomNav() {
         bottomNavigation.setSelectedItemId(R.id.nav_statistic);
 
-        bottomNavigation.setOnNavigationItemSelectedListener(item -> {
+        bottomNavigation.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
+            Intent intent = null;
 
             if (id == R.id.nav_home) {
-                startActivity(new Intent(this, HomeActivity.class));
-                return true;
+                intent = new Intent(this, com.finmate.ui.home.HomeActivity.class);
+            } else if (id == R.id.nav_wallet) {
+                intent = new Intent(this, com.finmate.ui.home.WalletActivity.class);
+            } else if (id == R.id.nav_add) {
+                intent = new Intent(this, AddTransactionActivity.class);
+            } else if (id == R.id.nav_statistic) {
+                return true; // Đang ở Statistic, không cần navigate
+            } else if (id == R.id.nav_settings) {
+                intent = new Intent(this, SettingsActivity.class);
             }
-            if (id == R.id.nav_wallet) {
-                startActivity(new Intent(this, WalletActivity.class));
-                return true;
+
+            if (intent != null) {
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             }
-            if (id == R.id.nav_add) {
-                startActivity(new Intent(this, AddTransactionActivity.class));
-                return true;
-            }
-            if (id == R.id.nav_statistic) {
-                return true;
-            }
-            if (id == R.id.nav_settings) {
-                startActivity(new Intent(this, SettingsActivity.class));
-                return true;
-            }
-            return false;
+            return true;
         });
     }
 }

@@ -4,9 +4,11 @@ import com.finmate.data.dto.LoginRequest;
 import com.finmate.data.dto.RegisterRequest;
 import com.finmate.data.dto.TokenResponse;
 import com.finmate.data.dto.RefreshTokenRequest;
+import com.finmate.data.dto.UserInfoResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 
 public interface AuthService {
@@ -18,4 +20,7 @@ public interface AuthService {
 
     @POST("auth/refresh")
     Call<TokenResponse> refresh(@Body RefreshTokenRequest request);
+
+    @GET("auth/me")
+    Call<UserInfoResponse> getCurrentUser();
 }

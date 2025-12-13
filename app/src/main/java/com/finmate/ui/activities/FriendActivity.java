@@ -2,13 +2,15 @@ package com.finmate.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
-import com.finmate.ui.models.FriendUIModel;
-import com.finmate.adapters.FriendAdapter;
+import com.finmate.ui.friend.FriendUIModel;
+import com.finmate.ui.friend.FriendAdapter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.finmate.ui.base.BaseActivity;
 
@@ -31,14 +33,42 @@ public class FriendActivity extends BaseActivity {
 
         // Sample data
         List<FriendUIModel> friendList = new ArrayList<>();
-        friendList.add(new FriendUIModel(R.drawable.ic_friend, "Bạn còn thiếu một chút tiền từ Nguyễn An"));
-        friendList.add(new FriendUIModel(R.drawable.ic_friend, "Nguyễn Văn B đã trả lại bạn 50,000 VND"));
-        friendList.add(new FriendUIModel(R.drawable.ic_friend, "Bạn đã nhắc nhở Trần Thị C trả tiền"));
-        friendList.add(new FriendUIModel(R.drawable.ic_friend, "Lê Văn D vừa gửi bạn một yêu cầu chia tiền"));
-        friendList.add(new FriendUIModel(R.drawable.ic_friend, "Bạn và Phạm Thị E đã hòa tiền"));
+        friendList.add(new FriendUIModel("1", "user1", "Nguyễn An", "nguyenan@example.com", "ACCEPTED", false));
+        friendList.add(new FriendUIModel("2", "user2", "Nguyễn Văn B", "nguyenvanb@example.com", "ACCEPTED", false));
+        friendList.add(new FriendUIModel("3", "user3", "Trần Thị C", "tranthic@example.com", "ACCEPTED", false));
+        friendList.add(new FriendUIModel("4", "user4", "Lê Văn D", "levand@example.com", "PENDING", true));
+        friendList.add(new FriendUIModel("5", "user5", "Phạm Thị E", "phamthie@example.com", "ACCEPTED", false));
 
-        FriendAdapter adapter = new FriendAdapter(this, friendList);
+        FriendAdapter adapter = new FriendAdapter(friendList);
         rvFriends.setAdapter(adapter);
+
+        // Setup empty state
+        View layoutEmptyState = findViewById(R.id.layoutEmptyState);
+        if (layoutEmptyState != null) {
+            TextView tvEmptyTitle = layoutEmptyState.findViewById(R.id.tvEmptyTitle);
+            TextView tvEmptyHint = layoutEmptyState.findViewById(R.id.tvEmptyHint);
+            if (tvEmptyTitle != null) {
+                tvEmptyTitle.setText(R.string.no_friends);
+            }
+            if (tvEmptyHint != null) {
+                tvEmptyHint.setText(R.string.no_friends_hint);
+            }
+
+            // Show/hide empty state based on data
+            if (friendList.isEmpty()) {
+                layoutEmptyState.setVisibility(View.VISIBLE);
+                rvFriends.setVisibility(View.GONE);
+            } else {
+                layoutEmptyState.setVisibility(View.GONE);
+                rvFriends.setVisibility(View.VISIBLE);
+            }
+        }
+
+        // Connect New Friend Button
+        android.widget.Button btnConnectNewFriend = findViewById(R.id.btnConnectNewFriend);
+        if (btnConnectNewFriend != null) {
+            btnConnectNewFriend.setOnClickListener(v -> showConnectFriendDialog());
+        }
 
         // Bottom Navigation
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigation);
@@ -46,19 +76,49 @@ public class FriendActivity extends BaseActivity {
 
         bottomNav.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
+            Intent intent = null;
+
             if (id == R.id.nav_home) {
-                startActivity(new Intent(this, HomeActivity.class));
+                intent = new Intent(this, com.finmate.ui.home.HomeActivity.class);
             } else if (id == R.id.nav_wallet) {
-                startActivity(new Intent(this, WalletActivity.class));
+                intent = new Intent(this, com.finmate.ui.home.WalletActivity.class);
             } else if (id == R.id.nav_add) {
-                startActivity(new Intent(this, AddTransactionActivity.class));
+                intent = new Intent(this, AddTransactionActivity.class);
             } else if (id == R.id.nav_statistic) {
-                startActivity(new Intent(this, StatisticActivity.class));
+                intent = new Intent(this, StatisticActivity.class);
             } else if (id == R.id.nav_settings) {
-                startActivity(new Intent(this, SettingsActivity.class));
+                return true; // Đang ở Settings (FriendActivity là sub-screen của Settings), không cần navigate
             }
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+
+            if (intent != null) {
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+            }
             return true;
         });
+    }
+    
+    private void showConnectFriendDialog() {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle(R.string.connect_new_friend);
+        
+        // Create input field
+        final android.widget.EditText input = new android.widget.EditText(this);
+        input.setHint(R.string.email_or_friend_name);
+        input.setInputType(android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        builder.setView(input);
+        
+        builder.setPositiveButton(R.string.connect, (dialog, which) -> {
+            String emailOrName = input.getText().toString().trim();
+            if (emailOrName.isEmpty()) {
+                android.widget.Toast.makeText(this, R.string.fill_all_info, android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+            // TODO: Call API to send friend request
+            android.widget.Toast.makeText(this, "Đã gửi lời mời kết bạn đến " + emailOrName, android.widget.Toast.LENGTH_SHORT).show();
+        });
+        
+        builder.setNegativeButton(R.string.cancel, null);
+        builder.show();
     }
 }

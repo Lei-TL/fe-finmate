@@ -1,5 +1,6 @@
 package com.finmate.ui.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
+import com.finmate.core.ui.LocaleHelper;
 import com.finmate.ui.transaction.CategoryUIModel;
 import com.finmate.ui.transaction.CategoryGridAdapter;
 
@@ -17,6 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SelectCategoryActivity extends AppCompatActivity {
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.applyLocale(newBase));
+    }
 
     private ImageView btnBack;
     private TextView tabExpense, tabIncome;

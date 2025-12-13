@@ -9,5 +9,9 @@
     <color name="white">#FFFFFFFF</color>
     <color name="gray">#888888</color>
     <color name="blue">#099DE0</color>
+    
+    <!-- Material colors -->
+    <color name="green_500">#4CAF50</color>
+    <color name="red_500">#F44336</color>
 
 </resources>

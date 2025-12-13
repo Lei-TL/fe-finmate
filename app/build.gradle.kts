@@ -65,10 +65,18 @@ dependencies {
     // Hilt
     implementation("com.google.dagger:hilt-android:2.51.1")
     annotationProcessor("com.google.dagger:hilt-compiler:2.51.1")
+    
+    // Hilt for WorkManager
+    implementation("androidx.hilt:hilt-work:1.2.0")
+    annotationProcessor("androidx.hilt:hilt-compiler:1.2.0")
+    
+    // WorkManager
+    implementation("androidx.work:work-runtime:2.9.0")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.retrofit2:adapter-rxjava3:2.9.0")
     implementation("com.google.code.gson:gson:2.10.1")
 
     // OkHttp

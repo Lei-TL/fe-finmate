@@ -1,38 +1,51 @@
 package com.finmate.ui.activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.finmate.R;
+import com.finmate.data.local.datastore.UserPreferencesLocalDataSource;
+import com.finmate.ui.activities.AddTransactionActivity;
+import com.finmate.ui.activities.StatisticActivity;
+import com.finmate.ui.base.BaseActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import java.util.Locale;
+import javax.inject.Inject;
 
-public class LanguageSettingActivity extends AppCompatActivity {
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
+public class LanguageSettingActivity extends BaseActivity {
+
+    @Inject
+    UserPreferencesLocalDataSource userPreferencesLocalDataSource;
 
     ImageView btnBack;
-    LinearLayout btnVietnamese, btnEnglish;
+    LinearLayout btnVietnamese, btnEnglish, btnSystem;
+    ImageView ivVietnameseCheck, ivEnglishCheck, ivSystemCheck;
     BottomNavigationView bottomNavigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // ⭐ Load ngôn ngữ trước khi setContentView
-        loadLanguage();
-
+        // Locale đã được apply tự động bởi BaseActivity.attachBaseContext()
         setContentView(R.layout.activity_language_settings);
 
         // ÁNH XẠ
         btnBack = findViewById(R.id.btnBack);
         btnVietnamese = findViewById(R.id.btnVietnamese);
         btnEnglish = findViewById(R.id.btnEnglish);
+        btnSystem = findViewById(R.id.btnSystem);
+        ivVietnameseCheck = btnVietnamese.findViewById(R.id.ivVietnameseCheck);
+        ivEnglishCheck = btnEnglish.findViewById(R.id.ivEnglishCheck);
+        ivSystemCheck = btnSystem.findViewById(R.id.ivSystemCheck);
         bottomNavigation = findViewById(R.id.bottomNavigation);
+        
+        // Load current language và hiển thị check
+        loadCurrentLanguage();
 
         // QUAY LẠI
         btnBack.setOnClickListener(v -> finish());
@@ -49,39 +62,69 @@ public class LanguageSettingActivity extends AppCompatActivity {
             restartApp();
         });
 
+        // ================= CHỌN THEO HỆ THỐNG =================
+        btnSystem.setOnClickListener(v -> {
+            saveLanguage("system");
+            restartApp();
+        });
 
+        // ================= BOTTOM NAVIGATION =================
+        setupBottomNavigation();
+    }
+
+    private void setupBottomNavigation() {
+        bottomNavigation.setOnItemSelectedListener(item -> {
+            int id = item.getItemId();
+            Intent intent = null;
+
+            if (id == R.id.nav_home) {
+                intent = new Intent(this, com.finmate.ui.home.HomeActivity.class);
+            } else if (id == R.id.nav_wallet) {
+                intent = new Intent(this, com.finmate.ui.home.WalletActivity.class);
+            } else if (id == R.id.nav_add) {
+                intent = new Intent(this, AddTransactionActivity.class);
+            } else if (id == R.id.nav_statistic) {
+                intent = new Intent(this, StatisticActivity.class);
+            } else if (id == R.id.nav_settings) {
+                return true; // Đang ở Settings (LanguageSettingActivity là sub-screen của Settings), không cần navigate
+            }
+
+            if (intent != null) {
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish(); // Đóng màn hình hiện tại khi navigate
+            }
+            return true;
+        });
     }
 
     // ==================================================
-    // ⭐ LƯU NGÔN NGỮ VÀO SharedPreferences
+    // ⭐ LƯU NGÔN NGỮ VÀO DataStore (và SharedPreferences)
     // ==================================================
     private void saveLanguage(String lang) {
-        SharedPreferences.Editor editor =
-                getSharedPreferences("settings", MODE_PRIVATE).edit();
-
-        editor.putString("language", lang);
-        editor.apply();
+        userPreferencesLocalDataSource.saveLanguage(lang);
     }
 
     // ==================================================
-    // ⭐ ÁP DỤNG NGÔN NGỮ KHI MỞ ACTIVITY
+    // ⭐ LOAD NGÔN NGỮ HIỆN TẠI VÀ HIỂN THỊ CHECK
     // ==================================================
-    private void loadLanguage() {
-        SharedPreferences prefs = getSharedPreferences("settings", MODE_PRIVATE);
-        String lang = prefs.getString("language", "vi");
-
-        Locale newLocale = new Locale(lang);
-        Locale.setDefault(newLocale);
-
-        android.content.res.Configuration config =
-                new android.content.res.Configuration();
-
-        config.setLocale(newLocale);
-
-        getResources().updateConfiguration(
-                config,
-                getResources().getDisplayMetrics()
-        );
+    private void loadCurrentLanguage() {
+        String currentLang = userPreferencesLocalDataSource.getLanguageSync();
+        hideAllChecks();
+        
+        if ("vi".equals(currentLang)) {
+            if (ivVietnameseCheck != null) ivVietnameseCheck.setVisibility(android.view.View.VISIBLE);
+        } else if ("en".equals(currentLang)) {
+            if (ivEnglishCheck != null) ivEnglishCheck.setVisibility(android.view.View.VISIBLE);
+        } else if ("system".equals(currentLang) || currentLang == null || currentLang.isEmpty()) {
+            if (ivSystemCheck != null) ivSystemCheck.setVisibility(android.view.View.VISIBLE);
+        }
+    }
+    
+    private void hideAllChecks() {
+        if (ivVietnameseCheck != null) ivVietnameseCheck.setVisibility(android.view.View.GONE);
+        if (ivEnglishCheck != null) ivEnglishCheck.setVisibility(android.view.View.GONE);
+        if (ivSystemCheck != null) ivSystemCheck.setVisibility(android.view.View.GONE);
     }
 
     // ==================================================

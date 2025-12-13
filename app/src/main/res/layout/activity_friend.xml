@@ -67,15 +67,27 @@
     </com.google.android.material.tabs.TabLayout>
 
     <!-- RecyclerView for Friends List -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvFriends"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_below="@id/tabLayout"
         android:layout_above="@+id/btnConnectNewFriend"
-        android:padding="16dp"
-        tools:listitem="@layout/item_friend"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        android:padding="16dp">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvFriends"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/item_friend"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        <include
+            android:id="@+id/layoutEmptyState"
+            layout="@layout/layout_empty_state"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+    </FrameLayout>
 
     <!-- Connect New Friend Button -->
     <Button

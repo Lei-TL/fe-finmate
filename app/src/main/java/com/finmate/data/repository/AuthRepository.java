@@ -1,5 +1,8 @@
 package com.finmate.data.repository;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import com.finmate.core.session.SessionManager;
 import com.finmate.data.dto.LoginRequest;
 import com.finmate.data.dto.RegisterRequest;
@@ -11,6 +14,7 @@ import com.finmate.data.remote.api.AuthService;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import dagger.hilt.android.qualifiers.ApplicationContext;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -21,12 +25,14 @@ public class AuthRepository {
     private final AuthService authApi;
     private final AuthLocalDataSource localDataSource;
     private final SessionManager sessionManager;
+    private final Context context;
 
     @Inject
-    public AuthRepository(AuthService authApi, AuthLocalDataSource localDataSource, SessionManager sessionManager) {
+    public AuthRepository(AuthService authApi, AuthLocalDataSource localDataSource, SessionManager sessionManager, @ApplicationContext Context context) {
         this.authApi = authApi;
         this.localDataSource = localDataSource;
         this.sessionManager = sessionManager;
+        this.context = context;
     }
 
     public interface LoginCallback {
@@ -55,7 +61,10 @@ public class AuthRepository {
                     localDataSource.saveTokens(tokens.getAccessToken(), tokens.getRefreshToken());
                     
                     // Save to SessionManager
-                    sessionManager.saveAccessToken(tokens.getAccessToken()); // FIX: saveToken -> saveAccessToken
+                    sessionManager.saveAccessToken(tokens.getAccessToken());
+                    
+                    // ✅ Gọi API /auth/me để lấy fullName và lưu vào SharedPreferences
+                    fetchAndSaveUserInfo();
                     
                     callback.onSuccess();
                 } else {
@@ -70,8 +79,8 @@ public class AuthRepository {
         });
     }
     
-    public void register(String email, String password, RegisterCallback callback) {
-        authApi.register(new RegisterRequest(email, password)).enqueue(new Callback<TokenResponse>() {
+    public void register(String email, String password, String fullName, String avatarUrl, RegisterCallback callback) {
+        authApi.register(new RegisterRequest(email, password, fullName, avatarUrl)).enqueue(new Callback<TokenResponse>() {
             @Override
             public void onResponse(Call<TokenResponse> call, Response<TokenResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -79,7 +88,14 @@ public class AuthRepository {
 
                     // Auto-login: Save tokens
                     localDataSource.saveTokens(tokens.getAccessToken(), tokens.getRefreshToken());
-                    sessionManager.saveAccessToken(tokens.getAccessToken()); // FIX: saveToken -> saveAccessToken
+                    sessionManager.saveAccessToken(tokens.getAccessToken());
+
+                    // ✅ Lưu fullName vào SharedPreferences (từ đăng ký)
+                    SharedPreferences prefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+                    prefs.edit().putString("full_name", fullName != null ? fullName : "").apply();
+
+                    // ✅ Gọi API /auth/me để lấy fullName từ server và cập nhật
+                    fetchAndSaveUserInfo();
 
                     callback.onSuccess();
                 } else {
@@ -150,5 +166,30 @@ public class AuthRepository {
     public void logout() {
         localDataSource.clearTokens();
         sessionManager.clear();
+        // ✅ Xóa fullName khỏi SharedPreferences
+        SharedPreferences prefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+        prefs.edit().remove("full_name").apply();
+    }
+
+    // ✅ Gọi API /auth/me để lấy user info và lưu fullName vào SharedPreferences
+    private void fetchAndSaveUserInfo() {
+        authApi.getCurrentUser().enqueue(new Callback<com.finmate.data.dto.UserInfoResponse>() {
+            @Override
+            public void onResponse(Call<com.finmate.data.dto.UserInfoResponse> call, Response<com.finmate.data.dto.UserInfoResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    com.finmate.data.dto.UserInfoResponse userInfo = response.body();
+                    // ✅ Lưu fullName vào SharedPreferences
+                    SharedPreferences prefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+                    if (userInfo.getFullName() != null && !userInfo.getFullName().isEmpty()) {
+                        prefs.edit().putString("full_name", userInfo.getFullName()).apply();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<com.finmate.data.dto.UserInfoResponse> call, Throwable t) {
+                // Ignore errors - fullName sẽ được lấy từ đăng ký hoặc giữ nguyên giá trị cũ
+            }
+        });
     }
 }
