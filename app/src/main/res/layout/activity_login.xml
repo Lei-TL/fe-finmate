@@ -93,7 +93,6 @@
             android:textSize="16sp"
             android:textStyle="bold"
             android:background="?attr/buttonBackground"
-            app:backgroundTint="@null"
             android:textColor="?attr/buttonTextColor"
             android:layout_marginBottom="24dp" />
 

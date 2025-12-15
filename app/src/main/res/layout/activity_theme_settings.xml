@@ -82,7 +82,7 @@
                     android:layout_height="24dp"
                     android:src="@drawable/ic_check"
                     android:visibility="gone"
-                    app:tint="?attr/iconTint" />
+                    app:tint="?attr/colorPrimary"/>
             </LinearLayout>
 
             <!-- ====== THEME: DARK ====== -->
@@ -118,7 +118,7 @@
                     android:layout_height="24dp"
                     android:src="@drawable/ic_check"
                     android:visibility="gone"
-                    app:tint="?attr/iconTint" />
+                    app:tint="?attr/colorPrimary"/>
             </LinearLayout>
 
             <!-- ====== THEME: SYSTEM ====== -->
@@ -154,7 +154,7 @@
                     android:layout_height="24dp"
                     android:src="@drawable/ic_check"
                     android:visibility="gone"
-                    app:tint="?attr/iconTint" />
+                    app:tint="?attr/colorPrimary"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
