@@ -88,8 +88,12 @@ public class WalletActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        chipWalletFilter.setOnClickListener(v -> showWalletSelectionMenu());
-        btnBack.setOnClickListener(v -> finish());
+        if (chipWalletFilter != null) {
+            chipWalletFilter.setOnClickListener(v -> showWalletSelectionMenu());
+        }
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> finish());
+        }
         setupBottomNavigation();
     }
 
@@ -219,8 +223,13 @@ public class WalletActivity extends AppCompatActivity {
                     }
                 }
                 
-                // Giảm dần: date2.compareTo(date1)
-                return date2.compareTo(date1);
+                // Giảm dần: date2.compareTo(date1) - mới nhất lên trên
+                int dateCompare = date2.compareTo(date1);
+                if (dateCompare != 0) {
+                    return dateCompare;
+                }
+                // Nếu date giống nhau, sort theo id DESC (mới nhất lên trên)
+                return Integer.compare(t2.id, t1.id);
             } catch (Exception e) {
                 return 0;
             }
@@ -269,10 +278,21 @@ public class WalletActivity extends AppCompatActivity {
             }
         }
         
-        // ✅ Tạo grouped items với header cho mỗi ngày (giữ thứ tự từ LinkedHashMap)
-        for (java.util.Map.Entry<String, List<TransactionEntity>> entry : transactionsByDate.entrySet()) {
-            String dateKey = entry.getKey();
-            List<TransactionEntity> dayTransactions = entry.getValue();
+        // ✅ Sort dates giảm dần (mới nhất lên trên) trước khi tạo grouped items
+        List<String> sortedDateKeys = new ArrayList<>(transactionsByDate.keySet());
+        sortedDateKeys.sort((d1, d2) -> {
+            try {
+                java.util.Date date1 = dateFormat.parse(d1);
+                java.util.Date date2 = dateFormat.parse(d2);
+                return date2.compareTo(date1); // Giảm dần
+            } catch (Exception e) {
+                return 0;
+            }
+        });
+        
+        // ✅ Tạo grouped items với header cho mỗi ngày (đã sort)
+        for (String dateKey : sortedDateKeys) {
+            List<TransactionEntity> dayTransactions = transactionsByDate.get(dateKey);
             
             try {
                 java.util.Date date = dateFormat.parse(dateKey);
@@ -400,6 +420,9 @@ public class WalletActivity extends AppCompatActivity {
 
     // ====================== XỬ LÝ BOTTOM NAVIGATION ======================
     private void setupBottomNavigation() {
+        if (bottomNavigation == null) {
+            return;
+        }
         bottomNavigation.setOnItemSelectedListener(item -> {
             int id = item.getItemId();
             Intent intent = null;

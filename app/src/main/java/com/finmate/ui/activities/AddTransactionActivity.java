@@ -703,6 +703,12 @@ public class AddTransactionActivity extends BaseActivity {
         transactionRemoteRepository.createTransaction(request, new ApiCallback<TransactionResponse>() {
             @Override
             public void onSuccess(TransactionResponse response) {
+                // ✅ Update transaction local với remoteId từ backend để tránh duplicate
+                if (response != null && response.getId() != null && !response.getId().isEmpty()) {
+                    transaction.remoteId = response.getId();
+                    transactionRepository.update(transaction);
+                }
+                
                 // Transaction synced successfully
                 runOnUiThread(() -> {
                     if (isEditMode) {

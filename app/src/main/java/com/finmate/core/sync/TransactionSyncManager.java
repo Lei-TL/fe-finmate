@@ -140,6 +140,11 @@ public class TransactionSyncManager {
      * Sync một transaction cụ thể
      */
     private void syncSingleTransaction(TransactionEntity transaction) {
+        // ✅ Skip nếu transaction đã có remoteId (đã được sync rồi)
+        if (transaction.remoteId != null && !transaction.remoteId.isEmpty()) {
+            return;
+        }
+        
         // Cần lấy walletId và categoryId từ walletName và categoryName
         final String[] walletId = {null};
         final String[] categoryId = {null};
@@ -219,7 +224,17 @@ public class TransactionSyncManager {
         transactionRemoteRepository.createTransaction(request, new ApiCallback<TransactionResponse>() {
             @Override
             public void onSuccess(TransactionResponse response) {
-                // ✅ Đánh dấu transaction đã sync
+                // ✅ Update transaction local với remoteId từ backend để tránh duplicate
+                if (response != null && response.getId() != null && !response.getId().isEmpty()) {
+                    // ✅ Giữ nguyên local id, chỉ update remoteId
+                    final int localId = transaction.id;
+                    transaction.remoteId = response.getId();
+                    // ✅ Đảm bảo id được giữ nguyên khi update
+                    transaction.id = localId;
+                    transactionRepository.update(transaction);
+                }
+                
+                // ✅ Đánh dấu transaction đã sync (backward compatibility với SharedPreferences)
                 String syncedIds = prefs.getString(PREF_SYNCED_TRANSACTION_IDS, "");
                 String transactionKey = String.valueOf(transaction.id);
                 if (!syncedIds.contains(transactionKey)) {

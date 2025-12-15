@@ -526,6 +526,46 @@ public class HomeActivity extends AppCompatActivity {
     private List<TransactionGroupedItem> groupTransactionsByDate(List<TransactionEntity> transactions) {
         List<TransactionGroupedItem> groupedItems = new ArrayList<>();
         
+        // ✅ Sắp xếp transactions theo date giảm dần (mới nhất lên trên) trước khi group
+        List<TransactionEntity> sortedTransactions = new ArrayList<>(transactions);
+        sortedTransactions.sort((t1, t2) -> {
+            try {
+                SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                
+                java.util.Date date1 = null, date2 = null;
+                try {
+                    date1 = isoFormat.parse(t1.date);
+                } catch (Exception e) {
+                    try {
+                        date1 = dateFormat.parse(t1.date);
+                    } catch (Exception e2) {
+                        return 0;
+                    }
+                }
+                
+                try {
+                    date2 = isoFormat.parse(t2.date);
+                } catch (Exception e) {
+                    try {
+                        date2 = dateFormat.parse(t2.date);
+                    } catch (Exception e2) {
+                        return 0;
+                    }
+                }
+                
+                // Giảm dần: date2.compareTo(date1) - mới nhất lên trên
+                int dateCompare = date2.compareTo(date1);
+                if (dateCompare != 0) {
+                    return dateCompare;
+                }
+                // Nếu date giống nhau, sort theo id DESC (mới nhất lên trên)
+                return Integer.compare(t2.id, t1.id);
+            } catch (Exception e) {
+                return 0;
+            }
+        });
+        
         // Parse and group transactions by date
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
@@ -533,10 +573,10 @@ public class HomeActivity extends AppCompatActivity {
         // Use Vietnamese locale to format day of week
         SimpleDateFormat dayOfWeekFormat = new SimpleDateFormat("EEEE", new Locale("vi", "VN"));
         
-        // Map to store transactions by date
+        // Map to store transactions by date (LinkedHashMap giữ thứ tự)
         java.util.Map<String, List<TransactionEntity>> transactionsByDate = new java.util.LinkedHashMap<>();
         
-        for (TransactionEntity entity : transactions) {
+        for (TransactionEntity entity : sortedTransactions) {
             if (entity.date == null || entity.date.isEmpty()) continue;
             
             try {
@@ -560,10 +600,21 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
         
-        // Create grouped items with headers for each day
-        for (java.util.Map.Entry<String, List<TransactionEntity>> entry : transactionsByDate.entrySet()) {
-            String dateKey = entry.getKey();
-            List<TransactionEntity> dayTransactions = entry.getValue();
+        // ✅ Sort dates giảm dần (mới nhất lên trên) trước khi tạo grouped items
+        List<String> sortedDateKeys = new ArrayList<>(transactionsByDate.keySet());
+        sortedDateKeys.sort((d1, d2) -> {
+            try {
+                java.util.Date date1 = dateFormat.parse(d1);
+                java.util.Date date2 = dateFormat.parse(d2);
+                return date2.compareTo(date1); // Giảm dần
+            } catch (Exception e) {
+                return 0;
+            }
+        });
+        
+        // Create grouped items with headers for each day (đã sort)
+        for (String dateKey : sortedDateKeys) {
+            List<TransactionEntity> dayTransactions = transactionsByDate.get(dateKey);
             
             try {
                 java.util.Date date = dateFormat.parse(dateKey);
@@ -577,7 +628,7 @@ public class HomeActivity extends AppCompatActivity {
                 // Add header
                 groupedItems.add(new TransactionGroupedItem(dateHeader, dayOfWeek));
                 
-                // Add transactions for that day
+                // ✅ Transactions trong mỗi ngày đã được sort từ sortedTransactions, chỉ cần add
                 for (TransactionEntity entity : dayTransactions) {
                     TransactionUIModel uiModel = new TransactionUIModel(
                             entity.id,

@@ -79,14 +79,12 @@ public class TransactionRepository {
     }
     
     // ✅ Method tối ưu cho sync manager - chỉ lấy transactions chưa sync
+    // ✅ Ưu tiên check remoteId: chỉ lấy transactions không có remoteId
     public void getUnsyncedTransactions(List<Integer> syncedIds, int limit, OnResultCallback<List<TransactionEntity>> callback) {
         EXECUTOR.execute(() -> {
-            if (syncedIds == null || syncedIds.isEmpty()) {
-                // Nếu không có synced IDs, lấy tất cả (giới hạn)
-                callback.onResult(dao.getAll(limit));
-            } else {
-                callback.onResult(dao.getUnsyncedTransactions(syncedIds, limit));
-            }
+            // ✅ Lấy transactions không có remoteId (chưa sync) - ưu tiên hơn syncedIds
+            List<TransactionEntity> unsynced = dao.getUnsyncedTransactionsByRemoteId(limit);
+            callback.onResult(unsynced);
         });
     }
 
