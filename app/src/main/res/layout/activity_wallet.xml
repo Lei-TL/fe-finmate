@@ -69,7 +69,7 @@
                 android:id="@+id/tvBalance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0 VND"
+                android:text="@string/zero_balance"
                 android:textColor="?attr/textColorPrimary"
                 android:textStyle="bold"
                 android:textSize="16sp"/>
@@ -103,14 +103,14 @@
             android:layout_width="match_parent"
             android:layout_height="8dp"
             android:max="100"
-            android:progressTint="#FF2EBF"
+            android:progressTint="#4CAF50"
             android:backgroundTint="?attr/progressBarBackgroundColor"/>
 
         <TextView
             android:id="@+id/tvIncomeValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="+0 VND"
+            android:text="@string/zero_income"
             android:textColor="?attr/textColorPositive"
             android:textSize="13sp"
             android:layout_marginBottom="12dp"/>
@@ -129,14 +129,14 @@
             android:layout_width="match_parent"
             android:layout_height="8dp"
             android:max="100"
-            android:progressTint="#7CE27D"
+            android:progressTint="#F44336"
             android:backgroundTint="?attr/progressBarBackgroundColor"/>
 
         <TextView
             android:id="@+id/tvExpenseValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="-0 VND"
+            android:text="@string/zero_expense"
             android:textColor="?attr/textColorNegative"
             android:textSize="13sp"/>
 

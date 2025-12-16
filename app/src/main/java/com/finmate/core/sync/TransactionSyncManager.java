@@ -102,10 +102,13 @@ public class TransactionSyncManager {
      */
     public void syncPendingTransactions() {
         if (!networkChecker.isNetworkAvailable()) {
+            android.util.Log.d("TransactionSyncManager", "No network, skipping sync");
             return; // Không có mạng, không sync
         }
 
-        // ✅ Lấy danh sách transaction IDs đã sync
+        android.util.Log.d("TransactionSyncManager", "Starting sync pending transactions...");
+
+        // ✅ Lấy danh sách transaction IDs đã sync (backward compatibility)
         String syncedIdsStr = prefs.getString(PREF_SYNCED_TRANSACTION_IDS, "");
         List<Integer> syncedIds = new java.util.ArrayList<>();
         if (!syncedIdsStr.isEmpty()) {
@@ -119,17 +122,21 @@ public class TransactionSyncManager {
             }
         }
 
-        // ✅ Chỉ lấy transactions chưa sync, giới hạn số lượng
+        // ✅ Chỉ lấy transactions chưa sync (remoteId IS NULL hoặc empty), giới hạn số lượng
         transactionRepository.getUnsyncedTransactions(syncedIds, SYNC_BATCH_SIZE, 
             new TransactionRepository.OnResultCallback<List<TransactionEntity>>() {
                 @Override
                 public void onResult(List<TransactionEntity> transactions) {
                     if (transactions == null || transactions.isEmpty()) {
+                        android.util.Log.d("TransactionSyncManager", "No pending transactions to sync");
                         return;
                     }
                     
+                    android.util.Log.d("TransactionSyncManager", "Found " + transactions.size() + " pending transactions to sync");
+                    
                     // Sync từng transaction
                     for (TransactionEntity transaction : transactions) {
+                        android.util.Log.d("TransactionSyncManager", "Syncing transaction: id=" + transaction.id + ", remoteId=" + transaction.remoteId + ", wallet=" + transaction.wallet + ", category=" + transaction.category);
                         syncSingleTransaction(transaction);
                     }
                 }
@@ -157,37 +164,66 @@ public class TransactionSyncManager {
                     for (WalletEntity w : wallets) {
                         if (w.name.equals(transaction.wallet)) {
                             walletId[0] = w.id;
+                            android.util.Log.d("TransactionSyncManager", "Found walletId: " + walletId[0] + " for wallet: " + transaction.wallet);
                             break;
                         }
                     }
                 }
                 
-                // 2. Lấy categoryId từ categoryName
+                if (walletId[0] == null) {
+                    android.util.Log.w("TransactionSyncManager", "Cannot find walletId for wallet: " + transaction.wallet);
+                }
+                
+                // 2. Lấy categoryId từ categoryName (nếu có)
                 if (transaction.category != null && transaction.type != null) {
                     String categoryType = transaction.type.toLowerCase();
+                    android.util.Log.d("TransactionSyncManager", "Fetching categories for type: " + categoryType + ", categoryName: " + transaction.category);
                     categoryRemoteRepository.fetchCategoriesByType(categoryType, new ApiCallback<List<CategoryResponse>>() {
                         @Override
                         public void onSuccess(List<CategoryResponse> categories) {
-                            if (categories != null) {
+                            android.util.Log.d("TransactionSyncManager", "Received " + (categories != null ? categories.size() : 0) + " categories for type: " + categoryType);
+                            if (categories != null && !categories.isEmpty()) {
                                 for (CategoryResponse cat : categories) {
+                                    android.util.Log.d("TransactionSyncManager", "Checking category: " + cat.getName() + " (id: " + cat.getId() + ")");
                                     if (cat.getName().equals(transaction.category)) {
                                         categoryId[0] = cat.getId();
+                                        android.util.Log.d("TransactionSyncManager", "Found categoryId: " + categoryId[0] + " for category: " + transaction.category);
                                         break;
                                     }
                                 }
+                            } else {
+                                android.util.Log.w("TransactionSyncManager", "No categories returned from backend for type: " + categoryType + ", will sync with categoryId=null");
                             }
                             
-                            // 3. Sync nếu có đủ thông tin
-                            if (walletId[0] != null && categoryId[0] != null) {
+                            // 3. Sync nếu có walletId (categoryId có thể null theo backend)
+                            // ✅ Backend cho phép categoryId null, chỉ cần walletId không null
+                            if (walletId[0] != null) {
+                                android.util.Log.d("TransactionSyncManager", "WalletId found, calling syncTransactionWithIds: walletId=" + walletId[0] + ", categoryId=" + categoryId[0]);
                                 syncTransactionWithIds(walletId[0], categoryId[0], transaction, transaction.name);
+                            } else {
+                                android.util.Log.w("TransactionSyncManager", "Cannot sync transaction id=" + transaction.id + ": walletId=" + walletId[0] + ", categoryId=" + categoryId[0]);
                             }
                         }
 
                         @Override
                         public void onError(String message) {
-                            // Không thể lấy categoryId, skip transaction này
+                            android.util.Log.e("TransactionSyncManager", "Error fetching categories: " + message + ", will sync with categoryId=null");
+                            // ✅ Lỗi fetch categories không block sync, vẫn sync với categoryId=null
+                            if (walletId[0] != null) {
+                                android.util.Log.d("TransactionSyncManager", "Syncing with categoryId=null due to fetch error: walletId=" + walletId[0]);
+                                syncTransactionWithIds(walletId[0], null, transaction, transaction.name);
+                            }
                         }
                     });
+                } else {
+                    // ✅ Transaction không có category hoặc type, vẫn sync được với categoryId=null
+                    android.util.Log.d("TransactionSyncManager", "Transaction missing category or type, will sync with categoryId=null: category=" + transaction.category + ", type=" + transaction.type);
+                    if (walletId[0] != null) {
+                        android.util.Log.d("TransactionSyncManager", "Syncing transaction without category: walletId=" + walletId[0]);
+                        syncTransactionWithIds(walletId[0], null, transaction, transaction.name);
+                    } else {
+                        android.util.Log.w("TransactionSyncManager", "Cannot sync transaction id=" + transaction.id + ": walletId=" + walletId[0]);
+                    }
                 }
             }
         });
@@ -197,19 +233,32 @@ public class TransactionSyncManager {
      * Sync transaction với đầy đủ thông tin
      */
     private void syncTransactionWithIds(String walletId, String categoryId, TransactionEntity transaction, String note) {
-        // Convert date từ transaction.date (yyyy-MM-dd) sang ISO datetime
+        // Convert date từ transaction.date (yyyy-MM-dd) sang ISO datetime với timezone
+        // ✅ Backend expect Instant which requires ISO-8601 format with timezone (Z for UTC)
         String occurredAtISO = transaction.date;
         if (occurredAtISO != null && !occurredAtISO.isEmpty()) {
             if (!occurredAtISO.contains("T")) {
-                occurredAtISO = occurredAtISO + "T00:00:00";
+                occurredAtISO = occurredAtISO + "T00:00:00Z";
+            } else {
+                // Kiểm tra xem đã có timezone chưa (Z hoặc +/- offset)
+                boolean hasTimezone = occurredAtISO.endsWith("Z") || 
+                                     occurredAtISO.contains("+") || 
+                                     (occurredAtISO.length() > 10 && occurredAtISO.substring(10).contains("-"));
+                if (!hasTimezone) {
+                    // Nếu đã có T nhưng chưa có timezone, thêm Z
+                    occurredAtISO = occurredAtISO + "Z";
+                }
             }
         } else {
-            // Fallback: dùng ngày hiện tại
+            // Fallback: dùng ngày hiện tại với timezone
             Calendar c = Calendar.getInstance();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
+            sdf.setTimeZone(java.util.TimeZone.getTimeZone("UTC"));
             occurredAtISO = sdf.format(c.getTime());
         }
 
+        android.util.Log.d("TransactionSyncManager", "Creating transaction request: walletId=" + walletId + ", categoryId=" + categoryId + ", type=" + transaction.type + ", amount=" + transaction.amountDouble + ", date=" + occurredAtISO);
+        
         CreateTransactionRequest request = new CreateTransactionRequest(
                 walletId,
                 categoryId,
@@ -221,30 +270,53 @@ public class TransactionSyncManager {
                 null
         );
 
+        android.util.Log.d("TransactionSyncManager", "Calling transactionRemoteRepository.createTransaction()...");
         transactionRemoteRepository.createTransaction(request, new ApiCallback<TransactionResponse>() {
             @Override
             public void onSuccess(TransactionResponse response) {
-                // ✅ Update transaction local với remoteId từ backend để tránh duplicate
-                if (response != null && response.getId() != null && !response.getId().isEmpty()) {
-                    // ✅ Giữ nguyên local id, chỉ update remoteId
-                    final int localId = transaction.id;
-                    transaction.remoteId = response.getId();
-                    // ✅ Đảm bảo id được giữ nguyên khi update
-                    transaction.id = localId;
-                    transactionRepository.update(transaction);
-                }
-                
-                // ✅ Đánh dấu transaction đã sync (backward compatibility với SharedPreferences)
-                String syncedIds = prefs.getString(PREF_SYNCED_TRANSACTION_IDS, "");
-                String transactionKey = String.valueOf(transaction.id);
-                if (!syncedIds.contains(transactionKey)) {
-                    syncedIds = syncedIds.isEmpty() ? transactionKey : syncedIds + "," + transactionKey;
-                    prefs.edit().putString(PREF_SYNCED_TRANSACTION_IDS, syncedIds).apply();
+                try {
+                    // ✅ Update transaction local với remoteId từ backend để tránh duplicate
+                    if (response != null && response.getId() != null && !response.getId().isEmpty()) {
+                        // ✅ Giữ nguyên local id, chỉ update remoteId
+                        final int localId = transaction.id;
+                        if (localId > 0) { // ✅ Chỉ update nếu có id hợp lệ
+                            transaction.remoteId = response.getId();
+                            // ✅ Đảm bảo id được giữ nguyên khi update
+                            transaction.id = localId;
+                            transactionRepository.update(transaction);
+                        }
+                    }
+                    
+                    // ✅ Đánh dấu transaction đã sync (backward compatibility với SharedPreferences)
+                    if (transaction.id > 0) {
+                        String syncedIds = prefs.getString(PREF_SYNCED_TRANSACTION_IDS, "");
+                        String transactionKey = String.valueOf(transaction.id);
+                        if (!syncedIds.contains(transactionKey)) {
+                            syncedIds = syncedIds.isEmpty() ? transactionKey : syncedIds + "," + transactionKey;
+                            prefs.edit().putString(PREF_SYNCED_TRANSACTION_IDS, syncedIds).apply();
+                        }
+                    }
+                    
+                    // ✅ Update wallet balance sau khi sync thành công
+                    if (transaction.wallet != null && !transaction.wallet.isEmpty()) {
+                        try {
+                            com.finmate.data.local.database.AppDatabase db = com.finmate.data.local.database.AppDatabase.getDatabase(context);
+                            walletRepository.updateWalletBalance(transaction.wallet, db.transactionDao());
+                            android.util.Log.d("TransactionSyncManager", "Wallet balance updated for wallet: " + transaction.wallet);
+                        } catch (Exception e) {
+                            android.util.Log.e("TransactionSyncManager", "Error updating wallet balance after sync: " + e.getMessage(), e);
+                            // ✅ Không crash, chỉ log error
+                        }
+                    }
+                } catch (Exception e) {
+                    android.util.Log.e("TransactionSyncManager", "Error updating transaction after sync: " + e.getMessage(), e);
                 }
             }
 
             @Override
             public void onError(String message) {
+                // ✅ Log error để debug
+                android.util.Log.e("TransactionSyncManager", "Sync transaction failed: " + message);
                 // Sync failed, sẽ thử lại lần sau
             }
         });

@@ -84,6 +84,55 @@ public class WalletRepository {
         });
     }
 
+    /**
+     * ✅ Tính lại và update wallet balance dựa trên tất cả transactions của wallet
+     * @param walletName Tên của wallet cần update balance
+     * @param transactionDao DAO để lấy transactions trực tiếp
+     */
+    public void updateWalletBalance(String walletName, com.finmate.data.local.database.dao.TransactionDao transactionDao) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                // Tìm wallet theo tên (vì có thể có nhiều wallets với tên khác nhau)
+                List<WalletEntity> allWallets = dao.getAll();
+                WalletEntity wallet = null;
+                for (WalletEntity w : allWallets) {
+                    if (w.name != null && w.name.equals(walletName)) {
+                        wallet = w;
+                        break;
+                    }
+                }
+                
+                if (wallet == null) {
+                    return; // Wallet không tồn tại
+                }
+                
+                // Lấy tất cả transactions của wallet này (không giới hạn)
+                List<com.finmate.data.local.database.entity.TransactionEntity> transactions = transactionDao.getByWalletName(walletName);
+                
+                // Tính lại balance từ initialBalance + tất cả transactions
+                double newBalance = wallet.initialBalance;
+                
+                if (transactions != null) {
+                    for (com.finmate.data.local.database.entity.TransactionEntity tx : transactions) {
+                        if (tx.type != null && tx.amountDouble != 0) {
+                            if ("INCOME".equals(tx.type)) {
+                                newBalance += tx.amountDouble;
+                            } else if ("EXPENSE".equals(tx.type)) {
+                                newBalance -= tx.amountDouble;
+                            }
+                        }
+                    }
+                }
+                
+                // Update wallet balance
+                wallet.currentBalance = newBalance;
+                dao.update(wallet);
+            } catch (Exception e) {
+                android.util.Log.e("WalletRepository", "Error updating wallet balance: " + e.getMessage(), e);
+            }
+        });
+    }
+
     public interface Callback {
         void onResult(List<WalletEntity> list);
     }

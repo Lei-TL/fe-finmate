@@ -25,4 +25,7 @@ public interface WalletDao {
 
     @Query("SELECT * FROM wallets WHERE id = :id LIMIT 1")
     WalletEntity getById(String id); // ✅ Đổi từ int sang String
+
+    @Query("DELETE FROM wallets")
+    void deleteAll();
 }

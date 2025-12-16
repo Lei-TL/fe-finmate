@@ -15,7 +15,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.finmate.R;
 import com.finmate.core.ui.LocaleHelper;
 import com.finmate.core.ui.ThemeHelper;
-import com.finmate.ui.activities.LanguageSettingActivity;
+import com.finmate.ui.settings.LanguageSettingActivity;
 import com.finmate.ui.dialogs.ThemeDialog;
 import com.finmate.ui.home.HomeActivity;
 

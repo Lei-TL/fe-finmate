@@ -52,12 +52,41 @@
             android:gravity="center" />
     </LinearLayout>
 
+    <!-- ====== FILTER BAR ====== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="8dp"
+        android:gravity="center_vertical">
+
+        <!-- Wallet Filter Chip -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipWalletFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/all_wallets"
+            android:clickable="true"
+            android:focusable="true"
+            style="@style/Widget.MaterialComponents.Chip.Choice" />
+
+        <!-- Time Filter Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTimeFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/this_month"
+            android:layout_marginStart="8dp"
+            style="@style/Widget.MaterialComponents.Button.TextButton" />
+    </LinearLayout>
+
     <!-- ====== TỔNG THU NHẬP ====== -->
     <TextView
         android:id="@+id/tvTotalIncome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="+60,000,000 VND"
+        android:text="+0 VND"
         android:textColor="?attr/textColorPositive"
         android:textSize="16sp"
         android:layout_marginStart="16dp"
@@ -86,18 +115,6 @@
                 android:textStyle="bold"
                 android:textColor="?attr/textColorPrimary"
                 android:layout_marginBottom="8dp" />
-
-            <!-- CATEGORY FILTER -->
-            <TextView
-                android:id="@+id/tvCategoryFilter"
-                android:layout_width="140dp"
-                android:layout_height="40dp"
-                android:gravity="center_vertical"
-                android:paddingHorizontal="12dp"
-                android:text="@string/filter_by_category"
-                android:background="?attr/editTextBackground"
-                android:textColor="?attr/editTextColor"
-                android:textSize="14sp" />
 
             <!-- BAR CHART -->
             <com.github.mikephil.charting.charts.BarChart

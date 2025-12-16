@@ -1,4 +1,4 @@
-package com.finmate.ui.activities;
+package com.finmate.ui.statistics;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +16,9 @@ import com.finmate.data.local.database.entity.TransactionEntity;
 import com.finmate.data.local.database.entity.WalletEntity;
 import com.finmate.data.repository.TransactionRepository;
 import com.finmate.data.repository.WalletRepository;
-import com.finmate.ui.home.WalletActivity;
+import com.finmate.ui.activities.AddTransactionActivity;
+import com.finmate.ui.settings.SettingsActivity;
+import com.finmate.ui.wallet.WalletActivity;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
@@ -114,9 +116,28 @@ public class StatisticActivity extends AppCompatActivity {
         // BOTTOM NAV
         setupBottomNav();
         
+        // ✅ Đọc time filter từ TimeFilterManager khi khởi tạo
+        loadTimeFilterFromManager();
+        
         // ✅ Load wallets và transactions
         loadWallets();
         loadTransactions();
+    }
+    
+    // ✅ Đọc time filter từ TimeFilterManager và áp dụng
+    private void loadTimeFilterFromManager() {
+        com.finmate.core.ui.TimeFilterManager.TimeFilterState state = 
+            com.finmate.core.ui.TimeFilterManager.getTimeFilter(this);
+        
+        if (state.startDate != null && state.endDate != null) {
+            startDateFilter = state.startDate;
+            endDateFilter = state.endDate;
+            
+            // Set text cho button
+            if (state.filterText != null) {
+                btnTimeFilter.setText(state.filterText);
+            }
+        }
     }
     
     private void setupFilters() {
@@ -142,7 +163,12 @@ public class StatisticActivity extends AppCompatActivity {
                         today.set(Calendar.MILLISECOND, 0);
                         startDateFilter = today.getTimeInMillis();
                         endDateFilter = today.getTimeInMillis() + 86400000 - 1; // End of day
-                        btnTimeFilter.setText(getString(R.string.today));
+                        String filterText = getString(R.string.today);
+                        btnTimeFilter.setText(filterText);
+                        
+                        // ✅ Lưu vào TimeFilterManager để share với HomeActivity
+                        com.finmate.core.ui.TimeFilterManager.saveTimeFilter(StatisticActivity.this, startDateFilter, endDateFilter, filterText);
+                        
                         loadTransactions();
                     }
 
@@ -157,7 +183,12 @@ public class StatisticActivity extends AppCompatActivity {
                         startDateFilter = cal.getTimeInMillis();
                         endDateFilter = cal.getTimeInMillis() + 86400000 - 1;
                         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault());
-                        btnTimeFilter.setText(sdf.format(date));
+                        String filterText = sdf.format(date);
+                        btnTimeFilter.setText(filterText);
+                        
+                        // ✅ Lưu vào TimeFilterManager để share với HomeActivity
+                        com.finmate.core.ui.TimeFilterManager.saveTimeFilter(StatisticActivity.this, startDateFilter, endDateFilter, filterText);
+                        
                         loadTransactions();
                     }
 
@@ -180,7 +211,12 @@ public class StatisticActivity extends AppCompatActivity {
                         endDateFilter = endCal.getTimeInMillis();
                         
                         java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy", java.util.Locale.getDefault());
-                        btnTimeFilter.setText(sdf.format(startDate) + " - " + sdf.format(endDate));
+                        String filterText = sdf.format(startDate) + " - " + sdf.format(endDate);
+                        btnTimeFilter.setText(filterText);
+                        
+                        // ✅ Lưu vào TimeFilterManager để share với HomeActivity
+                        com.finmate.core.ui.TimeFilterManager.saveTimeFilter(StatisticActivity.this, startDateFilter, endDateFilter, filterText);
+                        
                         loadTransactions();
                     }
 
@@ -188,7 +224,12 @@ public class StatisticActivity extends AppCompatActivity {
                     public void onClear() {
                         startDateFilter = null;
                         endDateFilter = null;
-                        btnTimeFilter.setText(getString(R.string.this_month));
+                        String filterText = getString(R.string.this_month);
+                        btnTimeFilter.setText(filterText);
+                        
+                        // ✅ Clear trong TimeFilterManager
+                        com.finmate.core.ui.TimeFilterManager.clearTimeFilter(StatisticActivity.this);
+                        
                         loadTransactions();
                     }
                 });
@@ -240,7 +281,10 @@ public class StatisticActivity extends AppCompatActivity {
                 new TransactionRepository.OnResultCallback<List<TransactionEntity>>() {
                     @Override
                     public void onResult(List<TransactionEntity> transactions) {
-                        processTransactions(transactions);
+                        // ✅ processTransactions phải chạy trên main thread vì nó update UI (charts)
+                        runOnUiThread(() -> {
+                            processTransactions(transactions);
+                        });
                     }
                 }
             );
@@ -250,7 +294,10 @@ public class StatisticActivity extends AppCompatActivity {
                 new TransactionRepository.OnResultCallback<List<TransactionEntity>>() {
                     @Override
                     public void onResult(List<TransactionEntity> transactions) {
-                        processTransactions(transactions);
+                        // ✅ processTransactions phải chạy trên main thread vì nó update UI (charts)
+                        runOnUiThread(() -> {
+                            processTransactions(transactions);
+                        });
                     }
                 }
             );
@@ -274,7 +321,7 @@ public class StatisticActivity extends AppCompatActivity {
         
         // Update total expense
         if (tvTotalExpense != null) {
-            tvTotalExpense.setText(formatAmount(totalExpense));
+            tvTotalExpense.setText("-" + formatAmount(totalExpense) + " VND");
         }
         
         // Load charts
@@ -294,7 +341,7 @@ public class StatisticActivity extends AppCompatActivity {
         }
     }
 
-    // ===================== BAR CHART =====================
+    // ===================== BAR CHART - STACKED BY DAY AND CATEGORY =====================
     private void loadBarChartData(List<TransactionEntity> transactions) {
         if (transactions == null || transactions.isEmpty()) {
             barChartExpense.clear();
@@ -303,75 +350,242 @@ public class StatisticActivity extends AppCompatActivity {
             return;
         }
 
-        // Group by month
-        Map<String, Double> monthlyData = new HashMap<>();
+        // ✅ Group by day and category: Map<dayKey, Map<category, amount>>
+        Map<String, Map<String, Double>> dailyCategoryData = new HashMap<>();
         Calendar cal = Calendar.getInstance();
-        SimpleDateFormat monthFormat = new SimpleDateFormat("yyyy-MM", Locale.getDefault());
+        SimpleDateFormat dayFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        
+        // Collect all unique categories
+        java.util.Set<String> allCategories = new java.util.HashSet<>();
         
         for (TransactionEntity t : transactions) {
             if (t.date != null && !t.date.isEmpty()) {
                 try {
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                     cal.setTime(dateFormat.parse(t.date));
-                    String monthKey = monthFormat.format(cal.getTime());
-                    monthlyData.put(monthKey, monthlyData.getOrDefault(monthKey, 0.0) + t.amountDouble);
+                    String dayKey = dayFormat.format(cal.getTime());
+                    
+                    String category = (t.category != null && !t.category.isEmpty()) ? t.category : "Khác";
+                    allCategories.add(category);
+                    
+                    // Initialize day map if not exists
+                    if (!dailyCategoryData.containsKey(dayKey)) {
+                        dailyCategoryData.put(dayKey, new HashMap<>());
+                    }
+                    
+                    // Add amount to category for this day
+                    Map<String, Double> categoryMap = dailyCategoryData.get(dayKey);
+                    categoryMap.put(category, categoryMap.getOrDefault(category, 0.0) + t.amountDouble);
                 } catch (Exception e) {
                     // Skip invalid dates
                 }
             }
         }
         
-        if (monthlyData.isEmpty()) {
+        if (dailyCategoryData.isEmpty()) {
             barChartExpense.clear();
             barChartExpense.setNoDataText("Không có dữ liệu");
             barChartExpense.invalidate();
             return;
         }
         
-        // Sort by month and create entries
-        List<String> sortedMonths = new ArrayList<>(monthlyData.keySet());
-        java.util.Collections.sort(sortedMonths);
+        // ✅ Sort days
+        List<String> sortedDays = new ArrayList<>(dailyCategoryData.keySet());
+        java.util.Collections.sort(sortedDays);
         
+        // ✅ Limit to last 30 days if too many
+        int maxDays = 30;
+        if (sortedDays.size() > maxDays) {
+            sortedDays = sortedDays.subList(sortedDays.size() - maxDays, sortedDays.size());
+        }
+        
+        // ✅ Convert categories to sorted list (by total amount across all days)
+        Map<String, Double> categoryTotals = new HashMap<>();
+        for (Map<String, Double> categoryMap : dailyCategoryData.values()) {
+            for (Map.Entry<String, Double> entry : categoryMap.entrySet()) {
+                categoryTotals.put(entry.getKey(), categoryTotals.getOrDefault(entry.getKey(), 0.0) + entry.getValue());
+            }
+        }
+        List<Map.Entry<String, Double>> sortedCategories = new ArrayList<>(categoryTotals.entrySet());
+        sortedCategories.sort((a, b) -> Double.compare(b.getValue(), a.getValue()));
+        
+        // ✅ Limit to top 8 categories
+        int maxCategories = Math.min(8, sortedCategories.size());
+        List<String> categoryOrder = new ArrayList<>();
+        for (int i = 0; i < maxCategories; i++) {
+            categoryOrder.add(sortedCategories.get(i).getKey());
+        }
+        
+        // ✅ Create stacked bar entries
         List<BarEntry> entries = new ArrayList<>();
         List<String> labels = new ArrayList<>();
         
-        for (int i = 0; i < sortedMonths.size(); i++) {
-            String month = sortedMonths.get(i);
-            entries.add(new BarEntry(i, monthlyData.get(month).floatValue()));
+        for (int i = 0; i < sortedDays.size(); i++) {
+            String dayKey = sortedDays.get(i);
+            Map<String, Double> categoryMap = dailyCategoryData.get(dayKey);
             
-            // Format label: "MM/yyyy"
+            // Create stacked values array for this day
+            float[] stackedValues = new float[maxCategories];
+            for (int j = 0; j < maxCategories; j++) {
+                String category = categoryOrder.get(j);
+                stackedValues[j] = categoryMap.getOrDefault(category, 0.0).floatValue();
+            }
+            
+            entries.add(new BarEntry(i, stackedValues));
+            
+            // Format label: "dd/MM"
             try {
-                SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM", Locale.getDefault());
-                SimpleDateFormat outputFormat = new SimpleDateFormat("MM/yyyy", Locale.getDefault());
-                labels.add(outputFormat.format(inputFormat.parse(month)));
+                SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM", Locale.getDefault());
+                labels.add(outputFormat.format(inputFormat.parse(dayKey)));
             } catch (Exception e) {
-                labels.add(month);
+                labels.add(dayKey.substring(5)); // "MM-dd"
             }
         }
 
+        // ✅ Lấy màu text từ theme
+        int textColor = getResources().getColor(android.R.color.white, getTheme());
+        try {
+            android.content.res.TypedArray a = obtainStyledAttributes(new int[]{com.finmate.R.attr.textColorPrimary});
+            textColor = a.getColor(0, Color.WHITE);
+            a.recycle();
+        } catch (Exception e) {
+            // Fallback to white
+        }
+        
+        // ✅ Category colors (same as pie chart)
+        int[] categoryColors = {
+            Color.parseColor("#FF5252"),
+            Color.parseColor("#FF8A65"),
+            Color.parseColor("#FF7043"),
+            Color.parseColor("#FFB74D"),
+            Color.parseColor("#FFA726"),
+            Color.parseColor("#FF9800"),
+            Color.parseColor("#FB8C00"),
+            Color.parseColor("#F57C00")
+        };
+        
         BarDataSet dataSet = new BarDataSet(entries, "Chi tiêu");
-        dataSet.setColor(Color.parseColor("#FF5252"));
-        dataSet.setValueTextColor(Color.WHITE);
-        dataSet.setValueTextSize(10f);
+        dataSet.setColors(categoryColors);
+        dataSet.setValueTextColor(textColor);
+        dataSet.setValueTextSize(8f);
+        dataSet.setStackLabels(categoryOrder.toArray(new String[0])); // Set category labels for legend
+        // ✅ Custom formatter để không hiển thị số 0 trên các cột
+        dataSet.setValueFormatter(new com.github.mikephil.charting.formatter.ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                if (value == 0f) {
+                    return ""; // Không hiển thị số 0
+                }
+                // Format số lớn với K/M/B
+                if (value >= 1_000_000_000) {
+                    return String.format(Locale.getDefault(), "%.1fB", value / 1_000_000_000);
+                } else if (value >= 1_000_000) {
+                    return String.format(Locale.getDefault(), "%.1fM", value / 1_000_000);
+                } else if (value >= 1_000) {
+                    return String.format(Locale.getDefault(), "%.1fK", value / 1_000);
+                } else {
+                    return String.format(Locale.getDefault(), "%.0f", value);
+                }
+            }
+        });
 
         BarData barData = new BarData(dataSet);
-        barData.setBarWidth(0.4f);
+        barData.setBarWidth(0.6f);
 
         barChartExpense.setData(barData);
         barChartExpense.setFitBars(true);
         barChartExpense.setNoDataText("Không có dữ liệu");
         barChartExpense.getDescription().setEnabled(false);
-        barChartExpense.getLegend().setEnabled(false);
+        
+        // ✅ Enable legend to show categories
+        Legend legend = barChartExpense.getLegend();
+        legend.setEnabled(true);
+        legend.setTextColor(textColor);
+        legend.setTextSize(10f);
+        legend.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        legend.setHorizontalAlignment(Legend.LegendHorizontalAlignment.CENTER);
+        legend.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        legend.setDrawInside(false);
 
         XAxis xAxis = barChartExpense.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setTextColor(Color.WHITE);
+        xAxis.setTextColor(textColor);
         xAxis.setDrawGridLines(false);
-        xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
-        xAxis.setLabelCount(labels.size(), true);
+        xAxis.setGranularity(1f); // Đảm bảo mỗi cột đều có label
+        
+        // ✅ Custom formatter để hiển thị tất cả labels nhưng xoay thẳng đứng
+        xAxis.setValueFormatter(new IndexAxisValueFormatter(labels) {
+            @Override
+            public String getFormattedValue(float value) {
+                int index = (int) value;
+                if (index >= 0 && index < labels.size()) {
+                    return labels.get(index);
+                }
+                return "";
+            }
+        });
+        
+        // ✅ Hiển thị labels ngang, điều chỉnh số lượng để không bị đè
+        if (labels.size() > 10) {
+            // Nếu nhiều ngày, chỉ hiển thị một số labels để tránh chồng khi ngang
+            int step = labels.size() > 20 ? 3 : (labels.size() > 15 ? 2 : 1);
+            xAxis.setLabelCount((labels.size() / step) + 1, false);
+            // Custom formatter để chỉ hiển thị labels ở các vị trí step
+            xAxis.setValueFormatter(new com.github.mikephil.charting.formatter.ValueFormatter() {
+                @Override
+                public String getFormattedValue(float value) {
+                    int index = (int) value;
+                    if (index >= 0 && index < labels.size() && index % step == 0) {
+                        return labels.get(index);
+                    }
+                    return ""; // Không hiển thị labels ở các vị trí khác
+                }
+            });
+        } else {
+            // Nếu ít ngày, hiển thị tất cả
+            xAxis.setLabelCount(labels.size(), false);
+        }
+        
+        xAxis.setLabelRotationAngle(0f); // Ngang (không xoay)
+        xAxis.setTextSize(9f); // Giảm kích thước text để tránh chồng
+        xAxis.setYOffset(2f); // Điều chỉnh vị trí
+        xAxis.setAvoidFirstLastClipping(true); // Tránh cắt labels ở đầu và cuối
 
-        barChartExpense.animateY(800);
-        barChartExpense.invalidate();
+        // ✅ Cấu hình YAxis: Tắt bên phải, ẩn số 0 bên trái
+        com.github.mikephil.charting.components.YAxis yAxisLeft = barChartExpense.getAxisLeft();
+        yAxisLeft.setEnabled(true);
+        yAxisLeft.setTextColor(textColor);
+        yAxisLeft.setDrawGridLines(true);
+        yAxisLeft.setDrawZeroLine(false); // Không vẽ đường zero line
+        // Custom formatter để không hiển thị số 0
+        yAxisLeft.setValueFormatter(new com.github.mikephil.charting.formatter.ValueFormatter() {
+            @Override
+            public String getFormattedValue(float value) {
+                if (value == 0f) {
+                    return ""; // Không hiển thị số 0
+                }
+                // Format số lớn với K/M/B
+                if (value >= 1_000_000_000) {
+                    return String.format(Locale.getDefault(), "%.1fB", value / 1_000_000_000);
+                } else if (value >= 1_000_000) {
+                    return String.format(Locale.getDefault(), "%.1fM", value / 1_000_000);
+                } else if (value >= 1_000) {
+                    return String.format(Locale.getDefault(), "%.1fK", value / 1_000);
+                } else {
+                    return String.format(Locale.getDefault(), "%.0f", value);
+                }
+            }
+        });
+        
+        com.github.mikephil.charting.components.YAxis yAxisRight = barChartExpense.getAxisRight();
+        yAxisRight.setEnabled(false); // Tắt YAxis bên phải
+
+        // ✅ Chart animation phải chạy trên main thread
+        runOnUiThread(() -> {
+            barChartExpense.animateY(800);
+            barChartExpense.invalidate();
+        });
     }
 
     // ===================== PIE CHART =====================
@@ -418,10 +632,20 @@ public class StatisticActivity extends AppCompatActivity {
             entries.add(new PieEntry(entry.getValue().floatValue(), entry.getKey()));
         }
 
+        // ✅ Lấy màu text từ theme
+        int textColor = getResources().getColor(android.R.color.white, getTheme());
+        try {
+            android.content.res.TypedArray a = obtainStyledAttributes(new int[]{com.finmate.R.attr.textColorPrimary});
+            textColor = a.getColor(0, Color.WHITE);
+            a.recycle();
+        } catch (Exception e) {
+            // Fallback to white
+        }
+        
         PieDataSet dataSet = new PieDataSet(entries, "");
         dataSet.setColors(colors);
         dataSet.setValueTextSize(12f);
-        dataSet.setValueTextColor(Color.WHITE);
+        dataSet.setValueTextColor(textColor);
 
         PieData pieData = new PieData(dataSet);
 
@@ -434,7 +658,7 @@ public class StatisticActivity extends AppCompatActivity {
         pieChartExpense.getDescription().setEnabled(false);
 
         Legend legend = pieChartExpense.getLegend();
-        legend.setTextColor(Color.WHITE);
+        legend.setTextColor(textColor);
         legend.setTextSize(12f);
 
         pieChartExpense.animateY(800);
@@ -444,12 +668,28 @@ public class StatisticActivity extends AppCompatActivity {
     // ===================== HIGHLIGHT TAB =====================
     private void highlightTabs() {
         // Chi tiêu ACTIVE
-        tvExpenseTab.setTextColor(Color.WHITE);
+        int textColorPrimary = getResources().getColor(android.R.color.white, getTheme());
+        try {
+            android.content.res.TypedArray a = obtainStyledAttributes(new int[]{com.finmate.R.attr.textColorPrimary});
+            textColorPrimary = a.getColor(0, Color.WHITE);
+            a.recycle();
+        } catch (Exception e) {
+            // Fallback to white
+        }
+        tvExpenseTab.setTextColor(textColorPrimary);
         tvExpenseTab.setTextSize(18f);
         tvExpenseTab.setTypeface(tvExpenseTab.getTypeface(), android.graphics.Typeface.BOLD);
 
         // Thu nhập INACTIVE
-        tvIncomeTab.setTextColor(Color.parseColor("#777777"));
+        int textColorSecondary = getResources().getColor(android.R.color.darker_gray, getTheme());
+        try {
+            android.content.res.TypedArray a = obtainStyledAttributes(new int[]{com.finmate.R.attr.textColorSecondary});
+            textColorSecondary = a.getColor(0, Color.parseColor("#777777"));
+            a.recycle();
+        } catch (Exception e) {
+            // Fallback to gray
+        }
+        tvIncomeTab.setTextColor(textColorSecondary);
         tvIncomeTab.setTypeface(tvIncomeTab.getTypeface(), android.graphics.Typeface.NORMAL);
     }
 
@@ -464,7 +704,7 @@ public class StatisticActivity extends AppCompatActivity {
             if (id == R.id.nav_home) {
                 intent = new Intent(this, com.finmate.ui.home.HomeActivity.class);
             } else if (id == R.id.nav_wallet) {
-                intent = new Intent(this, com.finmate.ui.home.WalletActivity.class);
+                intent = new Intent(this, WalletActivity.class);
             } else if (id == R.id.nav_add) {
                 intent = new Intent(this, AddTransactionActivity.class);
             } else if (id == R.id.nav_statistic) {

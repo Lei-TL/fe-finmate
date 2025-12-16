@@ -95,15 +95,38 @@ public class SignUpActivity extends AppCompatActivity {
             etEmail.setError(null);
         }
         
-        // Validate password
+        // Validate password với các yêu cầu mạnh hơn
         if (password.isEmpty()) {
             etPassword.setError(getString(R.string.required_field));
             isValid = false;
-        } else if (password.length() < 6) {
-            etPassword.setError(getString(R.string.password_too_short));
-            isValid = false;
         } else {
-            etPassword.setError(null);
+            // Kiểm tra độ dài tối thiểu 8 ký tự
+            if (password.length() < 8) {
+                etPassword.setError(getString(R.string.password_too_short));
+                isValid = false;
+            }
+            // Kiểm tra có chữ hoa
+            else if (!password.matches(".*[A-Z].*")) {
+                etPassword.setError(getString(R.string.password_no_uppercase));
+                isValid = false;
+            }
+            // Kiểm tra có chữ thường
+            else if (!password.matches(".*[a-z].*")) {
+                etPassword.setError(getString(R.string.password_no_lowercase));
+                isValid = false;
+            }
+            // Kiểm tra có số
+            else if (!password.matches(".*[0-9].*")) {
+                etPassword.setError(getString(R.string.password_no_digit));
+                isValid = false;
+            }
+            // Kiểm tra có ký tự đặc biệt
+            else if (!password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?].*")) {
+                etPassword.setError(getString(R.string.password_no_special_char));
+                isValid = false;
+            } else {
+                etPassword.setError(null);
+            }
         }
         
         if (!isValid) {

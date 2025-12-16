@@ -151,7 +151,11 @@
     <!-- Validation -->
     <string name="required_field">This field is required</string>
     <string name="invalid_email">Invalid email</string>
-    <string name="password_too_short">Password must be at least 6 characters</string>
+    <string name="password_too_short">Password must be at least 8 characters</string>
+    <string name="password_no_uppercase">Password must contain at least 1 uppercase letter</string>
+    <string name="password_no_lowercase">Password must contain at least 1 lowercase letter</string>
+    <string name="password_no_digit">Password must contain at least 1 digit</string>
+    <string name="password_no_special_char">Password must contain at least 1 special character (!@#$%^&amp;*)</string>
     <string name="amount_invalid">Invalid amount</string>
 
     <!-- Sync -->
@@ -192,5 +196,11 @@
     <string name="friday">Friday</string>
     <string name="saturday">Saturday</string>
     <string name="sunday">Sunday</string>
+
+    <!-- Currency -->
+    <string name="currency_vnd">VND</string>
+    <string name="zero_balance">0 VND</string>
+    <string name="zero_income">+0 VND</string>
+    <string name="zero_expense">-0 VND</string>
 
 </resources>

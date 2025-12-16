@@ -2,6 +2,7 @@ package com.finmate.data.repository;
 
 import com.finmate.core.network.ApiCallExecutor;
 import com.finmate.core.network.ApiCallback;
+import com.finmate.data.dto.CreateWalletRequest;
 import com.finmate.data.dto.WalletResponse;
 
 import java.util.List;
@@ -26,6 +27,12 @@ public class WalletRemoteRepository {
 
     public void fetchMyWallets(ApiCallback<List<WalletResponse>> callback) {
         Call<List<WalletResponse>> call = walletApi.getMyWallets();
+        apiCallExecutor.execute(call, callback);
+    }
+
+    public void createWallet(CreateWalletRequest request, ApiCallback<WalletResponse> callback) {
+        android.util.Log.d("WalletRemoteRepository", "createWallet called: " + request.toString());
+        Call<WalletResponse> call = walletApi.createWallet(request);
         apiCallExecutor.execute(call, callback);
     }
 }

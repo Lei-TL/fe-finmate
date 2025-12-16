@@ -1,4 +1,4 @@
-package com.finmate.ui.activities;
+package com.finmate.ui.settings;
 
 import android.content.Context;
 import android.os.Bundle;

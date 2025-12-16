@@ -1,4 +1,4 @@
-package com.finmate.ui.activities;
+package com.finmate.ui.auth;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -12,8 +12,26 @@ import android.widget.Toast;
 import com.finmate.ui.base.BaseActivity;
 import com.finmate.R;
 import com.finmate.core.ui.ThemeHelper;
+import com.finmate.data.dto.UserInfoResponse;
+import com.finmate.data.remote.api.AuthService;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+@AndroidEntryPoint
 public class AccountActivity extends BaseActivity {
+
+    @Inject
+    AuthService authService;
 
     private ImageView btnBack, btnCamera, btnEdit;
     private EditText edtName, edtEmail, edtBirthday, edtNote;
@@ -33,6 +51,9 @@ public class AccountActivity extends BaseActivity {
         loadThemeSelection();
 
         setEditingEnabled(false);
+        
+        // ✅ Load thông tin người dùng từ API
+        loadUserInfo();
     }
 
     private void initViews() {
@@ -150,6 +171,105 @@ public class AccountActivity extends BaseActivity {
             default:
                 spnTheme.setSelection(2);
                 break;
+        }
+    }
+
+    /**
+     * ✅ Load thông tin người dùng từ API /auth/me và hiển thị vào các EditText
+     */
+    private void loadUserInfo() {
+        authService.getCurrentUser().enqueue(new Callback<UserInfoResponse>() {
+            @Override
+            public void onResponse(Call<UserInfoResponse> call, Response<UserInfoResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    UserInfoResponse userInfo = response.body();
+                    
+                    // ✅ Load thông tin vào các EditText
+                    if (userInfo.getFullName() != null && !userInfo.getFullName().isEmpty()) {
+                        edtName.setText(userInfo.getFullName());
+                    }
+                    
+                    if (userInfo.getEmail() != null && !userInfo.getEmail().isEmpty()) {
+                        edtEmail.setText(userInfo.getEmail());
+                    }
+                    
+                    // ✅ Load birthday: Format từ yyyy-MM-dd sang dd/MM/yyyy hoặc hiển thị "--/--/--" nếu null
+                    String birthdayDisplay = formatBirthdayForDisplay(userInfo.getBirthday());
+                    edtBirthday.setText(birthdayDisplay);
+                    
+                    // ✅ Lưu fullName vào SharedPreferences để dùng ở HomeActivity
+                    SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+                    if (userInfo.getFullName() != null && !userInfo.getFullName().isEmpty()) {
+                        prefs.edit().putString("full_name", userInfo.getFullName()).apply();
+                    }
+                    
+                    // ✅ TODO: Load avatar nếu có avatarUrl
+                    // if (userInfo.getAvatarUrl() != null && !userInfo.getAvatarUrl().isEmpty()) {
+                    //     // Load avatar image vào imgAvatar
+                    // }
+                } else {
+                    // ✅ Fallback: Load từ SharedPreferences nếu API fail
+                    loadUserInfoFromSharedPreferences();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserInfoResponse> call, Throwable t) {
+                // ✅ Fallback: Load từ SharedPreferences nếu API fail
+                loadUserInfoFromSharedPreferences();
+            }
+        });
+    }
+
+    /**
+     * ✅ Fallback: Load thông tin từ SharedPreferences nếu API fail
+     */
+    private void loadUserInfoFromSharedPreferences() {
+        SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        
+        // Load fullName
+        String fullName = prefs.getString("full_name", "");
+        if (fullName != null && !fullName.isEmpty()) {
+            edtName.setText(fullName);
+        }
+        
+        // Load email (nếu có lưu trong SharedPreferences)
+        String email = prefs.getString("user_email", "");
+        if (email != null && !email.isEmpty()) {
+            edtEmail.setText(email);
+        }
+        
+        // Load birthday (nếu có lưu trong SharedPreferences)
+        String birthday = prefs.getString("user_birthday", "");
+        if (birthday != null && !birthday.isEmpty()) {
+            String birthdayDisplay = formatBirthdayForDisplay(birthday);
+            edtBirthday.setText(birthdayDisplay);
+        } else {
+            // Nếu không có birthday, hiển thị "--/--/--"
+            edtBirthday.setText("--/--/--");
+        }
+    }
+
+    /**
+     * ✅ Format birthday từ yyyy-MM-dd sang dd/MM/yyyy để hiển thị
+     * Nếu birthday là null hoặc rỗng, trả về "--/--/--"
+     */
+    private String formatBirthdayForDisplay(String birthday) {
+        if (birthday == null || birthday.isEmpty()) {
+            return "--/--/--";
+        }
+        
+        try {
+            // Parse từ yyyy-MM-dd
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date date = inputFormat.parse(birthday);
+            
+            // Format sang dd/MM/yyyy
+            SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            return outputFormat.format(date);
+        } catch (ParseException e) {
+            // Nếu parse fail, trả về "--/--/--"
+            return "--/--/--";
         }
     }
 }

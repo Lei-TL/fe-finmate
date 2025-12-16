@@ -1,10 +1,19 @@
 package com.finmate.data.local.database.entity;
 
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "transactions")
+@Entity(
+    tableName = "transactions",
+    indices = {
+        @Index(value = {"date"}), // ✅ Index cho date column để query nhanh hơn
+        @Index(value = {"type"}), // ✅ Index cho type column
+        @Index(value = {"wallet"}), // ✅ Index cho wallet column
+        @Index(value = {"remoteId"}) // ✅ Index cho remoteId column
+    }
+)
 public class TransactionEntity {
 
     @PrimaryKey(autoGenerate = true)

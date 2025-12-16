@@ -1,4 +1,4 @@
-package com.finmate.ui.activities;
+package com.finmate.ui.settings;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,10 +8,20 @@ import android.widget.LinearLayout;
 
 import com.finmate.R;
 import com.finmate.core.ui.ThemeHelper;
+import com.finmate.data.repository.AuthRepository;
 import com.finmate.ui.auth.LoginActivity;
 import com.finmate.ui.base.BaseActivity;
+import com.finmate.ui.home.HomeActivity;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class ThemeSettingActivity extends BaseActivity {
+
+    @Inject
+    AuthRepository authRepository;
 
     ImageView btnBack;
     LinearLayout btnLight, btnDark, btnSystem;
@@ -70,11 +80,33 @@ public class ThemeSettingActivity extends BaseActivity {
         ivSystemCheck.setVisibility(View.GONE);
     }
 
+    /**
+     * ✅ Restart app sau khi đổi theme: Kiểm tra login status để điều hướng đúng
+     * Nếu đã login → về HomeActivity
+     * Nếu chưa login → về LoginActivity
+     */
     private void restartApp() {
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        finish();
+        // ✅ Kiểm tra login status trước khi restart
+        authRepository.checkLoginStatus(new AuthRepository.LoginCallback() {
+            @Override
+            public void onSuccess() {
+                // ✅ Đã login → về HomeActivity
+                Intent intent = new Intent(ThemeSettingActivity.this, HomeActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+            }
+
+            @Override
+            public void onError(String message) {
+                // ✅ Chưa login → về LoginActivity
+                Intent intent = new Intent(ThemeSettingActivity.this, LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                finish();
+            }
+        });
     }
 }

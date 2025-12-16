@@ -151,7 +151,11 @@
     <!-- Validation -->
     <string name="required_field">Trường này là bắt buộc</string>
     <string name="invalid_email">Email không hợp lệ</string>
-    <string name="password_too_short">Mật khẩu phải có ít nhất 6 ký tự</string>
+    <string name="password_too_short">Mật khẩu phải có ít nhất 8 ký tự</string>
+    <string name="password_no_uppercase">Mật khẩu phải có ít nhất 1 chữ hoa</string>
+    <string name="password_no_lowercase">Mật khẩu phải có ít nhất 1 chữ thường</string>
+    <string name="password_no_digit">Mật khẩu phải có ít nhất 1 số</string>
+    <string name="password_no_special_char">Mật khẩu phải có ít nhất 1 ký tự đặc biệt (!@#$%^&amp;*)</string>
     <string name="amount_invalid">Số tiền không hợp lệ</string>
 
     <!-- Sync -->
@@ -192,5 +196,11 @@
     <string name="friday">Thứ 6</string>
     <string name="saturday">Thứ 7</string>
     <string name="sunday">Chủ nhật</string>
+
+    <!-- Currency -->
+    <string name="currency_vnd">VND</string>
+    <string name="zero_balance">0 VND</string>
+    <string name="zero_income">+0 VND</string>
+    <string name="zero_expense">-0 VND</string>
 
 </resources>

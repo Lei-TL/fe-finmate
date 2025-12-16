@@ -52,14 +52,16 @@
             android:id="@+id/etUsername"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:hint="@string/username_hint"
+            android:hint="@string/email_hint"
+            android:inputType="textEmailAddress"
             android:padding="12dp"
             android:background="?attr/editTextBackground"
-            android:drawableEnd="@drawable/ic_user"
+            android:drawableEnd="@drawable/ic_email"
             android:drawablePadding="12dp"
             android:textColor="?attr/editTextColor"
             android:textColorHint="?attr/editTextColorHint"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="16dp"
+            android:autofillHints="email" />
 
         <EditText
             android:id="@+id/etPassword"

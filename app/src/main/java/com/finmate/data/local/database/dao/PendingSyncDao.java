@@ -32,5 +32,8 @@ public interface PendingSyncDao {
 
     @Query("DELETE FROM pending_sync WHERE entityType = :entityType AND localEntityId = :localEntityId")
     void deleteByEntityTypeAndId(String entityType, int localEntityId);
+
+    @Query("DELETE FROM pending_sync")
+    void deleteAll();
 }
 

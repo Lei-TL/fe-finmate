@@ -8,8 +8,11 @@ import com.finmate.data.dto.LoginRequest;
 import com.finmate.data.dto.RegisterRequest;
 import com.finmate.data.dto.RefreshTokenRequest;
 import com.finmate.data.dto.TokenResponse;
+import com.finmate.data.local.database.AppDatabase;
 import com.finmate.data.local.datastore.AuthLocalDataSource;
 import com.finmate.data.remote.api.AuthService;
+
+import java.util.concurrent.Executors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -164,11 +167,37 @@ public class AuthRepository {
     }
 
     public void logout() {
+        // ✅ 1. Xóa tokens và session
         localDataSource.clearTokens();
         sessionManager.clear();
-        // ✅ Xóa fullName khỏi SharedPreferences
-        SharedPreferences prefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
-        prefs.edit().remove("full_name").apply();
+        
+        // ✅ 2. Xóa fullName khỏi SharedPreferences
+        SharedPreferences userPrefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+        userPrefs.edit().remove("full_name").apply();
+        
+        // ✅ 3. Xóa sync preferences (synced transaction IDs, etc.)
+        SharedPreferences syncPrefs = context.getSharedPreferences("sync_prefs", Context.MODE_PRIVATE);
+        syncPrefs.edit().clear().apply();
+        
+        // ✅ 4. Xóa tất cả dữ liệu trong local database (chạy trên background thread)
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                AppDatabase database = AppDatabase.getDatabase(context);
+                
+                // Xóa user-specific data
+                database.tokenDao().clearTokens();
+                // ✅ Giữ categories vì là system-wide (không phải user-specific)
+                // database.categoryDao().deleteAll();
+                database.walletDao().deleteAll();
+                database.transactionDao().deleteAll();
+                database.friendDao().deleteAll();
+                database.pendingSyncDao().deleteAll();
+                
+                android.util.Log.d("AuthRepository", "All local data cleared successfully (categories preserved)");
+            } catch (Exception e) {
+                android.util.Log.e("AuthRepository", "Error clearing local database: " + e.getMessage(), e);
+            }
+        });
     }
 
     // ✅ Gọi API /auth/me để lấy user info và lưu fullName vào SharedPreferences

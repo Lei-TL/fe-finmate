@@ -5,6 +5,7 @@ import android.content.Context;
 import com.finmate.data.local.database.AppDatabase;
 import com.finmate.data.local.database.dao.TransactionDao;
 import com.finmate.data.local.database.entity.TransactionEntity;
+import com.finmate.data.local.database.entity.MonthlyAggregate;
 
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -28,7 +29,21 @@ public class TransactionRepository {
     }
 
     public void insert(TransactionEntity entity) {
-        EXECUTOR.execute(() -> dao.insert(entity));
+        EXECUTOR.execute(() -> {
+            long id = dao.insert(entity);
+            entity.id = (int) id; // ✅ Set id sau khi insert
+        });
+    }
+    
+    // ✅ Insert với callback để lấy id sau khi insert
+    public void insert(TransactionEntity entity, OnResultCallback<Long> callback) {
+        EXECUTOR.execute(() -> {
+            long id = dao.insert(entity);
+            entity.id = (int) id; // ✅ Set id sau khi insert
+            if (callback != null) {
+                callback.onResult(id);
+            }
+        });
     }
 
     // ✅ Default limit cho UI (500 items đủ cho hầu hết trường hợp)
@@ -56,11 +71,35 @@ public class TransactionRepository {
     }
     
     public void getByDateRange(Long startDate, Long endDate, int limit, OnResultCallback<List<TransactionEntity>> callback) {
+        getByDateRange(startDate, endDate, limit, 0, callback);
+    }
+    
+    // ✅ Pagination: với offset
+    public void getByDateRange(Long startDate, Long endDate, int limit, int offset, OnResultCallback<List<TransactionEntity>> callback) {
         EXECUTOR.execute(() -> {
-            String startDateStr = startDate != null ? formatDateForQuery(startDate) : null;
-            String endDateStr = endDate != null ? formatDateForQuery(endDate) : null;
-            // ✅ Dùng SQL query thay vì load tất cả rồi filter
-            callback.onResult(dao.getByDateRange(startDateStr, endDateStr, limit));
+            try {
+                // ✅ Nếu cả startDate và endDate đều null → load tất cả
+                if (startDate == null && endDate == null) {
+                    android.util.Log.d("TransactionRepository", "getByDateRange: loading all transactions (no date filter), offset=" + offset);
+                    // TODO: Cần thêm getAll với offset nếu cần
+                    List<TransactionEntity> all = dao.getAll();
+                    int fromIndex = Math.min(offset, all.size());
+                    int toIndex = Math.min(offset + limit, all.size());
+                    callback.onResult(all.subList(fromIndex, toIndex));
+                    return;
+                }
+                
+                String startDateStr = startDate != null ? formatDateForQuery(startDate) : null;
+                String endDateStr = endDate != null ? formatDateForQuery(endDate) : null;
+                
+                // ✅ Dùng SQL query với pagination
+                List<TransactionEntity> result = dao.getByDateRange(startDateStr, endDateStr, limit, offset);
+                android.util.Log.d("TransactionRepository", "getByDateRange(" + startDateStr + ", " + endDateStr + ", limit=" + limit + ", offset=" + offset + "): loaded " + (result != null ? result.size() : 0) + " transactions");
+                callback.onResult(result);
+            } catch (Exception e) {
+                android.util.Log.e("TransactionRepository", "Error in getByDateRange: " + e.getMessage(), e);
+                callback.onResult(new java.util.ArrayList<>()); // Return empty list on error
+            }
         });
     }
 
@@ -70,11 +109,34 @@ public class TransactionRepository {
     }
     
     public void getByWalletNameAndDateRange(String walletName, Long startDate, Long endDate, int limit, OnResultCallback<List<TransactionEntity>> callback) {
+        getByWalletNameAndDateRange(walletName, startDate, endDate, limit, 0, callback);
+    }
+    
+    // ✅ Pagination: với offset
+    public void getByWalletNameAndDateRange(String walletName, Long startDate, Long endDate, int limit, int offset, OnResultCallback<List<TransactionEntity>> callback) {
         EXECUTOR.execute(() -> {
-            String startDateStr = startDate != null ? formatDateForQuery(startDate) : null;
-            String endDateStr = endDate != null ? formatDateForQuery(endDate) : null;
-            // ✅ Dùng SQL query thay vì load tất cả rồi filter
-            callback.onResult(dao.getByWalletNameAndDateRange(walletName, startDateStr, endDateStr, limit));
+            try {
+                // ✅ Nếu cả startDate và endDate đều null → chỉ filter theo wallet
+                if (startDate == null && endDate == null) {
+                    android.util.Log.d("TransactionRepository", "getByWalletNameAndDateRange: loading by wallet only (" + walletName + "), offset=" + offset);
+                    List<TransactionEntity> all = dao.getByWalletName(walletName);
+                    int fromIndex = Math.min(offset, all.size());
+                    int toIndex = Math.min(offset + limit, all.size());
+                    callback.onResult(all.subList(fromIndex, toIndex));
+                    return;
+                }
+                
+                String startDateStr = startDate != null ? formatDateForQuery(startDate) : null;
+                String endDateStr = endDate != null ? formatDateForQuery(endDate) : null;
+                
+                // ✅ Dùng SQL query với pagination
+                List<TransactionEntity> result = dao.getByWalletNameAndDateRange(walletName, startDateStr, endDateStr, limit, offset);
+                android.util.Log.d("TransactionRepository", "getByWalletNameAndDateRange(" + walletName + ", " + startDateStr + ", " + endDateStr + ", limit=" + limit + ", offset=" + offset + "): loaded " + (result != null ? result.size() : 0) + " transactions");
+                callback.onResult(result);
+            } catch (Exception e) {
+                android.util.Log.e("TransactionRepository", "Error in getByWalletNameAndDateRange: " + e.getMessage(), e);
+                callback.onResult(new java.util.ArrayList<>()); // Return empty list on error
+            }
         });
     }
     
@@ -103,7 +165,7 @@ public class TransactionRepository {
     }
     
     public void deleteByLocalId(long localId) {
-        EXECUTOR.execute(() -> dao.deleteById(localId));
+        EXECUTOR.execute(() -> dao.deleteById((int) localId));
     }
 
     /**
@@ -150,6 +212,53 @@ public class TransactionRepository {
                     // Chưa tồn tại → Insert mới
                     dao.insert(newTransaction);
                 }
+            }
+        });
+    }
+
+    /**
+     * ✅ Tối ưu: Load aggregate data theo tháng cho chart
+     * Chỉ trả về tối đa 6 rows (6 tháng) thay vì hàng nghìn transactions
+     */
+    public void getMonthlyAggregate(Long startDate, Long endDate, OnResultCallback<List<MonthlyAggregate>> callback) {
+        EXECUTOR.execute(() -> {
+            try {
+                String startDateStr = startDate != null ? formatDateForQuery(startDate) : null;
+                String endDateStr = endDate != null ? formatDateForQuery(endDate) : null;
+                
+                if (startDateStr == null || endDateStr == null) {
+                    android.util.Log.w("TransactionRepository", "getMonthlyAggregate: startDate or endDate is null");
+                    callback.onResult(new java.util.ArrayList<>());
+                    return;
+                }
+                
+                android.util.Log.d("TransactionRepository", "getMonthlyAggregate: querying from " + startDateStr + " to " + endDateStr);
+                
+                // ✅ Debug: Check total transactions in date range
+                List<TransactionEntity> allInRange = dao.getByDateRange(startDateStr, endDateStr);
+                android.util.Log.d("TransactionRepository", "Total transactions in range: " + (allInRange != null ? allInRange.size() : 0));
+                if (allInRange != null && !allInRange.isEmpty()) {
+                    // Log sample dates
+                    int sampleCount = Math.min(5, allInRange.size());
+                    for (int i = 0; i < sampleCount; i++) {
+                        android.util.Log.d("TransactionRepository", "  Sample transaction date: " + allInRange.get(i).date);
+                    }
+                }
+                
+                List<MonthlyAggregate> result = dao.getMonthlyAggregate(startDateStr, endDateStr);
+                android.util.Log.d("TransactionRepository", "getMonthlyAggregate: loaded " + (result != null ? result.size() : 0) + " months");
+                if (result != null && !result.isEmpty()) {
+                    for (MonthlyAggregate agg : result) {
+                        android.util.Log.d("TransactionRepository", "  Month: " + agg.month + ", Income: " + agg.totalIncome + ", Expense: " + agg.totalExpense);
+                    }
+                } else {
+                    android.util.Log.w("TransactionRepository", "getMonthlyAggregate: No aggregate data returned, but there are " + (allInRange != null ? allInRange.size() : 0) + " transactions in range");
+                }
+                callback.onResult(result != null ? result : new java.util.ArrayList<>());
+            } catch (Exception e) {
+                android.util.Log.e("TransactionRepository", "Error in getMonthlyAggregate: " + e.getMessage(), e);
+                e.printStackTrace();
+                callback.onResult(new java.util.ArrayList<>());
             }
         });
     }

@@ -1,6 +1,7 @@
 package com.finmate.ui.activities;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -32,6 +33,8 @@ import com.finmate.data.repository.CategoryRemoteRepository;
 import com.finmate.data.repository.TransactionRemoteRepository;
 import com.finmate.data.repository.TransactionRepository;
 import com.finmate.data.repository.WalletRepository;
+import com.finmate.data.repository.WalletRemoteRepository;
+import com.finmate.data.dto.WalletResponse;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.math.BigDecimal;
@@ -66,12 +69,17 @@ public class AddTransactionActivity extends BaseActivity {
     TransactionRemoteRepository transactionRemoteRepository;
     
     @Inject
+    WalletRemoteRepository walletRemoteRepository;
+    
+    @Inject
     NetworkChecker networkChecker;
+    
+    @Inject
+    com.finmate.core.sync.TransactionSyncManager transactionSyncManager;
 
     EditText etGroup, etCategory, etTitle, etAmount, etWallet, etNote;
     TextView tvDate, tvAddTitle;
     Button btnCancel, btnSave;
-    ImageView btnDelete; // Nút xóa khi edit mode
 
     String selectedGroup = ""; // "INCOME" hoặc "EXPENSE"
     String selectedCategoryId = null;
@@ -147,7 +155,7 @@ public class AddTransactionActivity extends BaseActivity {
         // Chọn ngày giao dịch
         tvDate.setOnClickListener(v -> showDueDateBottomSheet());
 
-        btnCancel.setOnClickListener(v -> finish());
+        btnCancel.setOnClickListener(v -> handleCancel());
 
         btnSave.setOnClickListener(v -> saveTransaction());
     }
@@ -363,31 +371,34 @@ public class AddTransactionActivity extends BaseActivity {
         walletRepository.getAll(new WalletRepository.Callback() {
             @Override
             public void onResult(List<WalletEntity> wallets) {
-                if (wallets == null || wallets.isEmpty()) {
-                    Toast.makeText(AddTransactionActivity.this, getString(R.string.no_wallets), Toast.LENGTH_SHORT).show();
-                    dialog.dismiss();
-                    return;
-                }
-
-                // Tạo TextView cho mỗi wallet
-                for (WalletEntity wallet : wallets) {
-                    TextView tv = new TextView(AddTransactionActivity.this);
-                    tv.setText(wallet.name);
-                    tv.setTextSize(17);
-                    tv.setPadding(32, 32, 32, 32);
-                    tv.setTextColor(Color.WHITE);
-                    tv.setBackgroundResource(android.R.drawable.list_selector_background);
-
-                    tv.setOnClickListener(v -> {
-                        selectedWalletId = wallet.id;
-                        selectedWalletName = wallet.name;
-                        etWallet.setText(wallet.name);
-                        etWallet.setTextColor(Color.BLACK);
+                // ✅ Chạy trên main thread để tránh lỗi Toast
+                runOnUiThread(() -> {
+                    if (wallets == null || wallets.isEmpty()) {
+                        Toast.makeText(AddTransactionActivity.this, getString(R.string.no_wallets), Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
-                    });
+                        return;
+                    }
 
-                    container.addView(tv);
-                }
+                    // Tạo TextView cho mỗi wallet
+                    for (WalletEntity wallet : wallets) {
+                        TextView tv = new TextView(AddTransactionActivity.this);
+                        tv.setText(wallet.name);
+                        tv.setTextSize(17);
+                        tv.setPadding(32, 32, 32, 32);
+                        tv.setTextColor(Color.WHITE);
+                        tv.setBackgroundResource(android.R.drawable.list_selector_background);
+
+                        tv.setOnClickListener(v -> {
+                            selectedWalletId = wallet.id;
+                            selectedWalletName = wallet.name;
+                            etWallet.setText(wallet.name);
+                            etWallet.setTextColor(Color.BLACK);
+                            dialog.dismiss();
+                        });
+
+                        container.addView(tv);
+                    }
+                });
             }
         });
 
@@ -665,34 +676,152 @@ public class AddTransactionActivity extends BaseActivity {
                 amountDouble                              // amountDouble
         );
 
-        // Save to local database first (offline-first)
-        transactionRepository.insert(transaction);
+        // ✅ Tạo final variables để dùng trong inner class
+        final TransactionEntity finalTransaction = transaction;
+        final String finalDateISO = dateISO;
+        final String finalNote = note;
+        final String finalSelectedWalletId = selectedWalletId;
+        final String finalSelectedCategoryId = selectedCategoryId;
+        final String finalSelectedWalletName = selectedWalletName; // ✅ Final variable cho wallet name
 
-        // ✅ Transaction đã được lưu local → sẽ hiện ra Home ngay khi quay lại
-        // ✅ Try to sync with backend ngay nếu có mạng và đủ thông tin
-        if (networkChecker.isNetworkAvailable() && selectedWalletId != null && selectedCategoryId != null) {
-            syncTransactionToBackend(transaction, dateISO, note);
-        } else {
-            // No network or missing IDs - transaction vẫn được lưu local
-            // Sẽ tự động sync sau khi có mạng (qua TransactionSyncManager)
-            if (isEditMode) {
-                Toast.makeText(this, "Đã cập nhật giao dịch!", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, R.string.transaction_saved, Toast.LENGTH_SHORT).show();
+        // Save to local database first (offline-first)
+        // ✅ Insert với callback để đảm bảo có id trước khi sync
+        transactionRepository.insert(finalTransaction, new TransactionRepository.OnResultCallback<Long>() {
+            @Override
+            public void onResult(Long id) {
+                // ✅ Check if Activity is still valid
+                if (isFinishing() || isDestroyed()) {
+                    return;
+                }
+                
+                // ✅ Đảm bảo id được set vào finalTransaction
+                if (id != null && id > 0) {
+                    finalTransaction.id = id.intValue();
+                }
+                
+                try {
+                    // ✅ Update wallet balance ngay sau khi insert transaction
+                    // ✅ Sử dụng finalSelectedWalletName thay vì selectedWalletName
+                    // ✅ Delay nhỏ để đảm bảo transaction đã được commit vào database
+                    if (finalSelectedWalletName != null && !finalSelectedWalletName.isEmpty()) {
+                        // ✅ Sử dụng Handler để delay một chút, đảm bảo transaction đã được commit
+                        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                            if (isFinishing() || isDestroyed()) {
+                                return;
+                            }
+                            try {
+                                com.finmate.data.local.database.AppDatabase db = com.finmate.data.local.database.AppDatabase.getDatabase(getApplicationContext());
+                                walletRepository.updateWalletBalance(finalSelectedWalletName, db.transactionDao());
+                                android.util.Log.d("AddTransactionActivity", "Wallet balance updated locally for: " + finalSelectedWalletName);
+                            } catch (Exception e) {
+                                android.util.Log.e("AddTransactionActivity", "Error updating wallet balance: " + e.getMessage(), e);
+                                // ✅ Không crash app nếu update wallet balance fail
+                            }
+                        }, 300); // ✅ Tăng delay lên 300ms để đảm bảo transaction đã được commit
+                    }
+                    
+                    // ✅ Transaction đã được lưu local với id → sẽ hiện ra Home ngay khi quay lại
+                    // ✅ Try to sync with backend ngay nếu có mạng và có walletId (categoryId có thể null theo backend)
+                    if (networkChecker.isNetworkAvailable() && finalSelectedWalletId != null) {
+                        // ✅ Truyền final variables vào syncTransactionToBackend
+                        // ✅ Backend cho phép categoryId null, nên chỉ cần walletId không null
+                        android.util.Log.d("AddTransactionActivity", "Syncing transaction to backend immediately: walletId=" + finalSelectedWalletId + ", categoryId=" + finalSelectedCategoryId);
+                        syncTransactionToBackend(finalTransaction, finalDateISO, finalNote, finalSelectedWalletId, finalSelectedCategoryId);
+                    } else {
+                        // No network or missing walletId - transaction vẫn được lưu local
+                        // ✅ Log để debug
+                        android.util.Log.d("AddTransactionActivity", "Transaction saved locally but not synced: networkAvailable=" + networkChecker.isNetworkAvailable() + ", walletId=" + finalSelectedWalletId + ", categoryId=" + finalSelectedCategoryId);
+                        android.util.Log.d("AddTransactionActivity", "Transaction will be synced later via TransactionSyncManager. Transaction id=" + finalTransaction.id + ", remoteId=" + finalTransaction.remoteId);
+                        
+                        // ✅ Trigger sync ngay nếu có mạng (có thể thiếu walletId nhưng vẫn thử sync)
+                        if (networkChecker.isNetworkAvailable() && transactionSyncManager != null) {
+                            android.util.Log.d("AddTransactionActivity", "Triggering TransactionSyncManager to sync pending transactions...");
+                            // Delay nhỏ để đảm bảo transaction đã được commit vào database
+                            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                                transactionSyncManager.syncPendingTransactions();
+                            }, 500);
+                        }
+                        runOnUiThread(() -> {
+                            if (isFinishing() || isDestroyed()) {
+                                return;
+                            }
+                            try {
+                                if (isEditMode) {
+                                    Toast.makeText(AddTransactionActivity.this, "Đã cập nhật giao dịch!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(AddTransactionActivity.this, R.string.transaction_saved, Toast.LENGTH_SHORT).show();
+                                }
+                                safeFinish();
+                            } catch (Exception e) {
+                                android.util.Log.e("AddTransactionActivity", "Error showing toast: " + e.getMessage(), e);
+                                safeFinish();
+                            }
+                        });
+                    }
+                } catch (Exception e) {
+                    android.util.Log.e("AddTransactionActivity", "Error in insert callback: " + e.getMessage(), e);
+                    // ✅ Nếu có lỗi, vẫn finish activity
+                    runOnUiThread(() -> {
+                        if (!isFinishing() && !isDestroyed()) {
+                            Toast.makeText(AddTransactionActivity.this, "Đã lưu giao dịch", Toast.LENGTH_SHORT).show();
+                            safeFinish();
+                        }
+                    });
+                }
             }
-            finish();
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        handleCancel();
+    }
+
+    /**
+     * ✅ Finish activity an toàn: Kiểm tra xem có activity nào trong stack không
+     * Nếu không có, start HomeActivity trước khi finish để tránh app tắt
+     */
+    private void safeFinish() {
+        try {
+            if (isTaskRoot()) {
+                // Nếu đây là root activity, start HomeActivity trước khi finish
+                Intent intent = new Intent(this, com.finmate.ui.home.HomeActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+            } else {
+                // Có activity trong stack, chỉ cần finish
+                finish();
+            }
+        } catch (Exception e) {
+            android.util.Log.e("AddTransactionActivity", "Error in safeFinish: " + e.getMessage(), e);
+            // Fallback: thử finish trực tiếp
+            try {
+                finish();
+            } catch (Exception e2) {
+                android.util.Log.e("AddTransactionActivity", "Error finishing activity: " + e2.getMessage(), e2);
+            }
         }
     }
 
-    private void syncTransactionToBackend(TransactionEntity transaction, String dateISO, String note) {
-        // Convert dateISO (yyyy-MM-dd) to ISO datetime string (yyyy-MM-dd'T'HH:mm:ss)
-        String occurredAtISO = dateISO + "T00:00:00";
+    private void handleCancel() {
+        safeFinish();
+    }
+
+    private void syncTransactionToBackend(TransactionEntity transaction, String dateISO, String note, String walletId, String categoryId) {
+        android.util.Log.d("AddTransactionActivity", "syncTransactionToBackend called: transaction.id=" + transaction.id + ", walletId=" + walletId + ", categoryId=" + categoryId + ", dateISO=" + dateISO);
         
-        // Create request
+        // Convert dateISO (yyyy-MM-dd) to ISO datetime string with timezone (yyyy-MM-dd'T'HH:mm:ss'Z')
+        // ✅ Backend expect Instant which requires ISO-8601 format with timezone (Z for UTC)
+        String occurredAtISO = dateISO + "T00:00:00Z";
+        
+        android.util.Log.d("AddTransactionActivity", "Creating CreateTransactionRequest: type=" + transaction.type + ", amount=" + transaction.amountDouble + ", occurredAt=" + occurredAtISO + ", note=" + note);
+        
+        // Create request - ✅ Sử dụng walletId và categoryId được truyền vào (đã final)
         CreateTransactionRequest request = new CreateTransactionRequest(
-                selectedWalletId,
-                selectedCategoryId,
-                selectedGroup,
+                walletId,
+                categoryId,
+                transaction.type, // ✅ Sử dụng type từ transaction thay vì selectedGroup
                 BigDecimal.valueOf(transaction.amountDouble),
                 "VND", // Default currency
                 occurredAtISO,
@@ -700,32 +829,137 @@ public class AddTransactionActivity extends BaseActivity {
                 null // transferRefId
         );
 
+        android.util.Log.d("AddTransactionActivity", "Calling transactionRemoteRepository.createTransaction()...");
         transactionRemoteRepository.createTransaction(request, new ApiCallback<TransactionResponse>() {
             @Override
             public void onSuccess(TransactionResponse response) {
-                // ✅ Update transaction local với remoteId từ backend để tránh duplicate
-                if (response != null && response.getId() != null && !response.getId().isEmpty()) {
-                    transaction.remoteId = response.getId();
-                    transactionRepository.update(transaction);
+                // ✅ Check if Activity is still valid
+                if (isFinishing() || isDestroyed()) {
+                    return;
                 }
+                
+                // ✅ Update transaction local với remoteId từ backend để tránh duplicate
+                // ✅ Chỉ update nếu transaction có id hợp lệ (> 0)
+                try {
+                    if (response != null && response.getId() != null && !response.getId().isEmpty()) {
+                        final String remoteId = response.getId();
+                        final int localId = transaction.id;
+                        
+                        android.util.Log.d("AddTransactionActivity", "Updating transaction with localId=" + localId + ", remoteId=" + remoteId);
+                        
+                        // ✅ Đảm bảo transaction.id đã được set (từ insert callback)
+                        if (localId > 0) {
+                            // Set remoteId và update
+                            transaction.remoteId = remoteId;
+                            transactionRepository.update(transaction);
+                            android.util.Log.d("AddTransactionActivity", "Transaction updated successfully with remoteId");
+                        } else {
+                            android.util.Log.w("AddTransactionActivity", "Transaction id not set yet (id=" + localId + "), remoteId will be set on next sync. remoteId=" + remoteId);
+                        }
+                    } else {
+                        android.util.Log.w("AddTransactionActivity", "Response is null or missing id");
+                    }
+                } catch (Exception e) {
+                    android.util.Log.e("AddTransactionActivity", "Error updating transaction remoteId: " + e.getMessage(), e);
+                    e.printStackTrace();
+                    // ✅ Không crash app, chỉ log error - transaction đã được lưu local
+                }
+                
+                // ✅ Sync lại wallets từ backend để lấy balance mới nhất (backend đã update balance)
+                walletRemoteRepository.fetchMyWallets(new com.finmate.core.network.ApiCallback<List<WalletResponse>>() {
+                    @Override
+                    public void onSuccess(List<WalletResponse> wallets) {
+                        if (wallets != null) {
+                            // Map và update wallets local với balance mới từ backend
+                            List<WalletEntity> mapped = new ArrayList<>();
+                            for (WalletResponse w : wallets) {
+                                if (w.isDeleted() || w.getId() == null || w.getId().isEmpty()) {
+                                    continue;
+                                }
+                                
+                                double currentBalance = w.getCurrentBalance() != 0.0 ? w.getCurrentBalance() : w.getInitialBalance();
+                                double initialBalance = w.getInitialBalance();
+                                
+                                String formattedBalance = String.format(
+                                        "%,.0f %s",
+                                        currentBalance,
+                                        w.getCurrency() != null ? w.getCurrency() : ""
+                                );
+                                
+                                WalletEntity entity = new WalletEntity(
+                                        w.getId(),
+                                        w.getName(),
+                                        formattedBalance,
+                                        currentBalance,
+                                        initialBalance,
+                                        0
+                                );
+                                mapped.add(entity);
+                            }
+                            
+                            // Upsert wallets với balance mới
+                            walletRepository.upsertAll(mapped);
+                            android.util.Log.d("AddTransactionActivity", "Wallets synced with updated balance: " + mapped.size() + " items");
+                        }
+                    }
+                    
+                    @Override
+                    public void onError(String message) {
+                        android.util.Log.e("AddTransactionActivity", "Error syncing wallets after transaction sync: " + message);
+                        // ✅ Fallback: Update wallet balance local nếu sync wallets fail
+                        if (transaction.wallet != null && !transaction.wallet.isEmpty()) {
+                            try {
+                                com.finmate.data.local.database.AppDatabase db = com.finmate.data.local.database.AppDatabase.getDatabase(getApplicationContext());
+                                walletRepository.updateWalletBalance(transaction.wallet, db.transactionDao());
+                                android.util.Log.d("AddTransactionActivity", "Wallet balance updated locally (fallback)");
+                            } catch (Exception e) {
+                                android.util.Log.e("AddTransactionActivity", "Error updating wallet balance: " + e.getMessage(), e);
+                            }
+                        }
+                    }
+                });
                 
                 // Transaction synced successfully
                 runOnUiThread(() -> {
-                    if (isEditMode) {
-                        Toast.makeText(AddTransactionActivity.this, "Đã cập nhật giao dịch!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(AddTransactionActivity.this, R.string.transaction_saved, Toast.LENGTH_SHORT).show();
+                    if (isFinishing() || isDestroyed()) {
+                        return;
                     }
-                    finish();
+                    try {
+                        if (isEditMode) {
+                            Toast.makeText(AddTransactionActivity.this, "Đã cập nhật giao dịch!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(AddTransactionActivity.this, R.string.transaction_saved, Toast.LENGTH_SHORT).show();
+                        }
+                        // ✅ Kiểm tra xem có activity nào trong stack không trước khi finish
+                        safeFinish();
+                    } catch (Exception e) {
+                        android.util.Log.e("AddTransactionActivity", "Error showing toast or finishing: " + e.getMessage(), e);
+                        // ✅ Nếu có lỗi, vẫn cố finish an toàn
+                        safeFinish();
+                    }
                 });
             }
 
             @Override
             public void onError(String message) {
+                android.util.Log.e("AddTransactionActivity", "Error syncing transaction to backend: " + message);
+                // ✅ Check if Activity is still valid
+                if (isFinishing() || isDestroyed()) {
+                    return;
+                }
+                
                 // Sync failed, but transaction is already saved locally
                 runOnUiThread(() -> {
-                    Toast.makeText(AddTransactionActivity.this, "Đã lưu (chưa đồng bộ)", Toast.LENGTH_SHORT).show();
-                    finish();
+                    if (isFinishing() || isDestroyed()) {
+                        return;
+                    }
+                    try {
+                        Toast.makeText(AddTransactionActivity.this, "Đã lưu (chưa đồng bộ)", Toast.LENGTH_SHORT).show();
+                        safeFinish();
+                    } catch (Exception e) {
+                        android.util.Log.e("AddTransactionActivity", "Error showing toast: " + e.getMessage(), e);
+                        safeFinish();
+                    }
                 });
             }
         });

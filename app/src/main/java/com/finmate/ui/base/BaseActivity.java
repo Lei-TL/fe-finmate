@@ -10,12 +10,6 @@ import com.finmate.core.ui.LocaleHelper;
 import com.finmate.core.ui.ThemeHelper;
 
 public class BaseActivity extends AppCompatActivity {
-
-    /**
-     * attachBaseContext được gọi TRƯỚC onCreate
-     * => Locale được apply TRƯỚC setContentView
-     * => Tất cả string resources sẽ hiển thị đúng ngôn ngữ
-     */
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(LocaleHelper.applyLocale(newBase));

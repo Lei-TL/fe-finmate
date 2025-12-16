@@ -5,6 +5,7 @@ public class UserInfoResponse {
     private String email;
     private String fullName;
     private String avatarUrl;
+    private String birthday; // Format: yyyy-MM-dd hoặc null
 
     public UserInfoResponse() {
     }
@@ -39,6 +40,14 @@ public class UserInfoResponse {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public String getBirthday() {
+        return birthday;
+    }
+
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
     }
 }
 

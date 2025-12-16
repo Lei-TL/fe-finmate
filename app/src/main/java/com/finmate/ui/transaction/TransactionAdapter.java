@@ -109,6 +109,19 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 if (iconName == null) {
                     iconName = categoryIconMap.get(categoryName.trim().toLowerCase());
                 }
+                
+                if (iconName == null) {
+                    android.util.Log.d("TransactionAdapter", "Icon not found for category: " + categoryName + ", map size: " + categoryIconMap.size());
+                } else {
+                    android.util.Log.d("TransactionAdapter", "Found icon for category: " + categoryName + " -> " + iconName);
+                }
+            } else {
+                if (categoryName == null || categoryName.isEmpty()) {
+                    android.util.Log.d("TransactionAdapter", "Category name is null or empty: " + categoryName);
+                }
+                if (categoryIconMap == null || categoryIconMap.isEmpty()) {
+                    android.util.Log.w("TransactionAdapter", "Category icon map is null or empty");
+                }
             }
             // ✅ iconName bây giờ là "ic_food", "ic_salary", etc. (hoặc null)
             int iconResId = getIconResourceId(context, iconName);
@@ -118,6 +131,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
                 transactionHolder.imgCategory.setColorFilter(null);
             } else {
                 // ✅ Fallback về default icon nếu không tìm thấy
+                android.util.Log.d("TransactionAdapter", "Using default icon for category: " + categoryName);
                 transactionHolder.imgCategory.setImageResource(R.drawable.ic_default_category);
                 transactionHolder.imgCategory.setColorFilter(null);
             }

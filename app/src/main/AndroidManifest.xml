@@ -31,23 +31,24 @@
         <!-- Màn hình Auth -->
         <activity android:name=".ui.auth.LoginActivity" android:exported="false" />
         <activity android:name=".ui.auth.SignUpActivity" android:exported="false" />
+        <activity android:name=".ui.auth.AccountActivity" android:exported="false" />
 
         <!-- Home -->
         <activity android:name=".ui.home.HomeActivity" android:exported="false" />
+        <activity android:name=".ui.home.AddWalletActivity" android:exported="false" />
 
-        <!-- ======= CÁC MÀN HÌNH KHÁC (Vẫn ở package cũ chưa move) ======= -->
-        <activity android:name=".ui.activities.SettingsActivity" android:exported="false" />
-        <activity android:name=".ui.activities.ThemeSettingActivity" android:exported="false" />
+        <!-- settings -->
+        <activity android:name=".ui.settings.SettingsActivity" android:exported="false" />
+        <activity android:name=".ui.settings.ThemeSettingActivity" android:exported="false" />
+        <activity android:name=".ui.settings.LanguageSettingActivity" android:exported="false" />
+
         <activity android:name=".ui.friend.FriendActivity" android:exported="false" />
-        <activity android:name=".ui.home.WalletActivity" android:exported="false" />
-        <activity android:name=".ui.activities.AccountActivity" android:exported="false" />
-        <activity android:name=".ui.activities.StatisticActivity" android:exported="false" />
+        <activity android:name=".ui.wallet.WalletActivity" android:exported="false" />
+        <activity android:name=".ui.statistics.StatisticActivity" android:exported="false" />
         <activity android:name=".ui.activities.AddTransactionActivity" android:exported="false" />
         <activity android:name=".ui.activities.CategoryIncomeActivity" android:exported="false" />
         <activity android:name=".ui.activities.CategoryExpenseActivity" android:exported="false" />
-        <activity android:name=".ui.activities.IncomeStatisticActivity" android:exported="false" />
-        <activity android:name=".ui.activities.LanguageSettingActivity" android:exported="false" />
-        <activity android:name=".ui.activities.AddWalletActivity" android:exported="false" />
+        <activity android:name=".ui.statistics.IncomeStatisticActivity" android:exported="false" />
 
     </application>
 
