@@ -51,6 +51,18 @@
         android:background="?attr/editTextBackground"
         android:textColor="?attr/editTextColor"
         android:textColorHint="?attr/editTextColorHint"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/etConfirmPassword"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="@string/confirm_password_hint"
+        android:inputType="textPassword"
+        android:padding="12dp"
+        android:background="?attr/editTextBackground"
+        android:textColor="?attr/editTextColor"
+        android:textColorHint="?attr/editTextColorHint"
         android:layout_marginBottom="24dp" />
 
     <Button

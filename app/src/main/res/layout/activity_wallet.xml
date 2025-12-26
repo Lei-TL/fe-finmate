@@ -6,6 +6,37 @@
     android:background="?attr/backgroundColor"
     android:orientation="vertical">
 
+    <!-- ====== FILTER BAR ====== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="8dp">
+
+        <!-- Wallet Filter Chip -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipWalletFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/all_wallets"
+            android:clickable="true"
+            android:focusable="true"
+            style="@style/Widget.MaterialComponents.Chip.Choice" />
+
+        <!-- Time Filter Chip -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipTimeFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/this_month"
+            android:clickable="true"
+            android:focusable="true"
+            style="@style/Widget.MaterialComponents.Chip.Choice" />
+    </LinearLayout>
+
     <!-- ====== CARD VÍ TIỀN ====== -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,13 +47,15 @@
         android:backgroundTint="?attr/cardBackgroundColor"
         android:orientation="vertical">
 
-        <!-- TIÊU ĐỀ + SỐ DƯ -->
+        <!-- TIÊU ĐỀ + SỐ DƯ + ICON ADD -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <TextView
+                android:id="@+id/tvWalletName"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -33,13 +66,26 @@
 
             <!-- Số dư -->
             <TextView
-                android:id="@+id/tv_balance"
+                android:id="@+id/tvBalance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="0 VND"
                 android:textColor="?attr/textColorPrimary"
                 android:textStyle="bold"
                 android:textSize="16sp"/>
+
+            <!-- Icon Add Transaction -->
+            <ImageView
+                android:id="@+id/btnAddTransaction"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/ic_add"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="4dp"
+                app:tint="?attr/textColorPrimary"/>
         </LinearLayout>
 
         <!-- Thu nhập -->
@@ -52,7 +98,7 @@
             android:textStyle="bold"/>
 
         <ProgressBar
-            android:id="@+id/prog_income"
+            android:id="@+id/progIncome"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="8dp"
@@ -61,7 +107,7 @@
             android:backgroundTint="?attr/progressBarBackgroundColor"/>
 
         <TextView
-            android:id="@+id/tv_income_value"
+            android:id="@+id/tvIncomeValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="+0 VND"
@@ -78,7 +124,7 @@
             android:textStyle="bold"/>
 
         <ProgressBar
-            android:id="@+id/prog_expense"
+            android:id="@+id/progExpense"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="8dp"
@@ -87,7 +133,7 @@
             android:backgroundTint="?attr/progressBarBackgroundColor"/>
 
         <TextView
-            android:id="@+id/tv_expense_value"
+            android:id="@+id/tvExpenseValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="-0 VND"
@@ -97,22 +143,53 @@
     </LinearLayout>
 
     <!-- ====== DANH SÁCH GIAO DỊCH ====== -->
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:fillViewport="true">
 
         <LinearLayout
-            android:id="@+id/container_transaction"
-            android:orientation="vertical"
-            android:paddingHorizontal="16dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <include layout="@layout/item_transaction" />
+            <!-- RecyclerView cho transactions -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvTransactions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:paddingBottom="75dp" />
 
+            <!-- Empty State -->
+            <LinearLayout
+                android:id="@+id/layoutEmptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="32dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/no_transactions"
+                    android:textColor="?attr/textColorSecondary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/no_transactions_hint"
+                    android:textColor="?attr/textColorSecondary"
+                    android:textSize="14sp" />
+            </LinearLayout>
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <!-- ====== BOTTOM NAV ====== -->
     <com.google.android.material.bottomnavigation.BottomNavigationView

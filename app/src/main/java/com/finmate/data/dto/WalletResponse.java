@@ -8,8 +8,13 @@ public class WalletResponse {
 
     private String id;
     private String name;
+    private String type;
     private String currency;
-    private double currentBalance;
+    private double initialBalance;
+    private double currentBalance; // ✅ Thêm currentBalance
+    private boolean archived;
+    private boolean deleted;
+    private String color;
 
     public WalletResponse() {
     }
@@ -26,8 +31,52 @@ public class WalletResponse {
         return currency;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public double getInitialBalance() {
+        return initialBalance;
+    }
+
+    public void setInitialBalance(double initialBalance) {
+        this.initialBalance = initialBalance;
+    }
+
     public double getCurrentBalance() {
         return currentBalance;
+    }
+
+    public void setCurrentBalance(double currentBalance) {
+        this.currentBalance = currentBalance;
+    }
+
+    public boolean isArchived() {
+        return archived;
+    }
+
+    public void setArchived(boolean archived) {
+        this.archived = archived;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 
     public void setId(String id) {
@@ -40,9 +89,5 @@ public class WalletResponse {
 
     public void setCurrency(String currency) {
         this.currency = currency;
-    }
-
-    public void setCurrentBalance(double currentBalance) {
-        this.currentBalance = currentBalance;
     }
 }

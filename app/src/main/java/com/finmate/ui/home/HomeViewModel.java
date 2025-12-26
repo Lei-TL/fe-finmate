@@ -13,6 +13,8 @@ import java.util.List;
 import javax.inject.Inject;
 
 import dagger.hilt.android.lifecycle.HiltViewModel;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 @HiltViewModel
 public class HomeViewModel extends ViewModel {
@@ -27,6 +29,13 @@ public class HomeViewModel extends ViewModel {
 
     private final MutableLiveData<String> _selectedWalletId = new MutableLiveData<>();
     public LiveData<String> selectedWalletId = _selectedWalletId;
+    
+    private final MutableLiveData<String> _selectedWalletName = new MutableLiveData<>();
+    public LiveData<String> selectedWalletName = _selectedWalletName;
+
+    // ✅ Time filter state
+    private Long timeFilterStartDate = null; // Timestamp in milliseconds
+    private Long timeFilterEndDate = null; // Timestamp in milliseconds
 
     private final MutableLiveData<Boolean> _isLoading = new MutableLiveData<>();
     public LiveData<Boolean> isLoading = _isLoading;
@@ -37,43 +46,90 @@ public class HomeViewModel extends ViewModel {
     }
 
     public void loadHomeData() {
-        _isLoading.setValue(true);
+        _isLoading.postValue(true); // Dùng postValue để an toàn
         homeRepository.fetchWallets(new HomeRepository.DataCallback<List<WalletEntity>>() {
             @Override
             public void onDataLoaded(List<WalletEntity> data) {
                 _wallets.postValue(data);
-                // Tạm thời chọn ví đầu tiên
-                if (data != null && !data.isEmpty()) {
-                    selectWallet(String.valueOf(data.get(0).id));
-                }
+                _isLoading.postValue(false); // ✅ Tắt loading sau khi load xong
+                // ✅ Mặc định load tất cả transactions (không filter theo ví)
+                selectWallet(null, null); // null = all wallets
             }
 
             @Override
             public void onError(String message) {
-                // Xử lý lỗi
+                _isLoading.postValue(false);
             }
         });
     }
 
+    public void selectWallet(String walletId, String walletName) {
+        _selectedWalletId.postValue(walletId); // Dùng postValue để an toàn khi gọi từ background thread
+        _selectedWalletName.postValue(walletName);
+        loadTransactions(walletId, walletName, timeFilterStartDate, timeFilterEndDate);
+    }
+    
+    // ✅ Overload method để backward compatible
     public void selectWallet(String walletId) {
-        _selectedWalletId.setValue(walletId);
-        loadTransactions(walletId);
+        selectWallet(walletId, null);
     }
 
-    private void loadTransactions(String walletId) {
-        _isLoading.setValue(true);
-        homeRepository.fetchTransactions(walletId, new HomeRepository.DataCallback<List<TransactionEntity>>() {
+    // ✅ Select time filter
+    public void selectTimeFilter(Long startDate, Long endDate) {
+        timeFilterStartDate = startDate;
+        timeFilterEndDate = endDate;
+        // Reload transactions with new time filter
+        String walletId = _selectedWalletId.getValue();
+        String walletName = _selectedWalletName.getValue();
+        loadTransactions(walletId, walletName, startDate, endDate);
+    }
+
+    private void loadTransactions(String walletId, String walletName) {
+        loadTransactions(walletId, walletName, timeFilterStartDate, timeFilterEndDate);
+    }
+
+    // ✅ Flag để tránh gọi API nhiều lần cùng lúc
+    private boolean isLoadingTransactions = false;
+    
+    private void loadTransactions(String walletId, String walletName, Long startDate, Long endDate) {
+        if (isLoadingTransactions) {
+            android.util.Log.d("HomeViewModel", "Already loading transactions, skipping...");
+            return;
+        }
+        
+        android.util.Log.d("HomeViewModel", "loadTransactions called: walletId=" + walletId + ", walletName=" + walletName + ", startDate=" + startDate + ", endDate=" + endDate);
+        
+        isLoadingTransactions = true;
+        _isLoading.postValue(true); // Dùng postValue để an toàn
+        homeRepository.fetchTransactions(walletId, walletName, startDate, endDate, new HomeRepository.DataCallback<List<TransactionEntity>>() {
             @Override
             public void onDataLoaded(List<TransactionEntity> data) {
-                _transactions.postValue(data);
+                isLoadingTransactions = false;
+                android.util.Log.d("HomeViewModel", "Transactions loaded: " + (data != null ? data.size() : 0) + " items");
+                _transactions.postValue(data != null ? data : new java.util.ArrayList<>());
                 _isLoading.postValue(false);
             }
 
             @Override
             public void onError(String message) {
+                isLoadingTransactions = false;
+                android.util.Log.e("HomeViewModel", "Error loading transactions: " + message);
                 _isLoading.postValue(false);
-                // Xử lý lỗi
+                // ✅ Post empty list on error để UI không bị stuck
+                _transactions.postValue(new java.util.ArrayList<>());
             }
         });
+    }
+
+    public void deleteTransaction(long localId) {
+        homeRepository.deleteTransaction(localId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> {
+                    // Reload transactions after deletion
+                    loadTransactions(_selectedWalletId.getValue(), _selectedWalletName.getValue());
+                }, throwable -> {
+                    // Handle error
+                });
     }
 }

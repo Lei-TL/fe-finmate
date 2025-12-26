@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Chi tiêu"
-            android:textColor="#FFFFFF"
+            android:textColor="?attr/textColorPrimary"
             android:textStyle="bold"
             android:textSize="18sp"
             android:gravity="center" />
@@ -47,9 +47,38 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Thu nhập"
-            android:textColor="#777777"
+            android:textColor="?attr/textColorSecondary"
             android:textSize="18sp"
             android:gravity="center" />
+    </LinearLayout>
+
+    <!-- FILTER BAR -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingBottom="8dp"
+        android:gravity="center_vertical">
+
+        <!-- Wallet Filter Chip -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipWalletFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/all_wallets"
+            android:clickable="true"
+            android:focusable="true"
+            style="@style/Widget.MaterialComponents.Chip.Choice" />
+
+        <!-- Time Filter Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTimeFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/this_month"
+            android:layout_marginStart="8dp"
+            style="@style/Widget.MaterialComponents.Button.TextButton" />
     </LinearLayout>
 
     <!-- TOTAL EXPENSE -->
@@ -57,8 +86,8 @@
         android:id="@+id/tvTotalExpense"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="-12,500,000 VND"
-        android:textColor="#FFFFFF"
+        android:text="-0 VND"
+        android:textColor="?attr/textColorNegative"
         android:textSize="16sp"
         android:layout_marginStart="16dp"
         android:layout_marginBottom="12dp" />
@@ -80,7 +109,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Thống kê chi tiêu theo tháng"
-                android:textColor="#FFFFFF"
+                android:textColor="?attr/textColorPrimary"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -96,7 +125,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="So sánh các loại chi tiêu"
-                android:textColor="#FFFFFF"
+                android:textColor="?attr/textColorPrimary"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:layout_marginTop="24dp" />

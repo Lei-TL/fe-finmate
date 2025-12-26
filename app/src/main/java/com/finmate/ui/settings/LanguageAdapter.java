@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
-import com.finmate.ui.models.LanguageUIModel;
+import com.finmate.ui.settings.LanguageUIModel;
 
 import java.util.List;
 

@@ -37,12 +37,14 @@
 
     <!-- Add Transaction Screen -->
     <string name="add_transaction_title">Thêm giao dịch</string>
+    <string name="edit_transaction">Chỉnh sửa giao dịch</string>
     <string name="select_group_first">Vui lòng chọn nhóm giao dịch trước!</string>
     <string name="select_date">Chọn ngày</string>
     <string name="select_start_date">Chọn ngày bắt đầu</string>
     <string name="select_end_date">Chọn ngày kết thúc</string>
     <string name="due_date">Đến hạn</string>
     <string name="today">Hôm nay</string>
+    <string name="yesterday">Hôm qua</string>
     <string name="single_day">Một ngày</string>
     <string name="date_range">Khoảng ngày (từ → đến)</string>
     <string name="clear">Xóa ngày</string>
@@ -54,6 +56,7 @@
     <string name="friend_hint">Bạn bè</string>
     <string name="note_hint">Ghi chú</string>
     <string name="select_due_date_title">Chọn ngày đến hạn</string>
+    <string name="add_transaction">Thêm giao dịch</string>
 
     <!-- Account Screen -->
     <string name="income">Thu nhập</string>
@@ -100,7 +103,7 @@
     <string name="notifications">Thông báo</string>
 
     <!-- Bottom Navigation -->
-    <string name="nav_home">Giao dịch</string>
+    <string name="nav_home">Home</string>
     <string name="nav_wallet">Ví tiền</string>
     <string name="nav_add">Thêm</string>
     <string name="nav_statistic">Thống kê</string>
@@ -115,5 +118,77 @@
     <string name="dark_theme">Tối</string>
     <string name="system_theme">Theo hệ thống</string>
     <string name="cancel">Hủy</string>
+    
+    <!-- Language -->
+    <string name="title_language">Chọn ngôn ngữ</string>
+    <string name="language_vietnamese">Tiếng Việt</string>
+    <string name="language_english">English</string>
+    <string name="system_language">Theo ngôn ngữ hệ thống</string>
+
+    <!-- Logout -->
+    <string name="logout">Đăng xuất</string>
+    <string name="logout_confirmation">Bạn có chắc chắn muốn đăng xuất?</string>
+
+    <!-- Empty States -->
+    <string name="no_transactions">Chưa có giao dịch nào</string>
+    <string name="no_transactions_hint">Bấm + để thêm giao dịch mới</string>
+    <string name="no_wallets">Chưa có ví nào</string>
+    <string name="no_wallets_hint">Bấm + để thêm ví mới</string>
+    <string name="no_friends">Chưa có bạn bè nào</string>
+    <string name="no_friends_hint">Bấm Kết nối để thêm bạn bè</string>
+    <string name="no_statistics">Chưa có dữ liệu thống kê</string>
+    <string name="no_statistics_hint">Thêm giao dịch để xem thống kê</string>
+
+    <!-- Filter -->
+    <string name="all_wallets">Tất cả ví</string>
+    <string name="this_month">Tháng này</string>
+    <string name="this_year">Năm này</string>
+    <string name="filter_time">Lọc thời gian</string>
+    <string name="filter_wallet">Lọc ví</string>
+    <string name="filter_transaction_type">Lọc loại giao dịch</string>
+    <string name="all_transactions">Tất cả</string>
+    <string name="income_only">Chỉ thu nhập</string>
+    <string name="expense_only">Chỉ chi tiêu</string>
+
+    <!-- Validation -->
+    <string name="required_field">Trường này là bắt buộc</string>
+    <string name="invalid_email">Email không hợp lệ</string>
+    <string name="password_too_short">Mật khẩu phải có ít nhất 6 ký tự</string>
+    <string name="amount_invalid">Số tiền không hợp lệ</string>
+
+    <!-- Sync -->
+    <string name="sync_now">Đồng bộ ngay</string>
+    <string name="syncing">Đang đồng bộ...</string>
+    <string name="sync_success">Đồng bộ thành công</string>
+    <string name="sync_failed">Đồng bộ thất bại</string>
+
+    <!-- Transaction -->
+    <string name="delete_transaction">Xóa giao dịch</string>
+    <string name="confirm_delete_transaction">Bạn có chắc chắn muốn xóa giao dịch này?</string>
+
+    <!-- Wallet -->
+    <string name="set_default_wallet">Đặt làm ví mặc định</string>
+    <string name="default_wallet">Ví mặc định</string>
+    <string name="wallet_type_cash">Tiền mặt</string>
+    <string name="wallet_type_bank">Ngân hàng</string>
+    <string name="wallet_type_ewallet">Ví điện tử</string>
+    <string name="initial_balance">Số dư ban đầu</string>
+    <string name="wallet_color">Màu ví</string>
+
+    <!-- Home Screen Additional -->
+    <string name="user">Người dùng</string>
+    <string name="select_wallet">Chọn ví</string>
+    <string name="last_updated_at">Cập nhật lúc %1$s</string>
+    <string name="income_label">Thu nhập</string>
+    <string name="expense_label">Chi tiêu</string>
+
+    <!-- Weekdays -->
+    <string name="monday">Thứ 2</string>
+    <string name="tuesday">Thứ 3</string>
+    <string name="wednesday">Thứ 4</string>
+    <string name="thursday">Thứ 5</string>
+    <string name="friday">Thứ 6</string>
+    <string name="saturday">Thứ 7</string>
+    <string name="sunday">Chủ nhật</string>
 
 </resources>

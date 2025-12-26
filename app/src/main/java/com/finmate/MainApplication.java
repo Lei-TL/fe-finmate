@@ -15,7 +15,7 @@ public class MainApplication extends Application {
         super.onCreate();
 
         SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
-        String theme = prefs.getString("theme", ThemeHelper.SYSTEM_DEFAULT);
+        String theme = prefs.getString("theme", ThemeHelper.THEME_SYSTEM);
         ThemeHelper.applyTheme(theme);
     }
 }

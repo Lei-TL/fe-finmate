@@ -20,9 +20,12 @@ public interface WalletDao {
     @Delete
     void delete(WalletEntity wallet);
 
-    @Query("SELECT * FROM wallets ORDER BY id DESC")
+    @Query("SELECT * FROM wallets ORDER BY currentBalance DESC")
     List<WalletEntity> getAll();
 
     @Query("SELECT * FROM wallets WHERE id = :id LIMIT 1")
-    WalletEntity getById(int id);
+    WalletEntity getById(String id);
+
+    @Query("DELETE FROM wallets")
+    void deleteAll();
 }

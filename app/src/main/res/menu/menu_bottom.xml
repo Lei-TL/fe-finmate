@@ -4,31 +4,31 @@
     <!-- Trang chủ -->
     <item
         android:id="@+id/nav_home"
-        android:icon="@drawable/giaodich"
+        android:icon="@drawable/ic_home"
         android:title="@string/nav_home" />
 
     <!-- Ví tiền -->
     <item
         android:id="@+id/nav_wallet"
-        android:icon="@drawable/vitien"
+        android:icon="@drawable/ic_wallet"
         android:title="@string/nav_wallet" />
 
     <!-- Nút thêm -->
     <item
         android:id="@+id/nav_add"
-        android:icon="@drawable/them"
+        android:icon="@drawable/ic_add"
         android:title="@string/nav_add" />
 
     <!-- Thống kê -->
     <item
         android:id="@+id/nav_statistic"
-        android:icon="@drawable/thongke"
+        android:icon="@drawable/ic_chart"
         android:title="@string/nav_statistic" />
 
     <!-- Cài đặt -->
     <item
         android:id="@+id/nav_settings"
-        android:icon="@drawable/caidat"
+        android:icon="@drawable/ic_settings"
         android:title="@string/nav_settings" />
 
 </menu>

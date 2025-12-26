@@ -1,6 +1,8 @@
 package com.finmate.ui.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -8,11 +10,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
+import com.finmate.core.ui.LocaleHelper;
 import com.finmate.ui.dialogs.AddCategoryDialog;
 import com.finmate.ui.transaction.CategoryUIModel;
 import com.finmate.ui.transaction.CategoryGridAdapter;
@@ -26,7 +31,15 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class CategoryIncomeActivity extends AppCompatActivity {
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(LocaleHelper.applyLocale(newBase));
+    }
 
     @Inject
     CategoryRepository categoryRepository;
@@ -41,8 +54,6 @@ public class CategoryIncomeActivity extends AppCompatActivity {
     private ImageView btnBack, btnMore;
     private TextView tabExpense, tabIncome;
     private View btnAddNew;
-
-    private CategoryRepository repo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,24 +84,41 @@ public class CategoryIncomeActivity extends AppCompatActivity {
     }
 
     private void loadCategoriesFromDB() {
-        repo.getByType("income", entities -> {
+        categoryRepository.getByType("income").observe(this, entities -> {
+            if (entities == null) return;
 
             List<CategoryUIModel> uiModels = new ArrayList<>();
 
             for (CategoryEntity entity : entities) {
-                uiModels.add(new CategoryUIModel(entity.iconRes, entity.name));
+                int iconRes = getIconResourceId(entity.getIcon());
+                uiModels.add(new CategoryUIModel(iconRes, entity.getName()));
             }
 
-            runOnUiThread(() -> {
-                incomeList = uiModels;
+            incomeList = uiModels;
 
-                if (isGrid && gridAdapter != null) {
-                    gridAdapter.updateList(uiModels);
-                } else if (!isGrid && listAdapter != null) {
-                    listAdapter.updateList(uiModels);
-                }
-            });
+            if (isGrid && gridAdapter != null) {
+                gridAdapter.updateList(uiModels);
+            } else if (!isGrid && listAdapter != null) {
+                listAdapter.updateList(uiModels);
+            }
         });
+    }
+
+    /**
+     * Convert icon name (String) sang drawable resource ID (int)
+     * Nếu không tìm thấy, trả về default icon
+     */
+    private int getIconResourceId(String iconName) {
+        if (iconName == null || iconName.isEmpty()) {
+            return R.drawable.ic_default_category;
+        }
+        
+        Resources resources = getResources();
+        String packageName = getPackageName();
+        int resId = resources.getIdentifier(iconName, "drawable", packageName);
+        
+        // Nếu không tìm thấy, dùng default icon
+        return resId != 0 ? resId : R.drawable.ic_default_category;
     }
 
     private void setupGrid() {
@@ -200,14 +228,16 @@ public class CategoryIncomeActivity extends AppCompatActivity {
     }
 
     private void saveCategory(String name, String type) {
-
+        // Lưu icon name dạng String (tên resource drawable)
+        String iconName = "ic_default_category";
+        
         CategoryEntity entity = new CategoryEntity(
                 name,
                 type,
-                R.drawable.ic_default_category
+                iconName
         );
 
-        repo.insert(entity);
+        categoryRepository.insert(entity);
 
         Toast.makeText(this, "Đã thêm danh mục!", Toast.LENGTH_SHORT).show();
         loadCategoriesFromDB();

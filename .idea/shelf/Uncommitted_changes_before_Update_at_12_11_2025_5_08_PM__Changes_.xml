@@ -1,0 +1,11 @@
+<changelist name="Uncommitted_changes_before_Update_at_12_11_2025_5_08_PM_[Changes]" date="1765447698262" recycled="false" toDelete="true">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_12_11_2025_5_08_PM_[Changes]/shelved.patch" />
+  <option name="DESCRIPTION" value="Uncommitted changes before Update at 12/11/2025 5:08 PM [Changes]" />
+  <binary>
+    <option name="BEFORE_PATH" value="app/src/main/java.zip" />
+  </binary>
+  <binary>
+    <option name="AFTER_PATH" value="app/src/main.zip" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_12_11_2025_5_08_PM_[Changes]/main.zip" />
+  </binary>
+</changelist>

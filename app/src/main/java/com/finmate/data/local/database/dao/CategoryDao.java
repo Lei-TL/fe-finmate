@@ -29,6 +29,15 @@ public interface CategoryDao {
     @Query("SELECT * FROM categories ORDER BY id DESC")
     LiveData<List<CategoryEntity>> getAll();
 
+    @Query("SELECT * FROM categories WHERE name = :name LIMIT 1")
+    CategoryEntity getByName(String name);
+
+    @Query("SELECT COUNT(*) FROM categories")
+    int getCount();
+
     @Query("DELETE FROM categories WHERE type = :type")
     int deleteByType(String type);
+
+    @Query("DELETE FROM categories")
+    void deleteAll();
 }
