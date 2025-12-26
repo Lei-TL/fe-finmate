@@ -26,22 +26,13 @@ public class TransactionRemoteRepository {
 
     public void fetchTransactions(String walletId,
                                   ApiCallback<TransactionPageResponse> callback) {
-        Call<TransactionPageResponse> call = transactionApi.getTransactions(walletId, null, null);
-        apiCallExecutor.execute(call, callback);
-    }
-    
-    // ✅ Overload với pagination support
-    public void fetchTransactions(String walletId, Integer page, Integer size,
-                                  ApiCallback<TransactionPageResponse> callback) {
-        Call<TransactionPageResponse> call = transactionApi.getTransactions(walletId, page, size);
+        Call<TransactionPageResponse> call = transactionApi.getTransactions(walletId);
         apiCallExecutor.execute(call, callback);
     }
 
     public void createTransaction(CreateTransactionRequest request,
                                   ApiCallback<TransactionResponse> callback) {
-        android.util.Log.d("TransactionRemoteRepository", "createTransaction called: walletId=" + request.getWalletId() + ", categoryId=" + request.getCategoryId() + ", type=" + request.getType() + ", amount=" + request.getAmount());
         Call<TransactionResponse> call = transactionApi.createTransaction(request);
-        android.util.Log.d("TransactionRemoteRepository", "Call created, executing via ApiCallExecutor...");
         apiCallExecutor.execute(call, callback);
     }
 }

@@ -25,7 +25,7 @@ public class SignUpActivity extends AppCompatActivity {
         super.attachBaseContext(LocaleHelper.applyLocale(newBase));
     }
 
-    EditText etName, etEmail, etPassword;
+    EditText etName, etEmail, etPassword, etConfirmPassword;
     Button btnSignup;
     TextView tvAlreadyAccount;
     
@@ -42,6 +42,7 @@ public class SignUpActivity extends AppCompatActivity {
         etName = findViewById(R.id.etName);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
+        etConfirmPassword = findViewById(R.id.etConfirmPassword);
         btnSignup = findViewById(R.id.btnSignup);
         tvAlreadyAccount = findViewById(R.id.tvAlreadyAccount);
         
@@ -53,9 +54,10 @@ public class SignUpActivity extends AppCompatActivity {
             String name = etName.getText().toString().trim();
             String email = etEmail.getText().toString().trim();
             String pass = etPassword.getText().toString().trim();
+            String confirmPass = etConfirmPassword.getText().toString().trim();
 
             // VALIDATE
-            if (!validateInputs(name, email, pass)) {
+            if (!validateInputs(name, email, pass, confirmPass)) {
                 return;
             }
             
@@ -73,7 +75,7 @@ public class SignUpActivity extends AppCompatActivity {
         });
     }
     
-    private boolean validateInputs(String name, String email, String password) {
+    private boolean validateInputs(String name, String email, String password, String confirmPassword) {
         boolean isValid = true;
         
         // Validate name
@@ -127,6 +129,17 @@ public class SignUpActivity extends AppCompatActivity {
             } else {
                 etPassword.setError(null);
             }
+        }
+        
+        // Validate confirm password
+        if (confirmPassword.isEmpty()) {
+            etConfirmPassword.setError(getString(R.string.required_field));
+            isValid = false;
+        } else if (!password.equals(confirmPassword)) {
+            etConfirmPassword.setError(getString(R.string.password_mismatch));
+            isValid = false;
+        } else {
+            etConfirmPassword.setError(null);
         }
         
         if (!isValid) {

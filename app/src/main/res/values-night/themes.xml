@@ -26,9 +26,11 @@
         <item name="textColorPositive">#66BB6A</item>
         <item name="textColorNegative">#EF5350</item>
 
+        <item name="editTextBackground">@drawable/edittext_bg</item>
         <item name="editTextColor">@color/white</item>
         <item name="editTextColorHint">#80FFFFFF</item>
 
+        <item name="buttonBackground">@drawable/login_button_bg</item>
         <item name="buttonTextColor">@color/white</item>
 
         <item name="iconTint">@color/white</item>

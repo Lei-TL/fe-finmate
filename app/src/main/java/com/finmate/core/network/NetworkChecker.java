@@ -47,8 +47,7 @@ public class NetworkChecker {
                 return false;
             }
             
-            return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
-                   capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);
+            return true;
         } else {
             // Android cũ hơn
             NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();

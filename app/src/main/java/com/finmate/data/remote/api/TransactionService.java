@@ -18,9 +18,7 @@ public interface TransactionService {
      */
     @GET("transactions")
     Call<TransactionPageResponse> getTransactions(
-            @Query("walletId") String walletId,
-            @Query("page") Integer page,
-            @Query("size") Integer size
+            @Query("walletId") String walletId
             // có thể thêm @Query("from") String from, @Query("to") String to nếu cần
     );
 

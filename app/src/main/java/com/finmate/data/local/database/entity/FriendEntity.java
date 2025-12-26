@@ -4,9 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-/**
- * Entity để lưu friend data trong local database
- */
 @Entity(tableName = "friends")
 public class FriendEntity {
 

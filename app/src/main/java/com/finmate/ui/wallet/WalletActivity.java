@@ -1,6 +1,5 @@
 package com.finmate.ui.wallet;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -10,15 +9,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.finmate.R;
-import com.finmate.core.ui.LocaleHelper;
 import com.finmate.data.local.database.entity.CategoryEntity;
 import com.finmate.data.local.database.entity.TransactionEntity;
 import com.finmate.data.local.database.entity.WalletEntity;
@@ -45,11 +41,6 @@ import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
 public class WalletActivity extends AppCompatActivity {
-
-    @Override
-    protected void attachBaseContext(Context newBase) {
-        super.attachBaseContext(LocaleHelper.applyLocale(newBase));
-    }
 
     // ✅ CategoryRepository để load categories và lấy icon
     @Inject
@@ -78,7 +69,6 @@ public class WalletActivity extends AppCompatActivity {
         mapViews();
         setupRecyclerView();
         setupClickListeners();
-        setupSwipeToDelete(); // ✅ Thêm swipe-to-delete với dialog xác nhận
         observeViewModel();
         loadCategories(); // ✅ Load categories để lấy icon
 
@@ -288,11 +278,10 @@ public class WalletActivity extends AppCompatActivity {
             }
         });
         
-        // ✅ Dùng Locale.getDefault() để tự động theo ngôn ngữ hiện tại của app
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
         SimpleDateFormat displayDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        SimpleDateFormat dayOfWeekFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
+        SimpleDateFormat dayOfWeekFormat = new SimpleDateFormat("EEEE", new Locale("vi", "VN"));
         
         // ✅ Calendar để so sánh ngày
         Calendar today = Calendar.getInstance();
@@ -398,9 +387,7 @@ public class WalletActivity extends AppCompatActivity {
     }
     
     private String formatDayOfWeek(String dayOfWeek) {
-        // ✅ Map cả tiếng Anh và tiếng Việt sang string resources
         java.util.Map<String, String> dayMap = new java.util.HashMap<>();
-        // English
         dayMap.put("Monday", getString(R.string.monday));
         dayMap.put("Tuesday", getString(R.string.tuesday));
         dayMap.put("Wednesday", getString(R.string.wednesday));
@@ -408,29 +395,8 @@ public class WalletActivity extends AppCompatActivity {
         dayMap.put("Friday", getString(R.string.friday));
         dayMap.put("Saturday", getString(R.string.saturday));
         dayMap.put("Sunday", getString(R.string.sunday));
-        // Vietnamese (full name)
-        dayMap.put("Thứ Hai", getString(R.string.monday));
-        dayMap.put("Thứ Ba", getString(R.string.tuesday));
-        dayMap.put("Thứ Tư", getString(R.string.wednesday));
-        dayMap.put("Thứ Năm", getString(R.string.thursday));
-        dayMap.put("Thứ Sáu", getString(R.string.friday));
-        dayMap.put("Thứ Bảy", getString(R.string.saturday));
-        dayMap.put("Chủ Nhật", getString(R.string.sunday));
         
-        // Check if already formatted
-        if (dayMap.containsKey(dayOfWeek)) {
-            return dayMap.get(dayOfWeek);
-        }
-        
-        // Try to match partial (case insensitive)
-        String lowerDay = dayOfWeek.toLowerCase();
-        for (java.util.Map.Entry<String, String> entry : dayMap.entrySet()) {
-            if (entry.getKey().toLowerCase().contains(lowerDay) || lowerDay.contains(entry.getKey().toLowerCase())) {
-                return entry.getValue();
-            }
-        }
-        
-        return dayOfWeek; // Return original if no match
+        return dayMap.getOrDefault(dayOfWeek, dayOfWeek);
     }
     
     private void updateBalance(List<WalletEntity> wallets) {
@@ -451,13 +417,13 @@ public class WalletActivity extends AppCompatActivity {
                 totalBalance += w.currentBalance;
             }
         }
-        tvBalance.setText(formatMoney((long) totalBalance) + " " + getString(R.string.currency_vnd));
+        tvBalance.setText(formatMoney((long) totalBalance) + " VND");
     }
     
     private void updateWalletData(List<TransactionEntity> transactions) {
         if (transactions == null || transactions.isEmpty()) {
-            tvIncomeValue.setText(getString(R.string.zero_income));
-            tvExpenseValue.setText(getString(R.string.zero_expense));
+            tvIncomeValue.setText("+0 VND");
+            tvExpenseValue.setText("-0 VND");
             progIncome.setProgress(0);
             progExpense.setProgress(0);
             return;
@@ -474,8 +440,8 @@ public class WalletActivity extends AppCompatActivity {
             }
         }
         
-        tvIncomeValue.setText("+" + formatMoney((long) totalIncome) + " " + getString(R.string.currency_vnd));
-        tvExpenseValue.setText("-" + formatMoney((long) totalExpense) + " " + getString(R.string.currency_vnd));
+        tvIncomeValue.setText("+" + formatMoney((long) totalIncome) + " VND");
+        tvExpenseValue.setText("-" + formatMoney((long) totalExpense) + " VND");
         
         double total = totalIncome + totalExpense;
         if (total > 0) {
@@ -493,54 +459,7 @@ public class WalletActivity extends AppCompatActivity {
     private String formatMoney(long amount) {
         return String.format(Locale.getDefault(), "%,d", amount).replace(",", ".");
     }
-    
-    /**
-     * ✅ Setup swipe-to-delete với dialog xác nhận
-     */
-    private void setupSwipeToDelete() {
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false;
-            }
 
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                int position = viewHolder.getAdapterPosition();
-                if (position == RecyclerView.NO_POSITION) {
-                    return;
-                }
-                
-                TransactionGroupedItem item = transactionAdapter.getItem(position);
-                if (item != null && item.isTransaction()) {
-                    TransactionUIModel transaction = item.getTransaction();
-                    
-                    // ✅ Hiển thị dialog xác nhận trước khi xóa
-                    new androidx.appcompat.app.AlertDialog.Builder(WalletActivity.this)
-                            .setTitle(R.string.delete_transaction)
-                            .setMessage(R.string.confirm_delete_transaction)
-                            .setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                                // ✅ User xác nhận xóa
-                                viewModel.deleteTransaction(transaction.localId);
-                            })
-                            .setNegativeButton(android.R.string.no, (dialog, which) -> {
-                                // ✅ User hủy - restore item về vị trí ban đầu
-                                transactionAdapter.notifyItemChanged(position);
-                                dialog.dismiss();
-                            })
-                            .setCancelable(true)
-                            .setOnCancelListener(dialog -> {
-                                // ✅ User cancel dialog - restore item
-                                transactionAdapter.notifyItemChanged(position);
-                            })
-                            .show();
-                } else {
-                    // ✅ Nếu là header, restore lại
-                    transactionAdapter.notifyItemChanged(position);
-                }
-            }
-        }).attachToRecyclerView(rvTransactions);
-    }
 
     // ====================== XỬ LÝ BOTTOM NAVIGATION ======================
     private void setupBottomNavigation() {

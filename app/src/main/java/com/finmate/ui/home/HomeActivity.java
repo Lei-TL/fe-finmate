@@ -60,13 +60,14 @@ public class HomeActivity extends AppCompatActivity {
 
     private HomeViewModel viewModel;
     
-    // ✅ CategoryRepository để load categories và lấy icon
     @javax.inject.Inject
     CategoryRepository categoryRepository;
     
-    // ✅ TransactionSyncManager để auto-sync pending transactions
     @javax.inject.Inject
     com.finmate.core.sync.TransactionSyncManager transactionSyncManager;
+    
+    @javax.inject.Inject
+    com.finmate.core.network.NetworkChecker networkChecker;
 
     private LineChart lineChart;
     private BottomNavigationView bottomNavigation;
@@ -87,7 +88,7 @@ public class HomeActivity extends AppCompatActivity {
     // Chart container
     private View chartContainer;
     
-    // ✅ Time filter state
+    // Time filter state
     private Long timeFilterStartDate = null;
     private Long timeFilterEndDate = null;
 
@@ -105,20 +106,20 @@ public class HomeActivity extends AppCompatActivity {
         setupSwipeToDelete();
         
         observeViewModel();
-        loadCategories(); // ✅ Load categories để lấy icon
+        loadCategories(); //  Load categories để lấy icon
         
-        // ✅ Đọc time filter từ TimeFilterManager khi khởi tạo
+        //  Đọc time filter từ TimeFilterManager khi khởi tạo
         loadTimeFilterFromManager();
         
         viewModel.loadHomeData(); // Load initial data
         
-        // ✅ Bắt đầu auto-sync pending transactions
+        //  Bắt đầu auto-sync pending transactions
         if (transactionSyncManager != null) {
             transactionSyncManager.startAutoSync();
         }
     }
     
-    // ✅ Đọc time filter từ TimeFilterManager và áp dụng
+    // Đọc time filter từ TimeFilterManager và áp dụng
     private void loadTimeFilterFromManager() {
         com.finmate.core.ui.TimeFilterManager.TimeFilterState state = 
             com.finmate.core.ui.TimeFilterManager.getTimeFilter(this);
@@ -141,16 +142,27 @@ public class HomeActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         
-        // ✅ Reset sync flag để sync lại khi quay lại Home
-        viewModel.resetSyncFlag();
-        
-        // ✅ Đọc lại time filter từ TimeFilterManager (có thể đã thay đổi từ StatisticActivity)
+        // Đọc lại time filter từ TimeFilterManager (có thể đã thay đổi từ StatisticActivity)
         loadTimeFilterFromManager();
         
-        // ✅ Reload data (sẽ sync nếu online và chưa sync trong session này, sau đó load từ local)
-        viewModel.loadHomeData();
+        // Chỉ reload transactions nếu đang loading hoặc chưa có data
+        // Tránh gọi API liên tục khi activity resume
+        Boolean isLoading = viewModel.isLoading.getValue();
+        List<TransactionEntity> currentTransactions = viewModel.transactions.getValue();
         
-        // ✅ Sync pending transactions khi có mạng (chỉ sync, không reload)
+        // Chỉ reload nếu chưa có data hoặc đang không loading (tránh duplicate calls)
+        if ((currentTransactions == null || currentTransactions.isEmpty()) && (isLoading == null || !isLoading)) {
+            // Chỉ reload transactions, không reload wallets (tránh trigger lại selectWallet)
+            String walletId = viewModel.selectedWalletId.getValue();
+            String walletName = viewModel.selectedWalletName.getValue();
+            if (walletId != null || walletName != null) {
+                viewModel.selectWallet(walletId, walletName);
+            } else {
+                viewModel.selectWallet(null, null);
+            }
+        }
+        
+        // Sync pending transactions khi có mạng (chỉ sync, không reload)
         if (transactionSyncManager != null) {
             transactionSyncManager.syncPendingTransactions();
         }
@@ -159,7 +171,7 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        // ✅ Dừng auto-sync khi activity không active
+        // Dừng auto-sync khi activity không active
         if (transactionSyncManager != null) {
             transactionSyncManager.stopAutoSync();
         }
@@ -168,48 +180,49 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // ✅ Clear observers để tránh memory leak
+        // Clear observers để tránh memory leak
         if (viewModel != null) {
             viewModel.wallets.removeObservers(this);
             viewModel.transactions.removeObservers(this);
         }
-        // ✅ CategoryRepository sử dụng LiveData, observers sẽ tự động được clear khi Activity destroy
+        // CategoryRepository sử dụng LiveData, observers sẽ tự động được clear khi Activity destroy
     }
     
-    // ✅ Load categories và tạo map categoryName -> iconName
+    // Load categories và tạo map categoryName -> iconName
+    // Ưu tiên sync từ backend khi có mạng
     private void loadCategories() {
         categoryRepository.getAll().observe(this, categories -> {
             if (categories != null && !categories.isEmpty()) {
-                android.util.Log.d("HomeActivity", "Loading categories for icon map: " + categories.size() + " items");
                 java.util.Map<String, String> categoryIconMap = new java.util.HashMap<>();
                 for (CategoryEntity category : categories) {
                     if (category.getName() != null && category.getIcon() != null) {
-                        // ✅ Lưu cả tên gốc và tên đã normalize để đảm bảo match
                         String categoryName = category.getName().trim();
                         String iconName = category.getIcon().trim();
                         if (!categoryName.isEmpty() && !iconName.isEmpty()) {
                             categoryIconMap.put(categoryName, iconName);
-                            // ✅ Thêm cả lowercase version để match case-insensitive
                             categoryIconMap.put(categoryName.toLowerCase(), iconName);
-                            android.util.Log.d("HomeActivity", "Added to icon map: " + categoryName + " -> " + iconName);
                         }
                     }
                 }
-                android.util.Log.d("HomeActivity", "Category icon map size: " + categoryIconMap.size());
-                // ✅ Truyền map vào adapter và notify để refresh
                 if (transactionAdapter != null) {
                     transactionAdapter.setCategoryIconMap(categoryIconMap);
-                    android.util.Log.d("HomeActivity", "Category icon map set to adapter");
-                } else {
-                    android.util.Log.w("HomeActivity", "TransactionAdapter is null, cannot set category icon map");
                 }
             } else {
-                android.util.Log.w("HomeActivity", "No categories found, fetching from backend...");
-                // ✅ Nếu chưa có categories, sync từ backend
+                // Nếu chưa có categories, sync từ backend (ưu tiên)
+                android.util.Log.d("HomeActivity", "No categories found, syncing from backend...");
                 categoryRepository.fetchRemoteCategoriesByType("INCOME");
                 categoryRepository.fetchRemoteCategoriesByType("EXPENSE");
             }
         });
+
+        boolean a = networkChecker.isNetworkAvailable();
+
+        // Sync categories từ backend khi có mạng (để đảm bảo có data mới nhất)
+        if (networkChecker != null && true) {
+            android.util.Log.d("HomeActivity", "Network available, syncing categories from backend...");
+            categoryRepository.fetchRemoteCategoriesByType("INCOME");
+            categoryRepository.fetchRemoteCategoriesByType("EXPENSE");
+        }
     }
 
     private void mapViews() {
@@ -246,7 +259,7 @@ public class HomeActivity extends AppCompatActivity {
     }
     
     private void setupHeader() {
-        // ✅ Lấy fullName từ SharedPreferences
+        // Lấy fullName từ SharedPreferences
         SharedPreferences prefs = getSharedPreferences("user_prefs", MODE_PRIVATE);
         String fullName = prefs.getString("full_name", "");
         if (fullName == null || fullName.isEmpty()) {
@@ -258,7 +271,7 @@ public class HomeActivity extends AppCompatActivity {
         }
         tvName.setText(fullName);
         
-        // ✅ Avatar click → AccountActivity
+        // Avatar click → AccountActivity
         imgAvatar.setOnClickListener(v -> {
             startActivity(new Intent(this, AccountActivity.class));
         });
@@ -287,7 +300,7 @@ public class HomeActivity extends AppCompatActivity {
                     String filterText = getString(R.string.today);
                     btnTimeFilter.setText(filterText);
                     
-                    // ✅ Filter transactions for today
+                    // Filter transactions for today
                     Calendar cal = Calendar.getInstance();
                     cal.set(Calendar.HOUR_OF_DAY, 0);
                     cal.set(Calendar.MINUTE, 0);
@@ -301,11 +314,11 @@ public class HomeActivity extends AppCompatActivity {
                     cal.set(Calendar.MILLISECOND, 999);
                     Long endOfDay = cal.getTimeInMillis();
                     
-                    // ✅ Lưu time filter state
+                    // Lưu time filter state
                     timeFilterStartDate = startOfDay;
                     timeFilterEndDate = endOfDay;
                     
-                    // ✅ Lưu vào TimeFilterManager để share với các activities khác
+                    // Lưu vào TimeFilterManager để share với các activities khác
                     com.finmate.core.ui.TimeFilterManager.saveTimeFilter(HomeActivity.this, startOfDay, endOfDay, filterText);
                     
                     viewModel.selectTimeFilter(startOfDay, endOfDay);
@@ -317,7 +330,7 @@ public class HomeActivity extends AppCompatActivity {
                     String dateText = sdf.format(date);
                     btnTimeFilter.setText(dateText);
                     
-                    // ✅ Filter transactions for selected day
+                    // Filter transactions for selected day
                     Calendar cal = Calendar.getInstance();
                     cal.setTime(date);
                     cal.set(Calendar.HOUR_OF_DAY, 0);
@@ -332,11 +345,11 @@ public class HomeActivity extends AppCompatActivity {
                     cal.set(Calendar.MILLISECOND, 999);
                     Long endOfDay = cal.getTimeInMillis();
                     
-                    // ✅ Lưu time filter state
+                    // Lưu time filter state
                     timeFilterStartDate = startOfDay;
                     timeFilterEndDate = endOfDay;
                     
-                    // ✅ Lưu vào TimeFilterManager để share với các activities khác
+                    // Lưu vào TimeFilterManager để share với các activities khác
                     com.finmate.core.ui.TimeFilterManager.saveTimeFilter(HomeActivity.this, startOfDay, endOfDay, dateText);
                     
                     viewModel.selectTimeFilter(startOfDay, endOfDay);
@@ -348,7 +361,7 @@ public class HomeActivity extends AppCompatActivity {
                     String dateText = sdf.format(startDate) + " - " + sdf.format(endDate);
                     btnTimeFilter.setText(dateText);
                     
-                    // ✅ Filter transactions for date range
+                    // Filter transactions for date range
                     Calendar calStart = Calendar.getInstance();
                     calStart.setTime(startDate);
                     calStart.set(Calendar.HOUR_OF_DAY, 0);
@@ -365,11 +378,11 @@ public class HomeActivity extends AppCompatActivity {
                     calEnd.set(Calendar.MILLISECOND, 999);
                     Long endTimestamp = calEnd.getTimeInMillis();
                     
-                    // ✅ Lưu time filter state
+                    // Lưu time filter state
                     timeFilterStartDate = startTimestamp;
                     timeFilterEndDate = endTimestamp;
                     
-                    // ✅ Lưu vào TimeFilterManager để share với các activities khác
+                    // Lưu vào TimeFilterManager để share với các activities khác
                     com.finmate.core.ui.TimeFilterManager.saveTimeFilter(HomeActivity.this, startTimestamp, endTimestamp, dateText);
                     
                     viewModel.selectTimeFilter(startTimestamp, endTimestamp);
@@ -380,11 +393,11 @@ public class HomeActivity extends AppCompatActivity {
                     String filterText = getString(R.string.today);
                     btnTimeFilter.setText(filterText);
                     
-                    // ✅ Clear filter (set to null = no filter)
+                    // Clear filter (set to null = no filter)
                     timeFilterStartDate = null;
                     timeFilterEndDate = null;
                     
-                    // ✅ Clear trong TimeFilterManager
+                    // Clear trong TimeFilterManager
                     com.finmate.core.ui.TimeFilterManager.clearTimeFilter(HomeActivity.this);
                     
                     viewModel.selectTimeFilter(null, null);
@@ -412,52 +425,43 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void observeViewModel() {
-        // ✅ Calculate total balance from all wallets
+        // Calculate total balance from all wallets
         viewModel.wallets.observe(this, wallets -> {
+            double totalBalance = 0;
             if (wallets != null && !wallets.isEmpty()) {
-                // ✅ All wallets: calculate total currentBalance
-                double totalBalance = 0;
+                // All wallets: calculate total currentBalance
                 for (com.finmate.data.local.database.entity.WalletEntity w : wallets) {
                     totalBalance += w.currentBalance;
                 }
-                if (tvBalance != null) {
-                    tvBalance.setText(formatAmount(totalBalance));
-                }
+            }
+            if (tvBalance != null) {
+                tvBalance.setText(formatAmount(totalBalance));
             }
         });
         
         viewModel.transactions.observe(this, transactionEntities -> {
-            android.util.Log.d("HomeActivity", "Transactions observer triggered: " + (transactionEntities != null ? transactionEntities.size() : 0) + " items");
-            
             updateTransactionList(transactionEntities);
             
             // Show/hide empty state
             View emptyStateLayout = findViewById(R.id.layoutEmptyState);
             if (emptyStateLayout != null) {
                 if (transactionEntities == null || transactionEntities.isEmpty()) {
-                    android.util.Log.d("HomeActivity", "Showing empty state");
                     emptyStateLayout.setVisibility(View.VISIBLE);
                     rvTransactions.setVisibility(View.GONE);
                 } else {
-                    android.util.Log.d("HomeActivity", "Showing transactions list");
                     emptyStateLayout.setVisibility(View.GONE);
                     rvTransactions.setVisibility(View.VISIBLE);
                 }
             }
             
-            // ✅ Update summary cards from filtered transactions
+            // Update summary cards and chart from filtered transactions
             updateSummaryCards(transactionEntities);
-        });
-        
-        // ✅ Chart data: Monthly aggregate (tối ưu - chỉ 6 rows)
-        viewModel.chartData.observe(this, chartData -> {
-            android.util.Log.d("HomeActivity", "Chart data observer triggered: " + (chartData != null ? chartData.size() : 0) + " months");
-            setupChartFromAggregate(chartData); // ✅ LiveData observer already runs on main thread
+            setupChart(transactionEntities); // LiveData observer already runs on main thread
         });
     }
     
-    // ✅ Calculate and update summary cards (income, expense)
-    // ✅ Transactions are already filtered by ViewModel by wallet and time filter
+    // Calculate and update summary cards (income, expense)
+    // Transactions are already filtered by ViewModel by wallet and time filter
     private void updateSummaryCards(List<TransactionEntity> transactions) {
         if (transactions == null || transactions.isEmpty()) {
             if (tvIncome != null) tvIncome.setText("0 VND");
@@ -471,7 +475,7 @@ public class HomeActivity extends AppCompatActivity {
         double totalIncome = 0;
         double totalExpense = 0;
         
-        // ✅ Calculate from filtered transactions (by wallet and time)
+        // Calculate from filtered transactions (by wallet and time)
         for (TransactionEntity t : transactions) {
             if (t.type != null && t.type.equals("INCOME")) {
                 totalIncome += t.amountDouble;
@@ -487,7 +491,7 @@ public class HomeActivity extends AppCompatActivity {
             tvExpense.setText(formatAmount(totalExpense));
         }
         
-        // ✅ Update subtitle based on selected time filter
+        // Update subtitle based on selected time filter
         String subtitle = getTimeFilterSubtitle();
         if (tvIncomeSubtitle != null) {
             tvIncomeSubtitle.setText(subtitle);
@@ -497,7 +501,7 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
     
-    // ✅ Format subtitle based on selected time filter
+    // Format subtitle based on selected time filter
     private String getTimeFilterSubtitle() {
         if (timeFilterStartDate == null && timeFilterEndDate == null) {
             // No filter → show "This month"
@@ -543,7 +547,7 @@ public class HomeActivity extends AppCompatActivity {
             return;
         }
 
-        // ✅ Group transactions by date
+        // Group transactions by date
         List<TransactionGroupedItem> groupedItems = groupTransactionsByDate(transactionEntities);
         if (transactionAdapter != null) {
             transactionAdapter.updateList(groupedItems);
@@ -560,46 +564,19 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getAdapterPosition();
-                if (position == RecyclerView.NO_POSITION) {
-                    return;
-                }
-                
                 TransactionGroupedItem item = transactionAdapter.getItem(position);
                 if (item != null && item.isTransaction()) {
-                    TransactionUIModel transaction = item.getTransaction();
-                    
-                    // ✅ Hiển thị dialog xác nhận trước khi xóa
-                    new androidx.appcompat.app.AlertDialog.Builder(HomeActivity.this)
-                            .setTitle(R.string.delete_transaction)
-                            .setMessage(R.string.confirm_delete_transaction)
-                            .setPositiveButton(android.R.string.yes, (dialog, which) -> {
-                                // ✅ User xác nhận xóa
-                                viewModel.deleteTransaction(transaction.localId);
-                            })
-                            .setNegativeButton(android.R.string.no, (dialog, which) -> {
-                                // ✅ User hủy - restore item về vị trí ban đầu
-                                transactionAdapter.notifyItemChanged(position);
-                                dialog.dismiss();
-                            })
-                            .setCancelable(true)
-                            .setOnCancelListener(dialog -> {
-                                // ✅ User cancel dialog - restore item
-                                transactionAdapter.notifyItemChanged(position);
-                            })
-                            .show();
-                } else {
-                    // ✅ Nếu là header, restore lại
-                    transactionAdapter.notifyItemChanged(position);
+                    viewModel.deleteTransaction(item.getTransaction().localId);
                 }
             }
         }).attachToRecyclerView(rvTransactions);
     }
     
-    // ✅ Group transactions by date and create headers for each day
+    // Group transactions by date and create headers for each day
     private List<TransactionGroupedItem> groupTransactionsByDate(List<TransactionEntity> transactions) {
         List<TransactionGroupedItem> groupedItems = new ArrayList<>();
         
-        // ✅ Sắp xếp transactions theo date giảm dần (mới nhất lên trên) trước khi group
+        // Sắp xếp transactions theo date giảm dần (mới nhất lên trên) trước khi group
         List<TransactionEntity> sortedTransactions = new ArrayList<>(transactions);
         sortedTransactions.sort((t1, t2) -> {
             try {
@@ -643,8 +620,8 @@ public class HomeActivity extends AppCompatActivity {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
         SimpleDateFormat displayDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-        // ✅ Dùng Locale.getDefault() để tự động theo ngôn ngữ hiện tại của app
-        SimpleDateFormat dayOfWeekFormat = new SimpleDateFormat("EEEE", Locale.getDefault());
+        // Use Vietnamese locale to format day of week
+        SimpleDateFormat dayOfWeekFormat = new SimpleDateFormat("EEEE", new Locale("vi", "VN"));
         
         // Map to store transactions by date (LinkedHashMap giữ thứ tự)
         java.util.Map<String, List<TransactionEntity>> transactionsByDate = new java.util.LinkedHashMap<>();
@@ -673,7 +650,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
         
-        // ✅ Sort dates giảm dần (mới nhất lên trên) trước khi tạo grouped items
+        // Sort dates giảm dần (mới nhất lên trên) trước khi tạo grouped items
         List<String> sortedDateKeys = new ArrayList<>(transactionsByDate.keySet());
         sortedDateKeys.sort((d1, d2) -> {
             try {
@@ -701,7 +678,7 @@ public class HomeActivity extends AppCompatActivity {
                 // Add header
                 groupedItems.add(new TransactionGroupedItem(dateHeader, dayOfWeek));
                 
-                // ✅ Transactions trong mỗi ngày đã được sort từ sortedTransactions, chỉ cần add
+                // Transactions trong mỗi ngày đã được sort từ sortedTransactions, chỉ cần add
                 for (TransactionEntity entity : dayTransactions) {
                     TransactionUIModel uiModel = new TransactionUIModel(
                             entity.id,
@@ -710,7 +687,7 @@ public class HomeActivity extends AppCompatActivity {
                             entity.amount,
                             entity.wallet,
                             entity.date,
-                            entity.type // ✅ Pass type so adapter can format color and sign
+                            entity.type // Pass type so adapter can format color and sign
                     );
                     groupedItems.add(new TransactionGroupedItem(uiModel));
                 }
@@ -722,7 +699,7 @@ public class HomeActivity extends AppCompatActivity {
         return groupedItems;
     }
     
-    // ✅ Format day of week: "Monday" -> "Thứ 2", "Tuesday" -> "Thứ 3", ...
+    // Format day of week: "Monday" -> "Thứ 2", "Tuesday" -> "Thứ 3", ...
     private String formatDayOfWeek(String dayOfWeek) {
         // Convert to Vietnamese day of week
         java.util.Map<String, String> dayMap = new java.util.HashMap<>();
@@ -766,7 +743,6 @@ public class HomeActivity extends AppCompatActivity {
 
             popup.setOnMenuItemClickListener(item -> {
                 int id = item.getItemId();
-                // ✅ Bỏ "Chọn ví" khỏi menu, chỉ giữ "Thêm ví"
                 if (id == R.id.action_add_wallet) {
                     startActivity(new Intent(HomeActivity.this, AddWalletActivity.class));
                     return true;
@@ -779,116 +755,95 @@ public class HomeActivity extends AppCompatActivity {
 
 
     private void setupRecyclerView() {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        rvTransactions.setLayoutManager(layoutManager);
+        rvTransactions.setLayoutManager(new LinearLayoutManager(this));
         transactionAdapter = new TransactionAdapter(new ArrayList<>()); 
         rvTransactions.setAdapter(transactionAdapter);
         
-        // ✅ Disable nested scrolling of RecyclerView because there is a NestedScrollView outside
+        // Disable nested scrolling of RecyclerView because there is a NestedScrollView outside
         // NestedScrollView will handle scroll, RecyclerView just displays content
         rvTransactions.setNestedScrollingEnabled(false);
         rvTransactions.setHasFixedSize(false);
-        
-        // ✅ Add scroll listener để load more khi scroll đến cuối
-        rvTransactions.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                
-                // ✅ Check xem có scroll đến cuối không
-                int visibleItemCount = layoutManager.getChildCount();
-                int totalItemCount = layoutManager.getItemCount();
-                int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
-                
-                // ✅ Load more khi còn 5 items nữa là đến cuối
-                Boolean isLoadingMore = viewModel.isLoadingMore.getValue();
-                boolean isNotLoadingMore = (isLoadingMore == null || !isLoadingMore);
-                
-                if (isNotLoadingMore && 
-                    (firstVisibleItemPosition + visibleItemCount) >= (totalItemCount - 5)) {
-                    // ✅ Load more transactions
-                    android.util.Log.d("HomeActivity", "Loading more transactions...");
-                    viewModel.loadMoreTransactions();
-                }
-            }
-        });
     }
 
-    /**
-     * ✅ Tối ưu: Setup chart từ aggregate data (chỉ 6 rows thay vì hàng nghìn transactions)
-     */
-    private void setupChartFromAggregate(List<com.finmate.data.local.database.entity.MonthlyAggregate> aggregateData) {
-        // ✅ Check if lineChart is null (safety check)
+    private void setupChart(List<TransactionEntity> transactions) {
+        // Check if lineChart is null (safety check)
         if (lineChart == null) {
             android.util.Log.w("HomeActivity", "lineChart is null, cannot setup chart");
             return;
         }
         
-        android.util.Log.d("HomeActivity", "setupChartFromAggregate called with " + (aggregateData != null ? aggregateData.size() : 0) + " months");
+        android.util.Log.d("HomeActivity", "setupChart called with " + (transactions != null ? transactions.size() : 0) + " transactions");
         
-        if (aggregateData == null || aggregateData.isEmpty()) {
-            // ✅ Hide chart if no data
-            android.util.Log.d("HomeActivity", "No aggregate data, hiding chart");
+        if (transactions == null || transactions.isEmpty()) {
+            // Hide chart if no data
+            android.util.Log.d("HomeActivity", "No transactions, hiding chart");
             if (chartContainer != null) {
                 chartContainer.setVisibility(View.GONE);
             }
             return;
         }
         
-        // ✅ Show chart
+        // Show chart
         if (chartContainer != null) {
             chartContainer.setVisibility(View.VISIBLE);
             android.util.Log.d("HomeActivity", "Chart container is now visible");
         }
         
         try {
-            // ✅ Create labels for last 6 months (including current month)
-            // ✅ Index 0 = tháng xa nhất (6 tháng trước), Index 5 = tháng hiện tại
+            // Calculate income and expense from transactions (last 6 months)
+            Calendar now = Calendar.getInstance();
             String[] months = new String[6];
             double[] monthlyIncome = new double[6];
             double[] monthlyExpense = new double[6];
             
-            // ✅ Map aggregate data vào HashMap để lookup nhanh
-            // Aggregate data có format month = "yyyy-MM" (ví dụ: "2025-01")
-            SimpleDateFormat monthKeyFormat = new SimpleDateFormat("yyyy-MM", Locale.getDefault());
-            java.util.Map<String, com.finmate.data.local.database.entity.MonthlyAggregate> aggregateMap = new java.util.HashMap<>();
-            for (com.finmate.data.local.database.entity.MonthlyAggregate agg : aggregateData) {
-                if (agg.month != null) {
-                    aggregateMap.put(agg.month, agg);
-                    android.util.Log.d("HomeActivity", "Aggregate data: " + agg.month + " - Income: " + agg.totalIncome + ", Expense: " + agg.totalExpense);
-                }
-            }
-            
-            // ✅ Fill data cho 6 tháng gần nhất (từ xa nhất đến hiện tại)
+            // Create labels for last 6 months (including current month)
             Calendar cal = Calendar.getInstance();
-            // ✅ Bắt đầu từ 6 tháng trước (index 0)
-            cal.add(Calendar.MONTH, -5); // -5 để có 6 tháng: -5, -4, -3, -2, -1, 0 (hiện tại)
-            
-            for (int i = 0; i < 6; i++) {
-                // ✅ Tạo label cho tháng này
-                int monthNumber = cal.get(Calendar.MONTH) + 1; // Calendar.MONTH bắt đầu từ 0
-                months[i] = "Tháng " + monthNumber;
-                
-                // ✅ Tạo key để lookup trong aggregateMap
-                String monthKey = monthKeyFormat.format(cal.getTime());
-                com.finmate.data.local.database.entity.MonthlyAggregate agg = aggregateMap.get(monthKey);
-                
-                if (agg != null) {
-                    monthlyIncome[i] = agg.totalIncome;
-                    monthlyExpense[i] = agg.totalExpense;
-                    android.util.Log.d("HomeActivity", "Month " + monthKey + " (index " + i + "): Income=" + monthlyIncome[i] + ", Expense=" + monthlyExpense[i]);
-                } else {
-                    // Không có data cho tháng này → 0
-                    monthlyIncome[i] = 0;
-                    monthlyExpense[i] = 0;
-                    android.util.Log.d("HomeActivity", "Month " + monthKey + " (index " + i + "): No data");
-                }
-                
-                // ✅ Chuyển sang tháng tiếp theo (gần hiện tại hơn)
-                cal.add(Calendar.MONTH, 1);
+            for (int i = 5; i >= 0; i--) {
+                months[i] = String.format(Locale.getDefault(), "T%d", cal.get(Calendar.MONTH) + 1);
+                cal.add(Calendar.MONTH, -1);
             }
             
-            // ✅ Create chart data
+            // Group transactions by actual month
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            // Try ISO format first, then other formats
+            SimpleDateFormat isoFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
+            
+            for (TransactionEntity t : transactions) {
+                if (t.date == null || t.date.isEmpty()) continue;
+                
+                try {
+                    java.util.Date date;
+                    // Try parsing as ISO format first
+                    try {
+                        date = isoFormat.parse(t.date);
+                    } catch (Exception e) {
+                        // Fallback to simple date format
+                        date = dateFormat.parse(t.date);
+                    }
+                    
+                    Calendar transactionCal = Calendar.getInstance();
+                    transactionCal.setTime(date);
+                    
+                    // Calculate difference in months
+                    int diffMonths = (now.get(Calendar.YEAR) - transactionCal.get(Calendar.YEAR)) * 12
+                            + (now.get(Calendar.MONTH) - transactionCal.get(Calendar.MONTH));
+                    
+                    // Only include transactions from last 6 months (0 to 5)
+                    if (diffMonths >= 0 && diffMonths < 6) {
+                        int index = 5 - diffMonths; // 0 = 6 months ago, 5 = this month
+                        if ("INCOME".equals(t.type)) {
+                            monthlyIncome[index] += t.amountDouble;
+                        } else if ("EXPENSE".equals(t.type)) {
+                            monthlyExpense[index] += t.amountDouble;
+                        }
+                    }
+                } catch (Exception e) {
+                    // Ignore parse errors for individual transactions
+                    android.util.Log.d("HomeActivity", "Error parsing transaction date: " + t.date, e);
+                }
+            }
+            
+            //  Create chart data
             ArrayList<Entry> income = new ArrayList<>();
             ArrayList<Entry> expense = new ArrayList<>();
 
@@ -914,13 +869,13 @@ public class HomeActivity extends AppCompatActivity {
             LineData data = new LineData(incomeSet, expenseSet);
             lineChart.setData(data);
             
-            // ✅ Improve chart UI
+            //  Improve chart UI
             lineChart.setDrawGridBackground(false);
             lineChart.getDescription().setEnabled(false);
             lineChart.getLegend().setEnabled(true);
             lineChart.getAxisRight().setEnabled(false);
             
-            // ✅ X-axis with month labels
+            //  X-axis with month labels
             XAxis xAxis = lineChart.getXAxis();
             xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
             xAxis.setGranularity(1f);
@@ -933,17 +888,17 @@ public class HomeActivity extends AppCompatActivity {
                 }
             });
             
-            // ✅ Y-axis
+            //  Y-axis
             YAxis leftAxis = lineChart.getAxisLeft();
             leftAxis.setTextColor(Color.parseColor("#333333"));
             leftAxis.setGridColor(Color.parseColor("#33000000"));
             
             lineChart.invalidate(); // Refresh chart
-            android.util.Log.d("HomeActivity", "Chart setup completed successfully (from aggregate data)");
+            android.util.Log.d("HomeActivity", "Chart setup completed successfully");
         } catch (Exception e) {
-            android.util.Log.e("HomeActivity", "Error setting up chart from aggregate", e);
+            android.util.Log.e("HomeActivity", "Error setting up chart", e);
             e.printStackTrace();
-            // ✅ Hide chart on error
+            //  Hide chart on error
             if (chartContainer != null) {
                 chartContainer.setVisibility(View.GONE);
             }
@@ -976,7 +931,7 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
     
-    // ✅ Format amount concisely to avoid breaking the layout
+    // Format amount concisely to avoid breaking the layout
     private String formatAmount(double amount) {
         if (amount >= 1_000_000_000) {
             // >= 1 billion: show as 1.2B

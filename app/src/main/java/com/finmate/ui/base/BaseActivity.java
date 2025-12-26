@@ -17,7 +17,6 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        // Áp dụng theme TRƯỚC super.onCreate()
         ThemeHelper.applyCurrentTheme(this);
         super.onCreate(savedInstanceState);
     }

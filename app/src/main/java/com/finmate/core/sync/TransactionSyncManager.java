@@ -102,13 +102,10 @@ public class TransactionSyncManager {
      */
     public void syncPendingTransactions() {
         if (!networkChecker.isNetworkAvailable()) {
-            android.util.Log.d("TransactionSyncManager", "No network, skipping sync");
             return; // Không có mạng, không sync
         }
 
-        android.util.Log.d("TransactionSyncManager", "Starting sync pending transactions...");
-
-        // ✅ Lấy danh sách transaction IDs đã sync (backward compatibility)
+        // ✅ Lấy danh sách transaction IDs đã sync
         String syncedIdsStr = prefs.getString(PREF_SYNCED_TRANSACTION_IDS, "");
         List<Integer> syncedIds = new java.util.ArrayList<>();
         if (!syncedIdsStr.isEmpty()) {
@@ -122,21 +119,17 @@ public class TransactionSyncManager {
             }
         }
 
-        // ✅ Chỉ lấy transactions chưa sync (remoteId IS NULL hoặc empty), giới hạn số lượng
+        // ✅ Chỉ lấy transactions chưa sync, giới hạn số lượng
         transactionRepository.getUnsyncedTransactions(syncedIds, SYNC_BATCH_SIZE, 
             new TransactionRepository.OnResultCallback<List<TransactionEntity>>() {
                 @Override
                 public void onResult(List<TransactionEntity> transactions) {
                     if (transactions == null || transactions.isEmpty()) {
-                        android.util.Log.d("TransactionSyncManager", "No pending transactions to sync");
                         return;
                     }
                     
-                    android.util.Log.d("TransactionSyncManager", "Found " + transactions.size() + " pending transactions to sync");
-                    
                     // Sync từng transaction
                     for (TransactionEntity transaction : transactions) {
-                        android.util.Log.d("TransactionSyncManager", "Syncing transaction: id=" + transaction.id + ", remoteId=" + transaction.remoteId + ", wallet=" + transaction.wallet + ", category=" + transaction.category);
                         syncSingleTransaction(transaction);
                     }
                 }
@@ -164,66 +157,37 @@ public class TransactionSyncManager {
                     for (WalletEntity w : wallets) {
                         if (w.name.equals(transaction.wallet)) {
                             walletId[0] = w.id;
-                            android.util.Log.d("TransactionSyncManager", "Found walletId: " + walletId[0] + " for wallet: " + transaction.wallet);
                             break;
                         }
                     }
                 }
                 
-                if (walletId[0] == null) {
-                    android.util.Log.w("TransactionSyncManager", "Cannot find walletId for wallet: " + transaction.wallet);
-                }
-                
-                // 2. Lấy categoryId từ categoryName (nếu có)
+                // 2. Lấy categoryId từ categoryName
                 if (transaction.category != null && transaction.type != null) {
                     String categoryType = transaction.type.toLowerCase();
-                    android.util.Log.d("TransactionSyncManager", "Fetching categories for type: " + categoryType + ", categoryName: " + transaction.category);
                     categoryRemoteRepository.fetchCategoriesByType(categoryType, new ApiCallback<List<CategoryResponse>>() {
                         @Override
                         public void onSuccess(List<CategoryResponse> categories) {
-                            android.util.Log.d("TransactionSyncManager", "Received " + (categories != null ? categories.size() : 0) + " categories for type: " + categoryType);
-                            if (categories != null && !categories.isEmpty()) {
+                            if (categories != null) {
                                 for (CategoryResponse cat : categories) {
-                                    android.util.Log.d("TransactionSyncManager", "Checking category: " + cat.getName() + " (id: " + cat.getId() + ")");
                                     if (cat.getName().equals(transaction.category)) {
                                         categoryId[0] = cat.getId();
-                                        android.util.Log.d("TransactionSyncManager", "Found categoryId: " + categoryId[0] + " for category: " + transaction.category);
                                         break;
                                     }
                                 }
-                            } else {
-                                android.util.Log.w("TransactionSyncManager", "No categories returned from backend for type: " + categoryType + ", will sync with categoryId=null");
                             }
                             
-                            // 3. Sync nếu có walletId (categoryId có thể null theo backend)
-                            // ✅ Backend cho phép categoryId null, chỉ cần walletId không null
-                            if (walletId[0] != null) {
-                                android.util.Log.d("TransactionSyncManager", "WalletId found, calling syncTransactionWithIds: walletId=" + walletId[0] + ", categoryId=" + categoryId[0]);
+                            // 3. Sync nếu có đủ thông tin
+                            if (walletId[0] != null && categoryId[0] != null) {
                                 syncTransactionWithIds(walletId[0], categoryId[0], transaction, transaction.name);
-                            } else {
-                                android.util.Log.w("TransactionSyncManager", "Cannot sync transaction id=" + transaction.id + ": walletId=" + walletId[0] + ", categoryId=" + categoryId[0]);
                             }
                         }
 
                         @Override
                         public void onError(String message) {
-                            android.util.Log.e("TransactionSyncManager", "Error fetching categories: " + message + ", will sync with categoryId=null");
-                            // ✅ Lỗi fetch categories không block sync, vẫn sync với categoryId=null
-                            if (walletId[0] != null) {
-                                android.util.Log.d("TransactionSyncManager", "Syncing with categoryId=null due to fetch error: walletId=" + walletId[0]);
-                                syncTransactionWithIds(walletId[0], null, transaction, transaction.name);
-                            }
+                            // Không thể lấy categoryId, skip transaction này
                         }
                     });
-                } else {
-                    // ✅ Transaction không có category hoặc type, vẫn sync được với categoryId=null
-                    android.util.Log.d("TransactionSyncManager", "Transaction missing category or type, will sync with categoryId=null: category=" + transaction.category + ", type=" + transaction.type);
-                    if (walletId[0] != null) {
-                        android.util.Log.d("TransactionSyncManager", "Syncing transaction without category: walletId=" + walletId[0]);
-                        syncTransactionWithIds(walletId[0], null, transaction, transaction.name);
-                    } else {
-                        android.util.Log.w("TransactionSyncManager", "Cannot sync transaction id=" + transaction.id + ": walletId=" + walletId[0]);
-                    }
                 }
             }
         });
@@ -257,8 +221,6 @@ public class TransactionSyncManager {
             occurredAtISO = sdf.format(c.getTime());
         }
 
-        android.util.Log.d("TransactionSyncManager", "Creating transaction request: walletId=" + walletId + ", categoryId=" + categoryId + ", type=" + transaction.type + ", amount=" + transaction.amountDouble + ", date=" + occurredAtISO);
-        
         CreateTransactionRequest request = new CreateTransactionRequest(
                 walletId,
                 categoryId,
@@ -270,7 +232,6 @@ public class TransactionSyncManager {
                 null
         );
 
-        android.util.Log.d("TransactionSyncManager", "Calling transactionRemoteRepository.createTransaction()...");
         transactionRemoteRepository.createTransaction(request, new ApiCallback<TransactionResponse>() {
             @Override
             public void onSuccess(TransactionResponse response) {

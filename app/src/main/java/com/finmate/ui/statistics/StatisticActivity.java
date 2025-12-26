@@ -104,13 +104,11 @@ public class StatisticActivity extends AppCompatActivity {
         // TAB CHI TIÊU (hiện tại)
         tvExpenseTab.setOnClickListener(v -> {});
 
-        // CHUYỂN QUA THU NHẬP
         tvIncomeTab.setOnClickListener(v -> {
             startActivity(new Intent(this, IncomeStatisticActivity.class));
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         });
 
-        // HIGHLIGHT TAB
         highlightTabs();
 
         // BOTTOM NAV
